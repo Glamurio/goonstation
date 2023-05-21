@@ -1588,6 +1588,15 @@ ABSTRACT_TYPE(/datum/manufacture)
 
 // Robotics Research
 
+/datum/manufacture/robopack_frame
+	name = "RoboPack Frame"
+	item_paths = list("MET-2")
+	item_amounts = list(12)
+	item_outputs = list(/obj/item/shell_frame)
+	time = 25 SECONDS
+	create = 1
+	category = "Component"
+
 /datum/manufacture/implanter
 	name = "Implanter"
 	item_paths = list("MET-1")

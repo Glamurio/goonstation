@@ -2378,6 +2378,7 @@ TYPEINFO(/obj/machinery/manufacturer)
 		/datum/manufacture/cybereye_prodoc,
 		/datum/manufacture/cybereye_camera,
 		/datum/manufacture/shell_frame,
+		/datum/manufacture/robopack_frame,
 		/datum/manufacture/ai_interface,
 		/datum/manufacture/latejoin_brain,
 		/datum/manufacture/shell_cell,
