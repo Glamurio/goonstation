@@ -1401,13 +1401,12 @@
 /obj/item/proc/attach(var/mob/living/carbon/human/attachee, var/mob/attacher)
 
 	var/obj/item/parts/human_parts/new_limb = null
-	var/datum/hud/zone_sel/target_limb = attacher.zone_sel.selecting
 
-	if (src.object_flags & (((target_limb == "l_arm" || target_limb == "r_arm") && NO_ARM_ATTACH) || ((target_limb == "l_leg" || target_limb == "r_leg") && NO_LEG_ATTACH)) || src.cant_drop || src.two_handed)
+	if (!attachee.is_allowed_limb(src))
 		boutput(attacher, "<span class='alert'>You try to attach [src] to [attachee]'s stump, but it politely declines!</span>")
 		return
 
-	switch(target_limb)
+	switch(attacher.zone_sel.selecting)
 		if ("l_arm")
 			new_limb = new /obj/item/parts/human_parts/arm/left/item(attachee)
 			attachee.limbs.l_arm = new_limb
@@ -1426,7 +1425,7 @@
 	attacher.remove_item(src)
 
 	var/can_secure = ismob(attacher) && (attacher?.find_type_in_hand(/obj/item/suture) || attacher?.find_type_in_hand(/obj/item/staple_gun))
-	new_arm.remove_stage = can_secure ? 0 : 2
+	new_limb.remove_stage = can_secure ? 0 : 2
 
 	new_limb:set_item(src)
 	src.cant_drop = 1

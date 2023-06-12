@@ -7,6 +7,7 @@
 	icon_state = "crowbar"
 	item_state = "crowbar"
 
+	object_flags = LEG_ATTACH
 	flags = FPRINT | TABLEPASS | CONDUCT
 	c_flags = ONBELT
 	tool_flags = TOOL_PRYING

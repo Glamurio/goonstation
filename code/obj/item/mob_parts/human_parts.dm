@@ -729,7 +729,7 @@
 	streak_descriptor = "bloody" //bloody, oily, et
 	remove_object = null
 	handlistPart = null
-	partlistPart = "legL-item"
+	partlistPart = null
 	no_icon = TRUE
 	skintoned = FALSE
 	/// uses defines and flags to determine if you can drop or remove it.
@@ -755,6 +755,7 @@
 			H = src.loc
 
 		name = "left [I.name] leg"
+		partlistPart = "legL-item-[I.name]"
 		remove_object = I//.type
 		I.set_loc(src)
 		remove_object.temp_flags |= IS_LIMB_ITEM
@@ -854,6 +855,7 @@
 			H = src.loc
 
 		name = "right [I.name] leg"
+		partlistPart = "legR-item-[I.name]"
 		remove_object = I//.type
 		I.set_loc(src)
 		remove_object.temp_flags |= IS_LIMB_ITEM
@@ -917,6 +919,12 @@
 	on_holder_examine()
 		if (src.remove_object)
 			return "has [bicon(src.remove_object)] \an [src.remove_object] attached as a"
+
+// /obj/item/parts/human_parts/leg/left/item/crowbar
+// 	partlistPart = "legL-item-crowbar"
+
+// /obj/item/parts/human_parts/leg/right/item/crowbar
+// 	partlistPart = "legR-item-crowbar"
 
 /obj/item/parts/human_parts/arm/left/brullbar
 	name = "left brullbar arm"

@@ -1961,7 +1961,20 @@ DEFINE_FLOORS(solidcolor/black/fullbright,
 	if(istype(C, /obj/item/tile))
 		var/obj/item/tile/T = C
 		if(intact)
-			var/obj/P = user.find_tool_in_hand(TOOL_PRYING)
+			var/obj/item/pry_leg = null
+			if (ishuman(user))
+				var/mob/living/carbon/human/H = user
+
+				// check both legs
+				var/obj/item/parts/human_parts/leg/right/item/R = H.limbs.r_leg
+				var/obj/item/parts/human_parts/leg/left/item/L = H.limbs.l_leg
+
+				if (R && (R.remove_object?.tool_flags & TOOL_PRYING))
+					pry_leg = R.remove_object
+				if (L && (L.remove_object?.tool_flags & TOOL_PRYING))
+					pry_leg = L.remove_object
+
+			var/obj/P = pry_leg ? pry_leg : user.find_tool_in_hand(TOOL_PRYING)
 			if (!P)
 				return
 			// Call ourselves w/ the tool, then continue

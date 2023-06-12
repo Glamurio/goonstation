@@ -857,4 +857,16 @@
 		if (new_invis != prev_invis && (new_invis == 0 || prev_invis == 0))
 			boutput(G, "<span class='notice'>You are [new_invis == 0 ? "now" : "no longer"] visible to the living!</span>")
 
+// Checks if the given item is allowed to go on the targeted limb
+/mob/proc/is_allowed_limb(obj/item/W)
+	if(istype(W))
+		var/deny_arm = HAS_FLAG(W.object_flags, NO_ARM_ATTACH) // not allowed on arms
+		var/deny_leg = !HAS_FLAG(W.object_flags, LEG_ATTACH) // not allowed on legs (inverted because it's easier to read)
+		var/is_arm_sel = src.zone_sel && (src.zone_sel.selecting in list("l_arm", "r_arm")) // targeting arm
+		var/is_leg_sel = src.zone_sel && (src.zone_sel.selecting in list("l_leg", "r_leg")) // targeting leg
 
+		// ensure that we've got an item that's allowed on a limb and is being attached to a limb
+		if(!(W.cant_drop || W.two_handed) && ((is_arm_sel && !deny_arm) || (is_leg_sel && !deny_leg)))
+			return 1
+
+	return 0
