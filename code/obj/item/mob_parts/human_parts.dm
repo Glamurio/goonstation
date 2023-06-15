@@ -753,8 +753,9 @@
 			else if(istype(I, /obj/item/saw))
 				step_image_state = "tracksL"
 				movement_modifier = /datum/movement_modifier/robot_part/tread_left
-			else if(istype(I, /obj/item/mop))
-				// TBD
+			// else if(istype(I, /obj/item/mop))
+			// 	// TBD
+
 
 	proc/set_item(var/obj/item/I)
 		var/mob/living/carbon/human/H = null
