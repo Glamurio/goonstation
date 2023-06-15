@@ -736,6 +736,7 @@
 	var/original_flags = 0
 	var/image/handimage = 0
 	var/special_icons = 'icons/mob/human.dmi'
+	step_image_state = "itemprintsL"
 	random_limb_blacklisted = TRUE
 	/// Also, item legs are supposedly junk jammed into a severed limb's socket
 	limb_is_unnatural = TRUE
@@ -746,6 +747,14 @@
 		..()
 		if (I)
 			src.set_item(I)
+
+			if(istype(I, /obj/item/crowbar))
+				// TBD
+			else if(istype(I, /obj/item/saw))
+				step_image_state = "tracksL"
+				movement_modifier = /datum/movement_modifier/robot_part/tread_left
+			else if(istype(I, /obj/item/mop))
+				// TBD
 
 	proc/set_item(var/obj/item/I)
 		var/mob/living/carbon/human/H = null
@@ -836,6 +845,7 @@
 	var/original_flags = 0
 	var/image/handimage = 0
 	var/special_icons = 'icons/mob/human.dmi'
+	step_image_state = "itemprintsR"
 	random_limb_blacklisted = TRUE
 	/// Also, item legs are supposedly junk jammed into a severed limb's socket
 	limb_is_unnatural = TRUE
@@ -919,12 +929,6 @@
 	on_holder_examine()
 		if (src.remove_object)
 			return "has [bicon(src.remove_object)] \an [src.remove_object] attached as a"
-
-// /obj/item/parts/human_parts/leg/left/item/crowbar
-// 	partlistPart = "legL-item-crowbar"
-
-// /obj/item/parts/human_parts/leg/right/item/crowbar
-// 	partlistPart = "legR-item-crowbar"
 
 /obj/item/parts/human_parts/arm/left/brullbar
 	name = "left brullbar arm"
