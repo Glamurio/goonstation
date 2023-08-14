@@ -13,6 +13,7 @@
 	wear_layer = MOB_BELT_LAYER
 	var/obj/item/card/id/ID_card = null // slap an ID card into that thang
 	var/obj/item/pen = null // slap a pen into that thang
+	var/mob/living/intangible/pdai = null // slap an artifically free-thinking intelligence into that thang
 	var/registered = null // so we don't need to replace all the dang checks for ID cards
 	var/assignment = null
 	var/access = list()
@@ -44,6 +45,7 @@
 	var/linkbg_color = "#565D4B"
 	var/graphic_mode = 0
 
+	var/setup_default_ai = null //PDAs can contain a sentient PDAI companion
 	var/setup_default_pen = /obj/item/pen //PDAs can contain writing implements by default
 	var/setup_default_cartridge = null //Cartridge contains job-specific programs
 	var/setup_drive_size = 32 //PDAs don't have much work room at all, really.
@@ -667,6 +669,12 @@
 		else
 			boutput(user, "<span class='alert'>There is already something in [src]'s pen slot!</span>")
 
+	else if (istype(C, /obj/item/organ/brain/latejoin))
+		if (!src.pdai)
+			src.insert_ai(C, user)
+		else
+			boutput(user, "<span class='alert'>There is already something in [src]'s AI slot!</span>")
+
 /obj/item/device/pda2/examine()
 	. = ..()
 	. += "The back cover is [src.closed ? "closed" : "open"]."
@@ -898,6 +906,17 @@
 			animate(time=2, transform=matrix(null, 0, -1, MATRIX_TRANSLATE))
 			animate(time=3, transform=null)
 			boutput(user, "<span class='notice'>You insert [insertedPen] into [src].</span>")
+
+	proc/insert_ai(obj/item/insertedBrain, mob/user)
+		if (!istype(insertedBrain))
+			return
+		if (user)
+			user.u_equip(insertedBrain)
+			insertedBrain.set_loc(src)
+			pdai = new /mob/living/intangible/pdai(src)
+			src.pdai.brain = insertedBrain
+
+			boutput(user, "<span class='notice'>You insert [insertedBrain] into [src].</span>")
 
 /*
 	//Toggle the built-in flashlight
