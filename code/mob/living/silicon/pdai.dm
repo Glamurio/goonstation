@@ -67,12 +67,32 @@
 		src.holocam.show_text(message, color, hearing_check, sight_check, allow_corruption, group)
 	return
 
+/// For use when you want to send text to the AI player regardless of it's in its mainframe, eye, or shell
+/// Calls show_text(), use its syntax
+/mob/living/silicon/ai/proc/textToPlayer(var/message, var/color = "#000000", var/hearing_check = 0, var/sight_check = 0, var/allow_corruption = 0, var/group)
+	if (deployed_to_hologram && src.holocam)
+		src.holocam.show_text(message, color, hearing_check, sight_check, allow_corruption, group)
+	else
+		src.show_text(message, color, hearing_check, sight_check, allow_corruption, group)
+
+/// For use when you want to play a sound to the AI player regardless of if it's in mainframe, eye, or shell
+/// Calls playsound_local(), use its syntax
+/mob/living/silicon/ai/proc/soundToPlayer(soundin, vol as num, vary, extrarange as num, pitch = 1, ignore_flag = 0, channel = VOLUME_CHANNEL_GAME, flags = 0)
+	if (deployed_to_hologram && src.holocam)
+		src.holocam.playsound_local(src.holocam, soundin, vol, vary, extrarange, pitch, ignore_flag, channel, flags)
+	else
+		src.playsound_local(src, soundin, vol, vary, extrarange, pitch, ignore_flag, channel, flags)
+
+
 //					//
 //	Hologram stuff	//
 //					//
 
 /mob/living/silicon/hologram
-	icon = 'icons/mob/robots.dmi'
+	name = "Hologram"
+	desc = "A holographic depiction of a cat."
+	icon = 'icons/misc/critter.dmi'
+	icon_state = "cat1"
 
 	var/mob/living/intangible/pdai/ai = null // PDA mainframe
 
