@@ -34,16 +34,14 @@
 	icon = 'icons/misc/featherzone.dmi'
 	icon_state = "shuttle-floor"
 
+TYPEINFO(/turf/simulated/floor/shuttlebay/flock)
+	mat_appearances_to_ignore = list("steel","gnesis")
 /turf/simulated/floor/shuttlebay/flock
 	name = "shuttle bay plating"
-	mat_appearances_to_ignore = list("steel","gnesis")
 	icon = 'icons/misc/featherzone.dmi'
 	icon_state = "shuttle-bay"
 	allows_vehicles = 1
-
-/turf/simulated/floor/shuttlebay/flock/New()
-	..()
-	setMaterial(getMaterial("gnesis"))
+	default_material = "gnesis"
 
 /turf/simulated/floor/shuttlebay/flock/middle
 	icon = 'icons/misc/featherzone.dmi'
@@ -157,7 +155,6 @@
 	picture = "flocktrader.png"
 	name = "Flocktrader Sa.le"
 	desc = "Some sort of weird holographic image on some fancy totem thing. Seems like it wants to trade."
-	trader_area = "/area/flock_trader"
 	var/is_greeting = 0
 	var/grad_col_1 = "#3cb5a3"
 	var/grad_col_2 = "#124e43"
@@ -193,6 +190,7 @@
 	src.goods_sell += new/datum/commodity/flock/tech/flockburger(src)
 	src.goods_sell += new/datum/commodity/flock/tech/flockblocker(src)
 	src.goods_sell += new/datum/commodity/flock/tech/incapacitor(src)
+	src.goods_sell += new/datum/commodity/flock/tech/ai_kit_flock(src)
 
 
 	greeting= {"[src.name] clicks from your headset. \"[gradientText(grad_col_1, grad_col_2, "Greetings, spacefarer. There are many permutations of the Signal, and we are an iteration less inclined to senseless destruction. Do you wish to engage in trade?")]\""}
@@ -394,17 +392,6 @@
 	sleep(0.5 SECONDS)
 	if(trader)
 		trader.donate(user, gained_resources)
-
-///////////////////////////
-// FLOCK WINGRILLE SPAWNER
-///////////////////////////
-/obj/wingrille_spawn/flock
-	icon = 'icons/misc/featherzone.dmi'
-	icon_state = "wingrille"
-	win_path = "/obj/window/feather"
-	grille_path = "/obj/grille/flock"
-	full_win = 1
-	no_dirs = TRUE
 
 ////////////////////
 // FLOCKTRADER DOOR

@@ -7,9 +7,10 @@
 
 import { BooleanLike } from "common/react";
 import { useBackend, useSharedState, useLocalState } from "../backend";
-import { Button, NumberInput, Section, Box, Table, Icon, Tabs, Input, Modal } from "../components";
+import { AnimatedNumber, Button, NumberInput, Section, Box, Table, Icon, Tabs, Input, Modal } from "../components";
 import { Window } from "../layouts";
 import { ReagentGraph, ReagentContainer, Reagent, ReagentList, MatterStateIconMap } from "./common/ReagentInfo";
+import { getTemperatureColor, getTemperatureIcon } from './common/temperatureUtils';
 
 type ChemDispenserData = {
   beakerName: string;
@@ -26,11 +27,36 @@ type ChemDispenserData = {
   activeRecording: string;
 };
 
+const sortMap = [
+  {
+    id: 0,
+    icon: "sort-amount-down",
+    contents: "",
+    compareFunction: (a: Reagent, b: Reagent) => b.volume - a.volume,
+  },
+  {
+    id: 1,
+    icon: "sort-amount-up",
+    contents: "",
+    compareFunction: (a: Reagent, b: Reagent) => a.volume - b.volume,
+  },
+  {
+    id: 2,
+    contents: "Density",
+    compareFunction: (a: Reagent, b: Reagent) => a.state - b.state,
+  },
+  {
+    id: 3,
+    contents: "Order Added",
+    compareFunction: () => 1,
+  },
+];
+
 export const ChemDispenser = (props, context) => {
   return (
     <Window
       width={570}
-      height={705}
+      height={730}
       theme="ntos">
       <Window.Content scrollable>
         <Box>
@@ -176,35 +202,38 @@ export const Beaker = (props, context) => {
         <Table.Cell bold collapsing textAlign="center" />
         <Table.Cell collapsing />
       </Table.Row>
-      <ReagentList container={container} height="auto" showState={iconToggle} renderButtons={reagent => (
-        <>
-          <Button
-            icon="filter"
-            onClick={() => act("isolate", {
-              reagentId: reagent.id,
-            })}>
-            Isolate
-          </Button>
-          <Button
-            icon="minus"
-            onClick={() => act("all", {
-              amount: removeAmount,
-              reagentId: reagent.id,
-            })}>
-            All
-          </Button>
-          {removeReagentButtons.map((amount, indexButtons) => (
+      <ReagentList container={container} height="auto" showState={iconToggle}
+        renderButtons={reagent => (
+          <>
             <Button
-              key={indexButtons}
-              icon="minus"
-              onClick={() => act("remove", {
-                amount: amount, reagentId: reagent.id,
+              icon="filter"
+              onClick={() => act("isolate", {
+                reagentId: reagent.id,
               })}>
-              {amount}
+              Isolate
             </Button>
-          ))}
-        </>
-      )} />
+            <Button
+              icon="minus"
+              onClick={() => act("all", {
+                amount: removeAmount,
+                reagentId: reagent.id,
+              })}>
+              All
+            </Button>
+            {removeReagentButtons.map((amount, indexButtons) => (
+              <Button
+                key={indexButtons}
+                icon="minus"
+                onClick={() => act("remove", {
+                  amount: amount, reagentId: reagent.id,
+                })}>
+                {amount}
+              </Button>
+            ))}
+          </>
+        )}
+        renderButtonsDeps={removeAmount}
+      />
 
     </Section>
   );
@@ -214,30 +243,7 @@ export const BeakerContentsGraph = (props, context) => {
   const { data } = useBackend<ChemDispenserData>(context);
   const [sort, setSort] = useSharedState(context, 'sort', 1);
   const { container } = data;
-  const sortMap = [
-    {
-      id: 0,
-      icon: "sort-amount-down",
-      contents: "",
-      compareFunction: (a: Reagent, b: Reagent) => b.volume - a.volume,
-    },
-    {
-      id: 1,
-      icon: "sort-amount-up",
-      contents: "",
-      compareFunction: (a: Reagent, b: Reagent) => a.volume - b.volume,
-    },
-    {
-      id: 2,
-      contents: "Density",
-      compareFunction: (a: Reagent, b: Reagent) => a.state - b.state,
-    },
-    {
-      id: 3,
-      contents: "Order Added",
-      compareFunction: () => 1,
-    },
-  ];
+
   return (
     <Section align="center" p={0.5}
       title={(
@@ -259,6 +265,15 @@ export const BeakerContentsGraph = (props, context) => {
         </Tabs>
       ) as any}>
       <ReagentGraph container={container} sort={sortMap[sort].compareFunction} />
+      {!!(container && container.totalVolume) && (
+        <Box
+          fontSize={2}
+          color={getTemperatureColor(container.temperature)}
+          className={"ChemHeater__TemperatureNumber"}>
+          <Icon name={getTemperatureIcon(container.temperature)} pr={0.5} />
+          <AnimatedNumber value={container.temperature} /> K
+        </Box>
+      )}
     </Section>
   );
 };

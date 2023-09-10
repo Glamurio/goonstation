@@ -100,7 +100,7 @@ TYPEINFO(/obj/item/device/t_scanner)
 						continue
 				else if(isobj(A))
 					var/obj/O = A
-					if(O.level != 1 && !istype(O, /obj/disposalpipe)) // disposal pipes handled below
+					if(O.level == OVERFLOOR && !istype(O, /obj/disposalpipe)) // disposal pipes handled below
 						continue
 				var/image/img = image(A.icon, icon_state=A.icon_state, dir=A.dir)
 				img.plane = PLANE_SCREEN_OVERLAYS
@@ -374,13 +374,14 @@ TYPEINFO(/obj/item/device/analyzer/healthanalyzer)
 
 		user.visible_message("<span class='alert'><b>[user]</b> has analyzed [M]'s vitals.</span>",\
 		"<span class='alert'>You have analyzed [M]'s vitals.</span>")
+		playsound(src.loc , 'sound/items/med_scanner.ogg', 20, 0)
 		boutput(user, scan_health(M, src.reagent_scan, src.disease_detection, src.organ_scan, visible = 1))
 
 		scan_health_overhead(M, user)
 
 		update_medical_record(M)
 
-		if (M.stat > 1)
+		if (isdead(M))
 			user.unlock_medal("He's dead, Jim", 1)
 		return
 
@@ -471,7 +472,7 @@ TYPEINFO(/obj/item/device/reagentscanner)
 		tooltip_rebuild = 1
 
 		if (!isnull(A.reagents))
-			if (A.reagents.reagent_list.len > 0)
+			if (length(A.reagents.reagent_list) > 0)
 				set_icon_state("reagentscan-results")
 			else
 				set_icon_state("reagentscan-no")
@@ -756,6 +757,7 @@ TYPEINFO(/obj/item/device/prisoner_scanner)
 				//Update Information
 				R["name"] = M.name
 				R["sex"] = M.gender
+				R["pronouns"] = M.get_pronouns().name
 				R["age"] = M.bioHolder.age
 				if (M.gloves)
 					R["fingerprint"] = "Unknown"
@@ -773,6 +775,7 @@ TYPEINFO(/obj/item/device/prisoner_scanner)
 			//Update Information
 			src.active1["name"] = M.name
 			src.active1["sex"] = M.gender
+			src.active1["pronouns"] = M.get_pronouns().name
 			src.active1["age"] = M.bioHolder.age
 			/////Fingerprint record update
 			if (M.gloves)

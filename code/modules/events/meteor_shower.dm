@@ -53,7 +53,7 @@ var/global/meteor_shower_active = 0
 			#endif
 		if(istext(transmute_material_instead))
 			transmute_material_instead = getMaterial(transmute_material_instead)
-		if(transmute_material_instead?.mat_id == "jean")
+		if(transmute_material_instead?.getID() == "jean")
 			shower_name = "jeteor jower"
 
 		if (isnum(direction) && direction == -1)
@@ -136,8 +136,7 @@ var/global/meteor_shower_active = 0
 			if (scroll_angle)
 				var/list/params = list("scroll_angle" = scroll_angle)
 
-				for (var/client/client in clients)
-					client.parallax_controller?.add_parallax_layer(/atom/movable/screen/parallax_layer/meteor_shower, layer_params = params)
+				add_global_parallax_layer(/atom/movable/screen/parallax_layer/meteor_shower, layer_params = params)
 	#endif
 
 			var/start_x
@@ -200,8 +199,7 @@ var/global/meteor_shower_active = 0
 				S.UpdateIcon()
 
 	#ifndef UNDERWATER_MAP
-			for (var/client/client in clients)
-				client.parallax_controller?.remove_parallax_layer(/atom/movable/screen/parallax_layer/meteor_shower)
+			remove_global_parallax_layer(/atom/movable/screen/parallax_layer/meteor_shower)
 	#endif
 
 	admin_call(var/source)
@@ -523,7 +521,7 @@ var/global/meteor_shower_active = 0
 		for(var/turf/T in range(src,1))
 			if (T.density || prob(40))
 				continue
-			var/turf/simulated/wall/auto/asteroid/asteroid = new(T)
+			var/turf/simulated/wall/auto/asteroid/asteroid = T.ReplaceWith(/turf/simulated/wall/auto/asteroid, FALSE, force = TRUE)
 			if (src.transmute_material)
 				asteroid.setMaterial(src.transmute_material)
 			turfs += asteroid
