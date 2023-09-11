@@ -748,10 +748,20 @@ ported and crapped up by: haine
 	item_state = "shell-frame"		// ToDo
 	w_class = W_CLASS_SMALL
 	var/build_step = 0
+	var/obj/item/storage/backpack/bag = null
 	var/obj/item/parts/robot_parts/arm/r_arm = null
 	var/obj/item/parts/robot_parts/arm/l_arm = null
 
 /obj/item/robopack_frame/attackby(obj/item/W, mob/user)
+	if (istype(W, /obj/item/storage/backpack))
+		if (!src.bag)
+			src.build_step++
+			boutput(user, "You add \the [W] to [src]!")
+			playsound(src, 'sound/impact_sounds/Generic_Stab_1.ogg', 40, 1)
+			src.bag = W
+			user.u_equip(W)
+			W.set_loc(src)
+			return
 	if (istype(W, /obj/item/parts/robot_parts/arm))
 		if (!src.r_arm)
 			src.build_step++
@@ -763,7 +773,6 @@ ported and crapped up by: haine
 			return
 		else
 			boutput(user, "\The [src] already has [src.r_arm] in that slot!")
-
 		if (!src.l_arm)
 			src.build_step++
 			boutput(user, "You add \the [W] to [src]!")
@@ -774,11 +783,9 @@ ported and crapped up by: haine
 			return
 		else
 			boutput(user, "\The [src] already has [src.l_arm] in that slot!")
-
 		return
-
 	if(iswrenchingtool(W))
-		if (src.r_arm && src.l_arm)
+		if (src.r_arm && src.l_arm && src.bag)
 			src.build_step++
 			boutput(user, "You wrench the arms into place.")
 			playsound(src, 'sound/items/Ratchet.ogg', 40, 1)
@@ -789,7 +796,11 @@ ported and crapped up by: haine
 			src.r_arm.set_loc(R)
 			src.l_arm = null
 			src.r_arm = null
+			src.bag = null
 			qdel(src)
+			return
+		else if (!src.bag)
+			boutput(user, "The [src] is still missing a bag!")
 			return
 		else if (src.r_arm && !src.l_arm || !src.r_arm && src.l_arm)
 			boutput(user, "The [src] is still missing an arm!")
