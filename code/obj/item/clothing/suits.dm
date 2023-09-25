@@ -437,6 +437,7 @@ ABSTRACT_TYPE(/obj/item/clothing/suit/jacket/design)
 	inhand_image_icon = 'icons/mob/inhand/overcoat/hand_suit_hazard.dmi'
 	body_parts_covered = TORSO|LEGS|ARMS
 	hides_from_examine = C_UNIFORM|C_GLOVES|C_SHOES
+	armor_variant = /obj/item/clothing/suit/rad/armored
 
 	New()
 		. = ..()
@@ -452,6 +453,19 @@ ABSTRACT_TYPE(/obj/item/clothing/suit/jacket/design)
 		setProperty("meleeprot", 3)
 		setProperty("rangedprot", 0.5)
 		setProperty("disorient_resist", 15)
+
+	armored
+		name = "\improper armored Class II radiation suit"
+		desc = "An old Soviet radiation suit made of 100% space asbestos. It's good for you! Somebody slapped some bulky armor onto the chest."
+		icon_state = "rad_armor"
+		item_state = "rad_armor"
+		default_variant = /obj/item/clothing/suit/rad
+
+		setupProperties()
+			..()
+			setProperty("meleeprot", 5)
+			setProperty("rangedprot", 1)
+			setProperty("movespeed", 0.45)
 
 /obj/item/clothing/suit/det_suit
 	name = "coat"
