@@ -15,10 +15,13 @@ ADMIN_INTERACT_PROCS(/mob/living/critter, proc/modify_health)
 	var/datum/hud/critter/custom_hud_type = /datum/hud/critter
 	var/datum/organHolder/custom_organHolder_type = null
 
+	var/hand_count = 0		// Used to ease setup. Setting this in-game has no effect.
+	var/list/hands = list()
 	var/list/equipment = list()
 	var/image/equipment_image = new
 	var/image/burning_image = new
 	var/burning_suffix = "generic"
+	var/active_hand = 0		// ID of the active hand
 	var/base_move_delay = 2
 	var/base_walk_delay = 3
 	var/stepsound = null

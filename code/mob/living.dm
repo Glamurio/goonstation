@@ -35,11 +35,6 @@
 	var/list/mob/living/ai_target_old = list()
 	var/is_npc = 0
 
-
-	var/hand_count = 0		// Used to ease setup. Setting this in-game has no effect.
-	var/active_hand = 0		// ID of the active hand
-	var/list/hands = list()
-
 	var/move_laying = null
 	var/has_typing_indicator = FALSE
 	var/static/mutable_appearance/speech_bubble = living_speech_bubble
@@ -159,6 +154,7 @@
 		sleep_bubble.appearance_flags = RESET_TRANSFORM | PIXEL_SCALE
 		if(!ishuman(src))
 			init_preferences?.apply_post_new_stuff(src)
+
 
 /mob/living/flash(duration)
 	vision.flash(duration)
