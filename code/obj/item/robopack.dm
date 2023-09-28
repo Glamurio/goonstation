@@ -14,13 +14,8 @@
 	duration_remove = 3 SECONDS
 	duration_put = 3 SECONDS
 
-	// equipped(/mob/living/carbon/human/user, slot)
-	// 	..()
-	// 	if(user)
-	// 		user.hud.add_object(I, HUD_LAYER, (user.hand ? user.hud.layouts[user.hud.layout_style]["lhand"] : user.hud.layouts[user.hud.layout_style]["rhand"]))
-
-	// 		user.icon_state = "handr"
-	// 		user.icon_state = "handl"
+	equipped(/mob/living/carbon/human/user, slot)
+		..()
 
 /obj/item/robopack_frame
 	name = "RoboPack Frame"

@@ -203,8 +203,6 @@
 		back = create_screen("back", "back", src.icon_hud, "back", layouts[layout_style]["back"], HUD_LAYER+1)
 		lhand = create_screen("lhand", "left hand", src.icon_hud, "handl0", layouts[layout_style]["lhand"], HUD_LAYER+1)
 		rhand = create_screen("rhand", "right hand", src.icon_hud, "handr0", layouts[layout_style]["rhand"], HUD_LAYER+1)
-		lhandextra = create_screen("lhandextra", "left extra hand", src.icon_hud, "handl0", layouts[layout_style]["lhand"], HUD_LAYER+1)
-		rhandextra = create_screen("rhandextra", "right extra hand", src.icon_hud, "handr0", layouts[layout_style]["rhand"], HUD_LAYER+1)
 		twohandl = create_screen("twohandl", "both hands", src.icon_hud, "twohandl", layouts[layout_style]["twohandl"], HUD_LAYER+1)
 		twohandr = create_screen("twohandr", "both hands", src.icon_hud, "twohandr", layouts[layout_style]["twohandr"], HUD_LAYER+1)
 		throwing = create_screen("throw", "throw mode", src.icon_hud, "throw0", layouts[layout_style]["throwing"], HUD_LAYER+1)
