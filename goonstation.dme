@@ -1731,6 +1731,7 @@ var/datum/preMapLoad/preMapLoad = new
 #include "code\obj\item\range_target.dm"
 #include "code\obj\item\rcd.dm"
 #include "code\obj\item\retribution.dm"
+#include "code\obj\item\robopack.dm"
 #include "code\obj\item\satchel.dm"
 #include "code\obj\item\scrapweapons.dm"
 #include "code\obj\item\sec_tape.dm"
