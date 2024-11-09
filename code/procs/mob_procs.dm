@@ -919,8 +919,8 @@
 // Checks if the given item is allowed to go on the targeted limb
 /mob/proc/is_allowed_limb(obj/item/W)
 	if(istype(W))
-		var/deny_arm = HAS_FLAG(W.object_flags, NO_ARM_ATTACH) // not allowed on arms
-		var/deny_leg = !HAS_FLAG(W.object_flags, LEG_ATTACH) // not allowed on legs (inverted because it's easier to read)
+		var/deny_arm = !W.can_arm_attach() // not allowed on arms
+		var/deny_leg = !HAS_FLAG(W.object_flags, LEG_ATTACH) // not allowed on legs
 		var/is_arm_sel = src.zone_sel && (src.zone_sel.selecting in list("l_arm", "r_arm")) // targeting arm
 		var/is_leg_sel = src.zone_sel && (src.zone_sel.selecting in list("l_leg", "r_leg")) // targeting leg
 
