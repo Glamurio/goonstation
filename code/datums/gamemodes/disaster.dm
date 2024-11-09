@@ -10,8 +10,13 @@
 	var/const/waittime_h = 1600
 	//Time until the shuttle can be called.
 	var/const/shuttle_waittime = 4000
+	/// We have to hold a ref to this here or it'll GC and delete itself
+	var/datum/allocated_region/HTR_shuttle = null
 
 /datum/game_mode/disaster/pre_setup()
+	src.HTR_shuttle = get_singleton(/datum/mapPrefab/allocated/htr_team).load()
+	message_admins("HTR vessel generated at [log_loc(src.HTR_shuttle.bottom_left)].")
+
 	var/list/candidates = get_possible_enemies(ROLE_WRAITH, 1)
 	if (length(candidates))
 		var/datum/mind/twraith = pick(candidates) // Just one for now
@@ -49,7 +54,7 @@
 			var/list/CORPSES = landmarks[LANDMARK_PESTSTART]
 			var/list/JUNK = landmarks[LANDMARK_HALLOWEEN_SPAWN]
 			for(var/turf/T in CORPSES)
-				var/obj/decal/fakeobjects/skeleton/S = new/obj/decal/fakeobjects/skeleton(T)
+				var/obj/fakeobject/skeleton/S = new/obj/fakeobject/skeleton(T)
 				S.name = "corpse"
 				S.desc = "The mangled body of some poor [pick("chump","sap","chap","crewmember","jerk","dude","lady","idiot","employee","oaf")]."
 				S.icon = 'icons/misc/hstation.dmi'
@@ -58,11 +63,11 @@
 				var/junk_type = rand(1,4)
 				switch(junk_type)
 					if(1)
-						new/obj/candle_light(T)
+						new /obj/candle_light(T)
 					if(2)
-						new/obj/item/spook(T)
+						new /obj/item/spook(T)
 					if(3)
-						new/obj/critter/floateye(T)
+						new /mob/living/critter/small_animal/floateye(T)
 					if(4)
 						var/obj/item/device/light/glowstick/G = new/obj/item/device/light/glowstick(T)
 						SPAWN(2 SECONDS)
@@ -136,17 +141,17 @@
 				survivors[player.real_name] = "alive"
 
 	if (survivors.len)
-		boutput(world, "<span class='notice'><B>The following survived the [disaster_name] event!</B></span>")
+		boutput(world, SPAN_NOTICE("<B>The following survived the [disaster_name] event!</B>"))
 		for(var/survivor in survivors)
 			var/condition = survivors[survivor]
 			switch(condition)
 				if("shuttle")
-					boutput(world, "&emsp; <B><FONT size = 2>[survivor] escaped on the shuttle!</FONT></B>")
+					boutput(world, "<span>&emsp; <B><FONT size = 2>[survivor] escaped on the shuttle!</FONT></B></span>")
 				if("alive")
-					boutput(world, "&emsp; <FONT size = 1>[survivor] stayed alive. Whereabouts unknown.</FONT>")
+					boutput(world, "<span>&emsp; <FONT size = 1>[survivor] stayed alive. Whereabouts unknown.</FONT></span>")
 
 	else
-		boutput(world, "<span class='notice'><B>No one survived the [disaster_name] event!</B></span>")
+		boutput(world, SPAN_NOTICE("<B>No one survived the [disaster_name] event!</B>"))
 
 #ifdef RP_MODE // if rp do not set to secret
 		world.save_mode("extended")

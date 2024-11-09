@@ -158,6 +158,9 @@
 #define RADGAS_CONTAMINATION_PER_MOLE 5
 // only apply contamination to atoms on a turf every few seconds, instead of every tick
 #define RADGAS_CONTAMINATION_COOLDOWN 3 SECONDS
+// threshold for neutrons reacting with gasses
+#define NEUTRON_PLASMA_REACT_MOLS_PER_LITRE 0.25
+#define NEUTRON_CO2_REACT_MOLS_PER_LITRE 0.40
 //Gas Reaction Flags
 #define REACTION_ACTIVE (1<<0) 	//! Reaction is Active
 #define COMBUSTION_ACTIVE (1<<1) //! Combustion is Active
@@ -221,13 +224,13 @@ What can break when adding new gases:
 	TEG stats computer will ignore your new gas. Feel free to add it to reactor_stats.dm manually but good luck.
 */
 
-#define SPECIFIC_HEAT_PLASMA	200
-#define SPECIFIC_HEAT_O2		20
-#define SPECIFIC_HEAT_N2		20
-#define SPECIFIC_HEAT_CO2		30
+#define SPECIFIC_HEAT_PLASMA	150
+#define SPECIFIC_HEAT_O2		40
+#define SPECIFIC_HEAT_N2		50
+#define SPECIFIC_HEAT_CO2		40
 #define SPECIFIC_HEAT_FARTS 	69
-#define SPECIFIC_HEAT_RADGAS 	20
-#define SPECIFIC_HEAT_N2O		40
+#define SPECIFIC_HEAT_RADGAS 	5
+#define SPECIFIC_HEAT_N2O		60
 #define SPECIFIC_HEAT_AGENTB	300
 
 #define _APPLY_TO_GASES(PREF, SUFF, MACRO, ARGS...) \
@@ -334,3 +337,42 @@ proc/gas_text_color(gas_id)
 
 #define _LIST_CONCENTRATION_REPORT(GAS, _, NAME, MIXTURE, LIST) LIST += "[NAME]: [round(MIXTURE.GAS / total_moles * 100)]%";
 #define LIST_CONCENTRATION_REPORT(MIXTURE, LIST) APPLY_TO_GASES(_LIST_CONCENTRATION_REPORT, MIXTURE, LIST)
+
+//Possible states are "exposed" and "intact". sizes are "short", "medium" and "long". These are strings.
+#define SET_PIPE_UNDERLAY(NODE, DIR, SIZE, COLOUR, HIDDEN) do { \
+	if (UNLINT(HIDDEN)) { \
+		src.ClearSpecificOverlays("[DIR]"); \
+		break; \
+		}  \
+	var/pipe_state = NODE ? "intact" : "exposed"; \
+	var/pipe_cached = pipe_underlay_cache["[pipe_state]_[DIR]_[SIZE]"]; \
+	if (!pipe_cached) { \
+		pipe_cached = icon('icons/obj/atmospherics/pipes/pipe_underlays.dmi', "[pipe_state]_[NODE ? null : SIZE]", DIR); \
+		pipe_underlay_cache["[pipe_state]_[DIR]_[SIZE]"] = pipe_cached; \
+		} \
+	var/image/pipe_image = mutable_appearance(pipe_cached); \
+	pipe_image.color = COLOUR ? COLOUR : "#B4B4B4"; \
+	pipe_image.layer = src.layer - 0.001; \
+	pipe_image.appearance_flags |= RESET_TRANSFORM | RESET_COLOR | KEEP_APART; \
+	src.AddOverlays(pipe_image, "[DIR]"); \
+	} while(0)
+
+//Used solely for simple pipes. Possible states are "exposed" and "intact".
+#define SET_SIMPLE_PIPE_UNDERLAY(NODE, DIR) do { \
+	var/pipe_state = NODE ? "intact" : "exposed"; \
+	var/pipe_cached = pipe_underlay_cache["[pipe_state]_[DIR]"]; \
+	if (!pipe_cached) { \
+		pipe_cached = icon('icons/obj/atmospherics/pipes/pipe.dmi', "ends_[pipe_state]", DIR); \
+		pipe_underlay_cache["simple_[pipe_state]_[DIR]"] = pipe_cached; \
+		} \
+	var/image/pipe_image = mutable_appearance(pipe_cached); \
+	pipe_image.color = src.color; \
+	pipe_image.layer = src.layer - 0.001; \
+	pipe_image.appearance_flags |= RESET_TRANSFORM | RESET_COLOR | KEEP_APART; \
+	src.AddOverlays(pipe_image, "[DIR]"); \
+	} while(0)
+
+#define issimplepipe(X) istype(X, /obj/machinery/atmospherics/pipe/simple)
+
+//check if we should hide our pipe ends
+#define CHECKHIDEPIPE(X) (intact && issimulatedturf(X.loc) && X.level == UNDERFLOOR)

@@ -37,7 +37,7 @@
 		. = {"It's [online ? "on" : "off"]line. [charging ? "It's charging, and it" : "It"] looks about [round(charge / capacity * 100, 20)]% full."}
 
 /obj/machinery/power/smes/construction
-	New(var/turf/iloc, var/idir = 2)
+	New(var/turf/iloc, var/idir = SOUTH)
 		if (!isturf(iloc))
 			qdel(src)
 		set_dir(idir)
@@ -73,6 +73,12 @@
 					if (term?.dir == turn(d, 180))
 						terminal = term
 						break dir_loop
+
+		AddComponent(/datum/component/mechanics_holder)
+		SEND_SIGNAL(src,COMSIG_MECHCOMP_ADD_INPUT,"Toggle Power Input", PROC_REF(_toggle_input_mechchomp))
+		SEND_SIGNAL(src,COMSIG_MECHCOMP_ADD_INPUT,"Set Power Input", PROC_REF(_set_input_mechchomp))
+		SEND_SIGNAL(src,COMSIG_MECHCOMP_ADD_INPUT,"Togle Power Output", PROC_REF(_toggle_output_mechchomp))
+		SEND_SIGNAL(src,COMSIG_MECHCOMP_ADD_INPUT,"Set Power Output", PROC_REF(_set_output_mechchomp))
 
 		if (!terminal)
 			status |= BROKEN
@@ -110,6 +116,28 @@
 /obj/machinery/power/smes/proc/chargedisplay()
 	return round(5.5*charge/capacity)
 
+/obj/machinery/power/smes/proc/_toggle_input_mechchomp()
+	src.chargemode = !src.chargemode
+	if (!chargemode)
+		charging = 0
+	src.UpdateIcon()
+
+/obj/machinery/power/smes/proc/_set_input_mechchomp(var/datum/mechanicsMessage/inp)
+	if(!length(inp.signal)) return
+	var/newinput = text2num(inp.signal)
+	if(newinput != src.chargelevel && isnum_safe(newinput))
+		src.chargelevel = clamp((newinput), 0 , SMESMAXCHARGELEVEL)
+
+/obj/machinery/power/smes/proc/_toggle_output_mechchomp()
+	src.online = !src.online
+	src.UpdateIcon()
+
+/obj/machinery/power/smes/proc/_set_output_mechchomp(var/datum/mechanicsMessage/inp)
+	if(!length(inp.signal)) return
+	var/newoutput = text2num(inp.signal)
+	if(newoutput != src.output && isnum_safe(newoutput))
+		src.output = clamp((newoutput), 0 , SMESMAXCHARGELEVEL)
+
 /obj/machinery/power/smes/process(mult)
 
 	if (status & BROKEN)
@@ -143,6 +171,7 @@
 	if (last_disp != chargedisplay() || last_chrg != charging || last_onln != online)
 		UpdateIcon()
 
+	SEND_SIGNAL(src,COMSIG_MECHCOMP_TRANSMIT_SIGNAL, "output=[src.output]&outputting=[src.online]&charge=[src.chargelevel]&charging=[src.chargemode]")
 	src.updateDialog()
 
 /obj/machinery/power/smes/proc/charge(mult)
@@ -156,8 +185,8 @@
 			// Adjusting mult to other power sources would likely cause more harm than good as it would cause unusual surges
 			// of power that would only be noticed though hotwire or be unrationalizable to player.  This will extrapolate power
 			// benefits to charged value so that minimal loss occurs.
-			charge += load * mult	// increase the charge
-			add_load(load)		// add the load to the terminal side network
+			if(terminal.add_load(load))			// add the load to the terminal side network
+				charge += load * mult	// increase the charge if successful
 
 		else					// if not enough capcity
 			charging = 0		// stop charging
@@ -181,7 +210,7 @@
 	if (status & BROKEN)
 		return
 
-	if (!online)
+	if (!online || isnull(powernet))
 		loaddemand = 0
 		return
 
@@ -202,15 +231,6 @@
 
 	if (clev != chargedisplay())
 		UpdateIcon()
-
-
-///obj/machinery/power/smes/add_avail(var/amount)
-//	if (terminal?.powernet)
-//		terminal.powernet.newavail += amount
-
-/obj/machinery/power/smes/add_load(var/amount)
-	if (terminal?.powernet)
-		terminal.powernet.newload += amount
 
 /obj/machinery/power/smes/ui_interact(mob/user, datum/tgui/ui)
 	ui = tgui_process.try_update_ui(user, src, ui)
@@ -309,8 +329,8 @@
 			// Adjusting mult to other power sources would likely cause more harm than good as it would cause unusual surges
 			// of power that would only be noticed though hotwire or be unrationalizable to player.  This will extrapolate power
 			// benefits to charged value so that minimal loss occurs.
-			charge += load * mult	// increase the charge
-			add_load(load)		// add the load to the terminal side network
+			if(terminal.add_load(load))			// attempt to add the load to the terminal side network
+				charge += load * mult	// increase the charge if successful
 
 			// Simulate bad PID
 			var/adjust = 0

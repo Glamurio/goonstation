@@ -4,8 +4,8 @@
 /// nulls a var if its value doesn't match the var's type
 #define ENSURE_TYPE(VAR) if(!istype(VAR)) VAR = null;
 
-#define ABSTRACT_TYPE(type) /datum/_is_abstract ## type
-#define IS_ABSTRACT(type) text2path("/datum/_is_abstract[type]")
+#define ABSTRACT_TYPE(type) /_is_abstract ## type
+#define IS_ABSTRACT(type) text2path("/_is_abstract[type]")
 /*
 usage:
 
@@ -112,9 +112,9 @@ proc/filtered_concrete_typesof(type, filter)
 /// Gets the instance of a singleton type (or a non-singleton type if you decide to use it on one).
 proc/get_singleton(type)
 	RETURN_TYPE(type)
-	if(!(type in singletons))
-		singletons[type] = new type
-	return singletons[type]
+	. = singletons[type]
+	if(isnull(.))
+		. = singletons[type] = new type
 
 var/global/list/singletons = list()
 
@@ -147,29 +147,14 @@ proc/maximal_subtype(var/list/L)
 // sometimes we want to have all objects of a certain type stored (bibles, staffs of cthulhu, ...)
 // to do that add START_TRACKING to New (or unpooled) and STOP_TRACKING to disposing, then use by_type[/obj/item/bible] to access the list of things
 
-#ifdef SPACEMAN_DMM // just don't ask
-	#define START_TRACKING
-	#define STOP_TRACKING
-#elif defined(OPENDREAM) // Yay, actual sanity!
-	#define START_TRACKING if(!by_type[__TYPE__]) { by_type[__TYPE__] = list() }; by_type[__TYPE__][src] = 1
-	#define STOP_TRACKING by_type[__TYPE__].Remove(src)
-#else
-	/// we use an assoc list here because removing from one is a lot faster
-	#define START_TRACKING if(!by_type[......]) { by_type[......] = list() }; by_type[.......][src] = 1
-	#if DM_BUILD >= 1552
-		// ok if ur seeing this and thinking "wtf is up with the .......
-		// in THIS use case it gives us the type path at the particular scope this is called.
-		// and the amount of dots varies based on scope in the macro! fun
-		#define STOP_TRACKING by_type[......].Remove(src)
-	#else
-		#define STOP_TRACKING by_type[.....].Remove(src)
-	#endif
-#endif
+#define START_TRACKING if(!by_type[__TYPE__]) { by_type[__TYPE__] = list() }; by_type[__TYPE__][src] = 1
+#define STOP_TRACKING by_type[__TYPE__].Remove(src)
 
 /// contains lists of objects indexed by their type based on [START_TRACKING] / [STOP_TRACKING]
 var/list/list/by_type = list()
 
-/// Performs a typecheckless for loop with var/iterator over by_type[_type]
+/// Loops over all instances of a type that's tracked via the [START_TRACKING] and [STOP_TRACKING] macros.
+/// Example: for_by_tcl(gnome, /obj/item/gnomechompski) qdel(gnome)
 #define for_by_tcl(_iterator, _type) for(var ##_type/##_iterator as anything in by_type[##_type])
 
 // sometimes we want to have a list of objects of multiple types, without having to traverse multiple lists
@@ -180,7 +165,7 @@ var/list/list/by_type = list()
 #define START_TRACKING_CAT(x) OTHER_START_TRACKING_CAT(src, x)
 #define STOP_TRACKING_CAT(x) OTHER_STOP_TRACKING_CAT(src, x)
 #define OTHER_START_TRACKING_CAT(what, x) if(!by_cat[x]) { by_cat[x] = list() }; by_cat[x][what] = 1
-#define OTHER_STOP_TRACKING_CAT(what, x) by_cat[x].Remove(what)
+#define OTHER_STOP_TRACKING_CAT(what, x) by_cat[x]?.Remove(what)
 
 /// contains lists of objects indexed by a category string based on START_TRACKING_CAT / STOP_TRACKING_CAT
 var/list/list/by_cat = list()
@@ -217,6 +202,8 @@ var/list/list/by_cat = list()
 #define TR_CAT_RANCID_STUFF "rancid_stuff"
 #define TR_CAT_GHOST_OBSERVABLES "ghost_observables"
 #define TR_CAT_STATION_EMERGENCY_LIGHTS "emergency_lights"
+#define TR_CAT_STAMINA_MOBS "stamina_mobs"
+#define TR_CAT_BUGS "bugs"
 // powernets? processing_items?
 // mobs? ai-mobs?
 
@@ -250,7 +237,7 @@ var/list/list/by_cat = list()
 /typeinfo/mob
 	parent_type = /typeinfo/atom/movable
 
-/typeinfo/var/SpacemanDMM_return_type = /typeinfo/
+/typeinfo/var/SpacemanDMM_return_type = /typeinfo
 
 /**
  * Declares typeinfo for some type.
@@ -458,7 +445,10 @@ proc/find_all_by_type(type, procedure=null, procedure_src=null, arguments=null, 
 		IT_TYPE(/turf) \
 		IT_TYPE(/atom/movable) \
 		IT_TYPE(/atom) \
-		IT_TYPE(/datum)
+		IT_TYPE(/datum) \
+		IT_TYPE(/client) \
+		else
+			CRASH("find_all_by_type: invalid type: [type]")
 	#undef IT_TYPE
 
 /// istype but for checking a list of types
@@ -476,3 +466,25 @@ proc/istypes(datum/dat, list/types)
 	if (!return_instance)
 		return chosen_type
 	return new chosen_type(return_instance_newargs)
+
+/// thing.type but it also returns "num" for numbers etc.
+/proc/string_type_of_anything(thing)
+	. = "unknown"
+	if(isnum(thing))
+		return "num"
+	else if(istext(thing))
+		return "text"
+	else if(islist(thing))
+		return "list"
+	else if(ispath(thing))
+		return "path"
+	else if(isnull(thing))
+		return "null"
+	else if(isproc(thing))
+		return "proc"
+	else if(isresource(thing))
+		return "resource"
+	else if(thing == world)
+		return "world"
+	else
+		return "[thing:type]"

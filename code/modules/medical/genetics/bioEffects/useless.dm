@@ -79,11 +79,13 @@
 	var/system_path = /datum/particleSystem/sparkles
 
 	OnAdd()
+		. = ..()
 		if (!particleMaster.CheckSystemExists(system_path, owner))
 			particleMaster.SpawnSystem(new system_path(owner))
 
 	OnRemove()
-		if (!particleMaster.CheckSystemExists(system_path, owner))
+		. = ..()
+		if (particleMaster.CheckSystemExists(system_path, owner))
 			particleMaster.RemoveSystem(system_path, owner)
 
 /datum/bioEffect/achromia
@@ -95,6 +97,7 @@
 	var/holder_skin = null
 
 	OnAdd()
+		. = ..()
 		if (!ishuman(owner))
 			return
 
@@ -112,6 +115,9 @@
 		H.update_body()
 
 	OnRemove()
+		. = ..()
+		if (!.)
+			return
 		if (!ishuman(owner))
 			return
 
@@ -123,9 +129,9 @@
 			return
 		AH.s_tone = holder_skin
 		if(AH.mob_appearance_flags & FIX_COLORS) // human -> achrom -> lizard -> notachrom is *bright*
-			AH.customization_first_color = fix_colors(AH.customization_first_color)
-			AH.customization_second_color = fix_colors(AH.customization_second_color)
-			AH.customization_third_color = fix_colors(AH.customization_third_color)
+			AH.customizations["hair_bottom"].color = fix_colors(AH.customizations["hair_bottom"].color)
+			AH.customizations["hair_middle"].color = fix_colors(AH.customizations["hair_middle"].color)
+			AH.customizations["hair_top"].color = fix_colors(AH.customizations["hair_top"].color)
 		H.update_colorful_parts()
 		H.update_body()
 
@@ -142,6 +148,7 @@
 	var/skintone_to_use = "#FFFFFF"
 
 	OnAdd()
+		. = ..()
 		if (ishuman(owner))
 			var/mob/living/carbon/human/H = owner
 			for (var/ID in H.bioHolder.effects)
@@ -149,31 +156,36 @@
 					H.bioHolder.RemoveEffect(ID)
 			var/datum/appearanceHolder/AH = H.bioHolder.mobAppearance
 			AH.e_color_original = AH.e_color
-			AH.customization_first_color_original = AH.customization_first_color
-			AH.customization_second_color_original = AH.customization_second_color
-			AH.customization_third_color_original = AH.customization_third_color
+			AH.customizations["hair_bottom"].color_original = AH.customizations["hair_bottom"].color
+			AH.customizations["hair_middle"].color_original = AH.customizations["hair_middle"].color
+			AH.customizations["hair_top"].color_original = AH.customizations["hair_top"].color
 			AH.s_tone_original = AH.s_tone
 
 			AH.e_color = eye_color_to_use
 			AH.s_tone = skintone_to_use
-			AH.customization_first_color = color_to_use
-			AH.customization_second_color = color_to_use
-			AH.customization_third_color = color_to_use
+			AH.customizations["hair_bottom"].color = color_to_use
+			AH.customizations["hair_middle"].color = color_to_use
+			AH.customizations["hair_top"].color = color_to_use
 			H.update_colorful_parts()
 
 	OnRemove()
+		. = ..()
+		if (!.)
+			return
 		if (ishuman(owner))
+			if (QDELETED(owner))
+				return
 			var/mob/living/carbon/human/H = owner
 			var/datum/appearanceHolder/AH = H.bioHolder.mobAppearance
 			AH.e_color = AH.e_color_original
 			AH.s_tone = AH.s_tone_original
-			AH.customization_first_color = AH.customization_first_color_original
-			AH.customization_second_color = AH.customization_second_color_original
-			AH.customization_third_color = AH.customization_third_color_original
+			AH.customizations["hair_bottom"].color = AH.customizations["hair_bottom"].color_original
+			AH.customizations["hair_middle"].color = AH.customizations["hair_middle"].color_original
+			AH.customizations["hair_top"].color = AH.customizations["hair_top"].color_original
 			if(AH.mob_appearance_flags & FIX_COLORS) // human -> blank -> lizard -> unblank is *bright*
-				AH.customization_first_color = fix_colors(AH.customization_first_color)
-				AH.customization_second_color = fix_colors(AH.customization_second_color)
-				AH.customization_third_color = fix_colors(AH.customization_third_color)
+				AH.customizations["hair_bottom"].color = fix_colors(AH.customizations["hair_bottom"].color)
+				AH.customizations["hair_middle"].color = fix_colors(AH.customizations["hair_middle"].color)
+				AH.customizations["hair_top"].color = fix_colors(AH.customizations["hair_top"].color)
 			H.update_colorful_parts()
 
 /datum/bioEffect/color_changer/black
@@ -220,7 +232,7 @@
 	effectType = EFFECT_TYPE_DISABILITY
 	isBad = 1
 	msgGain = "You feel sweaty."
-	msgLose = "You feel much more hygenic."
+	msgLose = "You feel much more hygienic."
 	var/personalized_stink = null
 
 	New()
@@ -237,26 +249,26 @@
 				if (C == owner)
 					continue
 				if (ispug(C))
-					boutput(C, "<span class='alert'>Wow, [owner] sure [pick("stinks", "smells", "reeks")]!")
+					boutput(C, SPAN_ALERT("Wow, [owner] sure [pick("stinks", "smells", "reeks")]!"), "stink_message")
 				else if (src.personalized_stink)
-					boutput(C, "<span class='alert'>[src.personalized_stink]</span>")
+					boutput(C, SPAN_ALERT("[src.personalized_stink]"), "stink_message")
 				else
-					boutput(C, "<span class='alert'>[stinkString()]</span>")
+					boutput(C, SPAN_ALERT("[stinkString()]"), "stink_message")
 
 
-/obj/effect/distort/dwarf
+/obj/effect/rt/dwarf
 	icon = 'icons/effects/96x96.dmi'
 	icon_state = "distort-dwarf"
 
 /datum/bioEffect/dwarf
 	name = "Dwarfism"
-	desc = "Greatly reduces the overall size of the subject, resulting in markedly dimished height."
+	desc = "Greatly reduces the overall size of the subject, resulting in markedly diminished height."
 	id = "dwarf"
 	msgGain = "Did everything just get bigger?"
 	msgLose = "You feel tall!"
 	icon_state  = "dwarf"
 	var/filter = null
-	var/obj/effect/distort/dwarf/distort = new
+	var/tmp/obj/effect/rt/dwarf/distort = new
 	var/size = 127
 
 	OnAdd()
@@ -342,7 +354,7 @@
 
 /datum/bioEffect/drunk/pentetic
 	name = "Pentetic Acid Production"
-	desc = "This mutation somehow causes the subject's body to manufacture a potent chellating agent. How exactly it functions is completely unknown."
+	desc = "This mutation somehow causes the subject's body to manufacture a potent chelating agent. How exactly it functions is completely unknown."
 	id = "drunk_pentetic"
 	msgGain = "You feel detoxified."
 	msgLose = "You feel toxic."
@@ -366,7 +378,7 @@
 	msgGain = "You begin to sense an odd chemical taste in your mouth."
 	msgLose = "The chemical taste in your mouth fades."
 	occur_in_genepools = 1 //this is going to be very goddamn rare and very fucking difficult to unlock.
-	mob_exclusive = /mob/living/carbon/human/
+	mob_exclusive = /mob/living/carbon/human
 	probability = 1
 	blockCount = 5
 	can_research = 0
@@ -386,7 +398,7 @@
 
 	New()
 		..()
-		if (all_functional_reagent_ids.len > 1)
+		if (length(all_functional_reagent_ids) > 1)
 			reagent_to_add = pick(all_functional_reagent_ids)
 		else
 			reagent_to_add = "water"
@@ -401,7 +413,7 @@
 	stability_loss = 25
 
 	OnLife(var/mult)
-		if (prob(src.change_prob) && all_functional_reagent_ids.len > 1)
+		if (prob(src.change_prob) && length(all_functional_reagent_ids) > 1)
 			reagent_to_add = pick(all_functional_reagent_ids)
 		..()
 
@@ -532,3 +544,61 @@
 	New()
 		..()
 		color_hex = "#680000"
+
+/datum/bioEffect/reversedSounds
+	name = "Antitemporal Inner Ear"
+	desc = "Makes your inner ear travel back in time, causing you to hear sounds in reverse."
+	id = "reversed_sounds"
+	probability = 25
+	msgGain = "You start hearing things backwards."
+	msgLose = "You no longer hear things backwards."
+
+	OnAdd()
+		..()
+		APPLY_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, src, -1)
+
+	OnRemove()
+		REMOVE_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, src)
+		..()
+
+/datum/bioEffect/slowSounds
+	name = "Leisurely Inner Ear"
+	desc = "Makes your inner ear chill out a little, meaning you hear things deeper and in slow motion."
+	id = "slow_sounds"
+	probability = 25
+	msgGain = "You hear everything slowed down and deeper."
+	msgLose = "You no longer hear everything slowed down and deeper."
+	effect_group = "soundspeed"
+
+	OnAdd()
+		..()
+		APPLY_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, src, 0.5 / power)
+
+	onPowerChange(oldval, newval)
+		. = ..()
+		APPLY_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, src, 0.5 / power)
+
+	OnRemove()
+		REMOVE_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, src)
+		..()
+
+/datum/bioEffect/fastSounds
+	name = "Hurried Inner Ear"
+	desc = "Your inner ear is full of performance enhancing drugs, it processes sounds really quickly and with higher pitch!"
+	id = "fast_sounds"
+	probability = 25
+	msgGain = "You hear everything sped up and higher pitched."
+	msgLose = "You no longer hear everything sped up and higher pitched."
+	effect_group = "soundspeed"
+
+	OnAdd()
+		..()
+		APPLY_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, src, 2 * power)
+
+	onPowerChange(oldval, newval)
+		. = ..()
+		APPLY_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, src, 2 * power)
+
+	OnRemove()
+		REMOVE_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, src)
+		..()

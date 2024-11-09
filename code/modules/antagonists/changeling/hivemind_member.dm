@@ -18,7 +18,7 @@
 			current_mob.ghost = null
 		else if (istype(current_mob, /mob/dead))
 			var/mob/dead/dead_mob = current_mob
-			dead_mob.corpse.ghost = null
+			dead_mob.corpse?.ghost = null
 			dead_mob.corpse = null
 			hivemind_observer.corpse = null
 		else if (istype(current_mob, /mob/living/critter/changeling))
@@ -39,9 +39,9 @@
 		else
 			hivemind_observer.corpse.ghost = ghost_mob
 			ghost_mob.corpse = hivemind_observer.corpse
-
-		hivemind_observer.hivemind_owner.hivemind -= hivemind_observer
-		hivemind_observer.observers -= hivemind_observer
+		if (hivemind_observer.hivemind_owner)
+			hivemind_observer.hivemind_owner.hivemind -= hivemind_observer
+		LAZYLISTREMOVE(hivemind_observer.observers, hivemind_observer)
 		qdel(hivemind_observer)
 
 	announce_objectives()

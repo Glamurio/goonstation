@@ -1,7 +1,7 @@
 // MASTER DATUMS
 
 ABSTRACT_TYPE(/datum/artifact/)
-/datum/artifact/
+/datum/artifact
 	/// the actual /obj type that is the artifact for this datum
 	var/associated_object = null
 	/// a weighted commonness, the higher it is the more often the artifact will appear
@@ -65,7 +65,8 @@ ABSTRACT_TYPE(/datum/artifact/)
 	var/list/triggers = list()
 	/// List from which to pick the triggers
 	var/validtriggers = list(/datum/artifact_trigger/force,/datum/artifact_trigger/electric,/datum/artifact_trigger/heat,
-	/datum/artifact_trigger/radiation,/datum/artifact_trigger/carbon_touch,/datum/artifact_trigger/silicon_touch,/datum/artifact_trigger/data)
+	/datum/artifact_trigger/radiation,/datum/artifact_trigger/carbon_touch,/datum/artifact_trigger/silicon_touch,/datum/artifact_trigger/data,
+	/datum/artifact_trigger/language)
 	/// minimum amount of triggers the artifact will have
 	var/min_triggers = 1
 	/// maximum amount of triggers the artifact will have
@@ -212,6 +213,16 @@ ABSTRACT_TYPE(/datum/artifact/)
 	proc/get_rarity_modifier()
 		return src.rarity_weight ? 0.995**src.rarity_weight : 0.2
 
+	/// show artifact fx
+	proc/show_fx(obj/artifact)
+		artifact.vis_contents += src.fx_image
+		artifact.vis_contents += src.fx_fallback
+
+	/// hide artifact fx
+	proc/hide_fx(obj/artifact)
+		artifact.vis_contents -= src.fx_image
+		artifact.vis_contents -= src.fx_fallback
+
 // SPECIFIC DATUMS
 
 ABSTRACT_TYPE(/datum/artifact/art)
@@ -279,9 +290,10 @@ ABSTRACT_TYPE(/datum/artifact/art)
 		. = ..()
 		src.dissipation_rate = 0
 		src.max_range = 13
-		src.power = max(10, src.power)
-		if(prob(90))
-			src.ks_ratio = 1
+		src.power = rand(20,50)
+		if(src.damage_type == D_RADIOACTIVE)
+			src.damage_type = pick(D_KINETIC,D_PIERCING,D_SLASHING,D_ENERGY,D_BURNING,D_RADIOACTIVE,D_TOXIC)
+		src.ks_ratio = 1
 		src.generate_inverse_stats()
 
 	on_pre_hit(atom/hit, angle, obj/projectile/O)

@@ -202,11 +202,11 @@
 
 		if (src.lasers)
 			use_power(200)
-			shoot_projectile_ST(src, lethal, U)
+			shoot_projectile_ST_pixel_spread(src, lethal, U)
 			muzzle_flash_any(src, get_angle(src,target), "muzzle_flash_laser")
 		else
 			use_power(100)
-			shoot_projectile_ST(src, stun, U)
+			shoot_projectile_ST_pixel_spread(src, stun, U)
 			muzzle_flash_any(src, get_angle(src,target), "muzzle_flash_elec")
 
 
@@ -221,7 +221,7 @@
 			theAI.notify_attacked()
 	damage = round((P.power*P.proj_data.ks_ratio), 1.0)
 
-	if(src.material) src.material.triggerOnBullet(src, src, P)
+	src.material_trigger_on_bullet(src, P)
 
 	if(P.proj_data.damage_type == D_KINETIC)
 		src.health -= damage
@@ -229,6 +229,8 @@
 		src.health -= (damage*2)
 	else if(P.proj_data.damage_type == D_ENERGY)
 		src.health -= damage / 2
+	if (damage > 0)
+		hit_twitch(src)
 
 	if (src.health <= 0)
 		src.die()
@@ -363,6 +365,36 @@ ADMIN_INTERACT_PROCS(/obj/machinery/turretid, proc/toggle_active, proc/toggle_le
 			var/area/A = get_area(src)
 			src.turretArea = A.type
 
+/obj/machinery/turretid/ai_upload
+	name = "AI Upload Turret Control"
+	turretArea = /area/station/turret_protected/ai_upload
+	req_access = list(access_ai_upload)
+
+/obj/machinery/turretid/ai_chamber
+	name = "AI Chamber Turret Control"
+	turretArea = /area/station/turret_protected/ai
+	req_access = list(access_ai_upload)
+
+/obj/machinery/turretid/ai_perimeter
+	name = "AI Perimeter Turret Control"
+	turretArea = /area/station/turret_protected/AIbaseoutside
+	req_access = list(access_ai_upload)
+
+/obj/machinery/turretid/computer_core
+	name = "Computer Core Turret Control"
+	turretArea = /area/station/turret_protected/Zeta
+	req_access = list(access_heads)
+
+/obj/machinery/turretid/armory
+	name = "Armory Turret Control"
+	turretArea = /area/station/ai_monitored/armory
+	req_access = list(access_armory)
+
+/obj/machinery/turretid/armory_perimeter
+	name = "Armory Perimeter Turret Control"
+	turretArea = /area/station/turret_protected/armory_outside
+	req_access = list(access_armory)
+
 /obj/machinery/turretid/attackby(obj/item/W, mob/user)
 	if(status & BROKEN) return
 	if (issilicon(user) || isAI(user))
@@ -379,7 +411,7 @@ ADMIN_INTERACT_PROCS(/obj/machinery/turretid, proc/toggle_active, proc/toggle_le
 				if (user.using_dialog_of(src))
 					src.Attackhand(user)
 		else
-			boutput(user, "<span class='alert'>Access denied.</span>")
+			boutput(user, SPAN_ALERT("Access denied."))
 
 /obj/machinery/turretid/attack_ai(mob/user as mob)
 	return attack_hand(user)

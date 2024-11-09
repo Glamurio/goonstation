@@ -35,6 +35,7 @@ var/global/datum/controller/lag_detection/lag_detection_process = new
 			if(manual_profiling_disable_time && (current_time > manual_profiling_disable_time))
 				message_admins("Manual profiling disabled, profile will periodically reset!")
 				manual_profiling_on = FALSE
+				manual_profiling_disable_time = 0
 			return
 		automatic_profiling()
 		#ifdef PRE_PROFILING_ENABLED
@@ -77,6 +78,8 @@ var/global/datum/controller/lag_detection/lag_detection_process = new
 				force_start = TRUE
 			else
 				highCpuCount = 0
+			if (global.current_state >= GAME_STATE_FINISHED) //we don't reeaally care about the end of game lag spike, probably
+				return
 			if(highCpuCount >= CPU_START_PROFILING_COUNT || force_start)
 				var/prof_flags = PROFILE_START
 				#ifndef PRE_PROFILING_ENABLED

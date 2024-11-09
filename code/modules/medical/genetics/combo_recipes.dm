@@ -1,3 +1,4 @@
+ABSTRACT_TYPE(/datum/geneticsrecipe)
 /datum/geneticsrecipe
 	var/list/required_effects = list()
 	var/result = null
@@ -164,7 +165,7 @@
 
 /datum/geneticsrecipe/cryokinesis
 	required_effects = list("chime_snaps","fire_resist")
-	result = /datum/bioEffect/power
+	result = /datum/bioEffect/power/cryokinesis
 
 /datum/geneticsrecipe/adrenaline
 	required_effects = list("detox","strong")
@@ -333,3 +334,11 @@
 /datum/geneticsrecipe/skeleton_three
 	required_effects = list("xray","dead_scan")
 	result = /datum/bioEffect/mutantrace/skeleton
+
+/datum/geneticsrecipe/reversed_sounds
+	required_effects = list("slow_sounds","fast_sounds")
+	result = /datum/bioEffect/reversedSounds
+
+/datum/geneticsrecipe/radioactive_farts
+	required_effects = list("radioactive","farty")
+	result = /datum/bioEffect/radioactive_farts

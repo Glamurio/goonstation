@@ -3,8 +3,10 @@
 
 ABSTRACT_TYPE(/obj/machinery/power/power_wheel)
 TYPEINFO(/obj/machinery/power/power_wheel)
-	mats = list("CON-1"=5, "MET-1"=25, "INS-1"=3, "POW-2"=10)
-
+	mats = list("conductive" = 5,
+				"metal" = 25,
+				"insulated" = 3,
+				"energy_high" = 10)
 /obj/machinery/power/power_wheel
 	name = "Kinetic Generator"
 	desc = "A large wheel used to generate power."
@@ -40,7 +42,7 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 
 	disposing()
 		if(occupant)
-			boutput(occupant, "<span class='alert'><B>Your [src] is destroyed!</B></span>")
+			boutput(occupant, SPAN_ALERT("<B>Your [src] is destroyed!</B>"))
 			eject_occupant()
 		. = ..()
 
@@ -49,6 +51,7 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 			occupant.Attackhand(user)
 			if(user.a_intent == INTENT_DISARM || user.a_intent == INTENT_GRAB)
 				eject_occupant()
+			user.lastattacked = occupant
 		else
 			. = ..()
 
@@ -72,15 +75,15 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 		else if(src.occupant && W.force)
 			W.attack(src.occupant, user)
 			user.lastattacked = src
-			if (occupant.hasStatus(list("weakened", "paralysis", "stunned")))
+			if (occupant.hasStatus(list("knockdown", "unconscious", "stunned")))
 				eject_occupant()
-			W.visible_message("<span class='alert'>[user] swings at [src.occupant] with [W]!</span>")
+			W.visible_message(SPAN_ALERT("[user] swings at [src.occupant] with [W]!"))
 		else if(!src.occupant && isgrab(W))
 			var/obj/item/grab/G = W
 			if (ismob(G.affecting))
 				var/mob/new_occupant = G.affecting
 				var/msg = "[user.name] pushes [new_occupant.name] onto \the [src]!"
-				user.visible_message(msg, self_message="<span class='notice'>You push [new_occupant.name] onto \the [src]!</span>")
+				user.visible_message(msg, self_message=SPAN_NOTICE("You push [new_occupant.name] onto \the [src]!"))
 				user.u_equip(G)
 				qdel(G)
 				insert_occupant(new_occupant)
@@ -121,6 +124,11 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 						A.ex_act(severity)
 					qdel(src)
 
+	Entered(atom/movable/AM, atom/OldLoc)
+		. = ..()
+		if(isitem(AM)) // prevent dropped items being lost forever
+			AM.set_loc(src)
+
 	Exited(atom/movable/thing, atom/newloc)
 		. = ..()
 		if(thing == src.occupant)
@@ -132,7 +140,7 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 		else
 			..()
 
-	temperature_expose(datum/gas_mixture/air, exposed_temperature, exposed_volume)
+	temperature_expose(datum/gas_mixture/air, exposed_temperature, exposed_volume, cannot_be_cooled = FALSE)
 		..()
 		// Simulate hotspot Crossed/Process so turfs engulfed in flames aren't simply ignored in vehicles
 		if (isliving(src.occupant) && exposed_volume > (CELL_VOLUME * 0.5) && exposed_temperature > FIRE_MINIMUM_TEMPERATURE_TO_SPREAD)
@@ -140,20 +148,24 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 			L.update_burning(clamp(exposed_temperature / 60, 0, 20))
 
 	MouseDrop_T(mob/living/target, mob/user)
+		climb_into(target, user)
+
+	proc/climb_into(mob/living/target, mob/user)
 		if (occupant || !istype(target) || target.buckled || LinkBlocked(target.loc,src.loc) || BOUNDS_DIST(user, src) > 0 || BOUNDS_DIST(user, target) > 0 || is_incapacitated(user) || isAI(user))
-			return
+			return FALSE
 
 		var/msg
 		if(target == user && !user.stat)	// if drop self, then climbed in
 			msg = "[user.name] climbs onto the [src]."
-			user.visible_message(msg, self_message="<span class='notice'>You climb onto \the [src].</span>")
+			user.visible_message(msg, self_message=SPAN_NOTICE("You climb onto \the [src]."))
 		else if(target != user && !user.restrained())
 			msg = "[user.name] helps [target.name] onto \the [src]!"
-			user.visible_message(msg, self_message="<span class='notice'>You help [target.name] onto \the [src]!</span>")
+			user.visible_message(msg, self_message=SPAN_NOTICE("You help [target.name] onto \the [src]!"))
 		else
-			return
+			return FALSE
 
 		insert_occupant(target)
+		return TRUE
 
 	proc/insert_occupant(mob/target)
 		target.set_loc(src)
@@ -169,13 +181,21 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 		if(usr != occupant)
 			..()
 			return
-		if(!(usr.getStatusDuration("paralysis") || usr.getStatusDuration("stunned") || usr.getStatusDuration("weakened") || usr.stat))
+		if(can_act(usr))
 			eject_occupant()
-		return
+
+	Bumped(AM)
+		if(isliving(AM) && get_dir(src, AM) == SOUTH)
+			if(climb_into(AM, AM))
+				return
+		. = ..()
 
 	proc/eject_occupant()
 		if(src.occupant?.loc == src)
 			src.occupant.set_loc(get_turf(src))
+
+		for (var/atom/movable/AM in src.contents)
+			AM.set_loc(get_turf(src))
 
 		if(src.occupant)
 			occupant.vis_flags = occupant_vis_flags
@@ -204,7 +224,7 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 		if(src.watts_gen && src.powernet)
 			indicator.alpha = 255
 		else
-			indicator.alpha = 200
+			indicator.alpha = 50
 
 		if(!src.lastgen || !src.watts_gen)
 			was_running = 0 // clear running
@@ -227,6 +247,9 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 		watts_gen = 0
 
 	relaymove(mob/user, direction, delay, running)
+		if(src.occupant != user)
+			stack_trace("relaymove() called on [src] by '[user]' who is not the occupant '[occupant]'!")
+			src.occupant = user
 		var/spin_dir = direction & (EAST | WEST)
 		if(spin_dir)
 			if(was_running && (was_running != spin_dir) )
@@ -245,9 +268,9 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 
 		if(!ON_COOLDOWN(src, "squeek", delay * 3))
 			if(running)
-				playsound(src, movement_sound, 20, 1, 0, 0.9)
+				playsound(src, movement_sound, 20, TRUE, 0, 0.9)
 			else
-				playsound(src, movement_sound, 15, 1, -3, 1.0)
+				playsound(src, movement_sound, 15, TRUE, -3, 1.0)
 
 		was_running = spin_dir * running
 
@@ -257,11 +280,11 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 		return delay
 
 	proc/tumble(mob/user)
-		user.show_text("<span class='alert'>You weren't able to keep up with [src]!</span>")
+		user.show_text(SPAN_ALERT("You weren't able to keep up with [src]!"))
 		animate_spin(user, was_running == WEST ? "L" : "R", 1, 0)
-		user.changeStatus("paralysis", 2 SECONDS)
-		user.changeStatus("weakened", 2 SECONDS)
-		src.visible_message("<span class='alert'><b>[user]</b> loses their footing and tumbles inside of [src].</span>")
+		user.changeStatus("unconscious", 2 SECONDS)
+		user.changeStatus("knockdown", 2 SECONDS)
+		src.visible_message(SPAN_ALERT("<b>[user]</b> loses their footing and tumbles inside of [src]."))
 		animate_storage_thump(src)
 		return TRUE
 
@@ -346,9 +369,9 @@ TYPEINFO(/obj/machinery/power/power_wheel)
 		animate(time=delay*0.5, pixel_x=0)
 
 	tumble(mob/user)
-		user.show_text("<span class='alert'>You weren't able to keep up with [src]!</span>")
-		user.changeStatus("weakened", 2 SECONDS)
-		src.visible_message("<span class='alert'><b>[user]</b> loses their footing and slides off [src].</span>")
+		user.show_text(SPAN_ALERT("You weren't able to keep up with [src]!"))
+		user.changeStatus("knockdown", 2 SECONDS)
+		src.visible_message(SPAN_ALERT("<b>[user]</b> loses their footing and slides off [src]."))
 		eject_occupant()
 		var/dx = 2
 		if(was_running == EAST)

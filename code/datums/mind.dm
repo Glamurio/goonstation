@@ -5,12 +5,14 @@ datum/mind
 	var/mob/current
 	var/mob/virtual
 
+	/// stores valuable things about the mind's memory
 	var/memory
+	/// stores custom notes set by the player
+	var/cust_notes
 	var/list/datum/dynamic_player_memory/dynamic_memories = list()
 	var/remembered_pin = null
 	var/last_memory_time = 0 //Give a small delay when adding memories to prevent spam. It could happen!
 	var/miranda // sec's miranda rights thingy.
-	var/last_miranda_time = 0 // this is different than last_memory_time, this is when the rights were last SAID, not last CHANGED
 
 	var/violated_hippocratic_oath = 0
 	var/soul = 100 // how much soul we have left
@@ -26,6 +28,11 @@ datum/mind
 
 	/// A list of every antagonist datum that we have.
 	var/list/datum/antagonist/antagonists = list()
+	/// A list of every antagonist datum subordinate to this mind.
+	var/list/datum/antagonist/subordinate/subordinate_antagonists = list()
+
+	//Gang variables
+	var/obj/item/device/pda2/originalPDA //! The PDA that this crewmember started with - for gang PDA messages
 
 	// This used for dead/released/etc mindhacks and rogue robots we still want them to show up
 	// in the game over stats. It's a list because former mindhacks could also end up as an emagged
@@ -69,36 +76,41 @@ datum/mind
 			Z_LOG_DEBUG("Mind/TransferTo", "No new_character given, transfer aborted")
 			return
 
+		if (new_character == src.current)
+			CRASH("Tried to transfer mind of [identify_object(src.current)] to itself.")
+
 		Z_LOG_DEBUG("Mind/TransferTo", "New mob: \ref[new_character] ([new_character])")
 		if (new_character.disposed)
-			if (current)
-				boutput(current, "You were about to be transferred into another body, but that body was pending deletion! This may fuck everything up so if it does dial 1-800-CODER.")
-				message_admins("Tried to transfer mind of mob [current] (\ref[current], [key_name(current)]) to qdel'd mob [new_character] (\ref[new_character]) God damnit. Un-qdeling the mob and praying (this will probably fuck up).")
-				new_character.disposed = 0
-			else
-				message_admins("Tried to transfer mind [src] to qdel'd mob [new_character] (\ref[new_character]).")
+			boutput(current, "<h3 class='alert'>You were about to be transferred into another body, but that body was pending deletion! You're a ghost now instead! Adminhelp if this is a problem.</h3>")
+			message_admins("Tried to transfer mind of mob [identify_object(current)] to qdel'd mob [identify_object(new_character)] God damnit.")
+			var/mob/dead/observer/obs = new(src.current)
+			src.transfer_to(obs)
 
 			Z_LOG_ERROR("Mind/TransferTo", "Tried to transfer mind [(current ? "of mob " + key_name(current) : src)] to qdel'd mob [new_character].")
-			return
-			//CRASH("Trying to transfer to a mob that's in the delete queue!")
+			CRASH("Tried to transfer mind [identify_object(src)] to qdel'd mob [identify_object(new_character)].")
 
 		if (new_character.client)
 			if (current)
-				boutput(current, "You were about to be transferred into another body, but that body was occupied!")
-				message_admins("Tried to transfer mind of mob [current] (\ref[current], [key_name(current)]) to mob with an existing client [new_character] (\ref[new_character])")
+				boutput(current, "<h3 class='alert'>You were about to be transferred into another body, but that body was occupied!</h3>")
+				var/errmsg = "Tried to transfer mind of mob [identify_object(current)] to mob with an existing client [identify_object(new_character)]"
+				message_admins(errmsg)
+				CRASH(errmsg)
 			else
 				message_admins("Tried to transfer mind [src] to mob with an existing client [new_character] (\ref[new_character]).")
 			Z_LOG_ERROR("Mind/TransferTo", "Tried to transfer mind [(current ? "of mob " + key_name(current) : src)] to mob with an existing client [new_character] [key_name(new_character)])")
 			return
-
+		var/mob/old_mob = null
 		if (current)
+			old_mob = current
 			if(current.client)
 				current.removeOverlaysClient(current.client)
 				tgui_process.on_transfer(current, new_character)
 				new_character.lastKnownIP = current.client.address
+			current.oldmind = src
 			current.mind = null
 			SEND_SIGNAL(src, COMSIG_MIND_DETACH_FROM_MOB, current, new_character)
 
+		new_character.oldmind = new_character.mind
 		new_character.mind = src
 		current = new_character
 
@@ -119,9 +131,13 @@ datum/mind
 			Z_LOG_DEBUG("Mind/TransferTo", "Transferring abilityHolder")
 			new_character.abilityHolder.transferOwnership(new_character)
 
+		if (global.current_state == GAME_STATE_FINISHED)
+			if (!new_character.abilityHolder)
+				new_character.add_ability_holder(/datum/abilityHolder/generic)
+			new_character.addAbility(/datum/targetable/crew_credits)
 		Z_LOG_DEBUG("Mind/TransferTo", "Complete")
 
-		SEND_SIGNAL(src, COMSIG_MIND_ATTACH_TO_MOB, current)
+		SEND_SIGNAL(src, COMSIG_MIND_ATTACH_TO_MOB, current, old_mob)
 
 
 	proc/swap_with(mob/target)
@@ -174,8 +190,12 @@ datum/mind
 				src.dynamic_memories -= dynamic_memory
 
 	proc/show_memory(mob/recipient)
-		var/output = "<B>[current.real_name]'s Memory</B><HR>"
+		var/output = "<B>[current.real_name]'s Memory</B><br>"
 		output += memory
+
+		if (src.cust_notes)
+			output += "<HR><B>Notes:</B><br>"
+			output += replacetext(src.cust_notes, "\n", "<br>")
 
 		for (var/datum/dynamic_player_memory/dynamic_memory in src.dynamic_memories)
 			output += dynamic_memory.memory_text
@@ -193,13 +213,18 @@ datum/mind
 		if (master?.current)
 			output += "<br><b>Your master:</b> [master.current.real_name]"
 
-		recipient.Browse(output,"window=memory;title=Memory")
+		tgui_message(recipient, output, "Notes")
 
 	proc/set_miranda(new_text)
 		miranda = new_text
 
+	proc/get_miranda()
+		if (islist(src.miranda)) //isproc machine broke, so uh just wrap your procs in a list when you pass them here to distinguish them from strings :)
+			return call(src.miranda[1])()
+		return src.miranda
+
 	proc/show_miranda(mob/recipient)
-		var/output = "<B>[current.real_name]'s Miranda Rights</B><HR>[miranda]"
+		var/output = "<B>[current.real_name]'s Miranda Rights</B><HR>[src.get_miranda()]"
 
 		recipient.Browse(output,"window=miranda;title=Miranda Rights")
 
@@ -209,8 +234,21 @@ datum/mind
 		// stuff for critter respawns
 		src.get_player()?.last_death_time = world.timeofday
 
+	/// Returns whether this mind is a non-pseudo antagonist.
+	proc/is_antagonist()
+		// Handles pre-round antagonist assignments utilising `special_role`.
+		if (global.current_state < GAME_STATE_PLAYING)
+			return !!src.special_role
+
+		for (var/datum/antagonist/A as anything in src.antagonists)
+			if (!A.pseudo)
+				return TRUE
+
+		return FALSE
+
 	/// Gets an existing antagonist datum of the provided ID role_id.
 	proc/get_antagonist(role_id)
+		RETURN_TYPE(/datum/antagonist)
 		for (var/datum/antagonist/A as anything in src.antagonists)
 			if (A.id == role_id)
 				return A
@@ -275,7 +313,7 @@ datum/mind
 		return FALSE
 
 	/// Attempts to remove existing antagonist datums of ID `role` from this mind, or if provided, a specific instance of an antagonist datum.
-	proc/remove_antagonist(role, source = null)
+	proc/remove_antagonist(role, source = null, take_gear = TRUE)
 		var/datum/antagonist/antagonist_role
 		if (istype(role, /datum/antagonist))
 			antagonist_role = role
@@ -289,9 +327,12 @@ datum/mind
 		if (!antagonist_role)
 			return FALSE
 		if (antagonist_role.faction)
-			antagonist_role.owner.current.faction &= ~antagonist_role.faction
-		antagonist_role.remove_self(TRUE, source)
+			LAZYLISTREMOVE(antagonist_role.owner.current.faction, antagonist_role.faction)
+		antagonist_role.remove_self(take_gear, source)
 		src.antagonists.Remove(antagonist_role)
+		var/mob/living/carbon/human/H = src.current
+		if (istype(H))
+			H.update_arrest_icon() // for derevving
 		if (!length(src.antagonists) && src.special_role == antagonist_role.id)
 			src.special_role = null
 			ticker.mode.traitors.Remove(src)

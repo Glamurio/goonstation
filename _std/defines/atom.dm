@@ -3,9 +3,6 @@
 /// Is this an atom? idk ask mr. molecule man
 #define isatom(A) (isloc(A))
 
-/// Is this an atom that can move!!?
-#define isatommovable(A) (istype(A, /atom/movable))
-
 /// built-in isobj returns true for /atom/movable
 #define isobj(A) (istype(A, /obj))
 
@@ -48,24 +45,24 @@
 
 
 // event_handler_flags
-/// Atom implements HasProximity() call in some way.
-#define USE_PROXIMITY				(1 << 0)
 /// Atom implements EnteredFluid() call in some way.
-#define USE_FLUID_ENTER				(1 << 1)
+#define USE_FLUID_ENTER				(1 << 0)
 /// Atom can be held as an item and have a grab inside it to choke somebuddy
-#define USE_GRAB_CHOKE				(1 << 2)
+#define USE_GRAB_CHOKE				(1 << 1)
 /// Atom implements var/active = XXX and responds to sticker removal methods (burn-off + acetone). this atom MUST have an 'active' var. im sory.
-#define HANDLE_STICKER				(1 << 3)
+#define HANDLE_STICKER				(1 << 2)
 /// cannot be pushed by MANTAwaters
-#define IMMUNE_MANTA_PUSH			(1 << 5)
-#define IMMUNE_SINGULARITY			(1 << 6)
-#define IMMUNE_SINGULARITY_INACTIVE	(1 << 7)
+#define IMMUNE_MANTA_PUSH			(1 << 3)
+#define IMMUNE_SINGULARITY			(1 << 4)
+#define IMMUNE_SINGULARITY_INACTIVE	(1 << 5)
 /// used for trinkets GC
-#define IS_TRINKET					(1 << 8)
-#define IS_FARTABLE					(1 << 9)
+#define IS_TRINKET					(1 << 6)
+#define IS_FARTABLE					(1 << 7)
 /// overrides the click drag mousedrop pickup QOL kinda stuff
-#define NO_MOUSEDROP_QOL			(1 << 10)
-#define MOVE_NOCLIP 				(1 << 11)
+#define NO_MOUSEDROP_QOL			(1 << 8)
+#define MOVE_NOCLIP 				(1 << 9)
+/// Atom won't get warped to z5 via floor holes on underwater maps
+#define IMMUNE_TRENCH_WARP			(1 << 10)
 
 
 //THROW flags (what kind of throw, we can have ddifferent kinds of throws ok)
@@ -74,6 +71,7 @@
 #define THROW_GUNIMPACT (1 << 2)
 #define THROW_SLIP		(1 << 3)
 #define THROW_PEEL_SLIP	(1 << 4)
+#define THROW_BASEBALL  (1 << 5) // throw that doesn't stun into walls.
 
 //For serialization purposes
 #define DESERIALIZE_ERROR				(0 << 0)
@@ -113,3 +111,8 @@
 #define ANCHORED 1
 /// For an atom that's always immovable, even by stuff like black holes and gravity artifacts.
 #define ANCHORED_ALWAYS 2
+
+/// The atom is below the floor tiles.
+#define UNDERFLOOR 1
+/// The atom is above the floor tiles.
+#define OVERFLOOR 2

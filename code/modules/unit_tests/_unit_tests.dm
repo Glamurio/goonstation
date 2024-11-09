@@ -31,13 +31,25 @@
 #define UNIT_TEST_PASSED 0
 #define UNIT_TEST_FAILED 1
 
+#include "metadata_type_typos.dm"
 #include "rand.dm"
 #include "deletions.dm"
+#include "explosions.dm"
 #include "monkey_thunderdome.dm"
 #include "reagent_id_typos.dm"
 #include "record_database.dm"
 #include "passability_cache.dm"
+#include "bsp.dm"
 #include "unit_test.dm"
+#include "building_materials_mat_amount.dm"
+#include "bioeffect_id_uniqueness.dm"
+#include "reagent_id_uniqueness.dm"
+#include "trait_id_uniqueness.dm"
+#include "material_id_uniqueness.dm"
+#include "action_id_uniqueness.dm"
+#include "antag_popup_existence.dm"
+#include "job_name_uniqueness.dm"
+#include "mutation_combo_valid_ids.dm"
 
 #undef TEST_ASSERT
 #undef TEST_ASSERT_EQUAL
