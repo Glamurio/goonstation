@@ -17,8 +17,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 	var/datum/limb/limb_data = null
 	/// the type of limb_data
 	var/limb_type = /datum/limb
-	/// set to create an item when severed rather than removing the arm itself
-	var/obj/item/remove_object = null
+	/// the item that's attached to item arms & limbs - now featuring a significantly less cursed variable name!
+	var/obj/item/attached_item = null
 	/// used for streak direction
 	var/side = "left"
 	/// 2 will fall off, 3 is removed. This should use defines honestly but eh.
@@ -139,12 +139,12 @@ ABSTRACT_TYPE(/obj/item/parts)
 		if(ishuman(holder))
 			var/mob/living/carbon/human/H = holder
 			H.limbs.vars[src.slot] = null
-			if(remove_object)
-				if (H.l_hand == remove_object)
+			if(attached_item)
+				if (H.l_hand == attached_item)
 					H.l_hand = null
-				if (H.r_hand == remove_object)
+				if (H.r_hand == attached_item)
 					H.r_hand = null
-				src.remove_object = null
+				src.attached_item = null
 
 			if (src.slot == "l_arm")
 				H.drop_from_slot(H.l_hand)
@@ -161,8 +161,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 
 	proc/remove(var/show_message = 1)
 		if (!src.holder) // fix for Cannot read null.loc, hopefully - haine
-			if (remove_object)
-				src.remove_object = null
+			if (attached_item)
+				src.attached_item = null
 				holder = null
 				qdel(src)
 			return
@@ -171,8 +171,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 			REMOVE_MOVEMENT_MODIFIER(holder, movement_modifier, src.type)
 
 		var/obj/item/object = src
-		if(remove_object)
-			object = remove_object
+		if(attached_item)
+			object = attached_item
 			object.set_loc(src.loc)
 			object.cant_drop = initial(object.cant_drop)
 		else
@@ -188,8 +188,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 		if(ishuman(holder))
 			var/mob/living/carbon/human/H = holder
 			H.limbs.vars[src.slot] = null
-			if(remove_object)
-				src.remove_object = null
+			if(attached_item)
+				src.attached_item = null
 				qdel(src)
 			//fix for gloves/shoes still displaying after limb loss
 			H.update_clothing()
@@ -203,8 +203,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 				H.drop_from_slot(H.r_hand)
 				H.hud.update_hands()
 
-		else if(remove_object)
-			src.remove_object = null
+		else if(attached_item)
+			src.attached_item = null
 			qdel(src)
 		if(!QDELETED(src))
 			src.holder = null
@@ -212,8 +212,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 
 	proc/sever(var/mob/user)
 		if (!src.holder) // fix for Cannot read null.loc, hopefully - haine
-			if (remove_object)
-				src.remove_object = null
+			if (attached_item)
+				src.attached_item = null
 				holder = null
 				qdel(src)
 			return
@@ -225,8 +225,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 			logTheThing(LOG_ADMIN, user, "severed [constructTarget(src.holder,"admin")]'s limb, [src] (<i>type: [src.type], side: [src.side]</i>)")
 
 		var/obj/item/object = src
-		if(remove_object)
-			object = remove_object
+		if(attached_item)
+			object = attached_item
 			object.set_loc(src.loc)
 			object.layer = initial(object.layer)
 		else
@@ -265,8 +265,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 			holder = null
 			if(H.limbs.vars[src.slot] == src) //BAD BAD HACK FUCK FUCK UGLY SHITCODE - Tarm
 				H.limbs.vars[src.slot] = null
-			if(remove_object)
-				src.remove_object = null
+			if(attached_item)
+				src.attached_item = null
 				qdel(src)
 			//fix for gloves/shoes still displaying after limb loss
 			H.update_clothing()
@@ -280,8 +280,8 @@ ABSTRACT_TYPE(/obj/item/parts)
 				H.drop_from_slot(H.r_hand)
 				H.hud.update_hands()
 
-		else if(remove_object)
-			src.remove_object = null
+		else if(attached_item)
+			src.attached_item = null
 			holder = null
 			qdel(src)
 		if(!QDELETED(src))

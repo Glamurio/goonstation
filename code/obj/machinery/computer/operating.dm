@@ -226,7 +226,7 @@
 		else
 			if (istype(H.limbs.l_arm, /obj/item/parts/human_parts/arm/left/item))
 				var/obj/item/parts/human_parts/arm/left/item/I = H.limbs.l_arm
-				current_status = I.remove_object
+				current_status = I.attached_item
 			else if (istype(H.limbs.l_arm, /obj/item/parts/robot_parts/arm/left/))
 				current_status = "Cybernetic"
 			else if (istype(H.limbs.l_arm, /obj/item/parts/artifact_parts/arm/))
@@ -243,7 +243,7 @@
 		else
 			if (istype(H.limbs.r_arm, /obj/item/parts/human_parts/arm/right/item))
 				var/obj/item/parts/human_parts/arm/right/item/I = H.limbs.r_arm
-				current_status = I.remove_object
+				current_status = I.attached_item
 			else if (istype(H.limbs.r_arm, /obj/item/parts/robot_parts/arm/right))
 				current_status = "Cybernetic"
 			else if (istype(H.limbs.r_arm, /obj/item/parts/artifact_parts/arm/))

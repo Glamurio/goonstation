@@ -723,10 +723,10 @@
 /datum/limb/item
 	can_pickup_item = FALSE
 	attack_hand(atom/target, var/mob/user, var/reach, params, location, control)
-		if (holder?.remove_object && istype(holder.remove_object))
-			target.Attackby(holder.remove_object, user, params, location, control)
+		if (holder?.attached_item && istype(holder.attached_item))
+			target.Attackby(holder.attached_item, user, params, location, control)
 			if (target)
-				holder.remove_object.AfterAttack(target, user, reach)
+				holder.attached_item.AfterAttack(target, user, reach)
 
 /datum/limb/bear
 	can_beat_up_robots = TRUE //it's a bear!

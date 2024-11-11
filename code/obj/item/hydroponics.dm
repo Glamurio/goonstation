@@ -31,6 +31,7 @@ TYPEINFO(/obj/item/saw)
 	throw_speed = 1
 	throw_range = 5
 	w_class = W_CLASS_BULKY
+	object_flags = LEG_ATTACH
 	flags = TABLEPASS | CONDUCT
 	tool_flags = TOOL_SAWING
 	leaves_slash_wound = TRUE

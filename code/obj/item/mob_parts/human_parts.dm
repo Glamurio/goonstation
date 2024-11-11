@@ -452,7 +452,7 @@
 	streak_decal = /obj/decal/cleanable/oil
 	streak_descriptor = "oily"
 	can_hold_items = 0
-	remove_object = null
+	attached_item = null
 	handlistPart = null
 	partlistPart = null
 	no_icon = TRUE
@@ -477,9 +477,9 @@
 			return
 		var/ret = null
 		if (!ismob(newloc))
-			if (remove_object)
-				remove_object.set_loc(newloc)
-				ret = remove_object
+			if (attached_item)
+				attached_item.set_loc(newloc)
+				ret = attached_item
 			src.loc = null
 			if (!disposed)
 				qdel(src)
@@ -506,9 +506,9 @@
 			H.update_inhands()
 
 		name = "left [I.name] arm"
-		remove_object = I//I.type
+		attached_item = I//I.type
 		I.set_loc(src)
-		remove_object.temp_flags |= IS_LIMB_ITEM
+		attached_item.temp_flags |= IS_LIMB_ITEM
 		if (istype(I))
 			//if(I.over_clothes) handlistPart += "l_arm_[I.arm_icon]"
 			//else partlistPart += "l_arm_[I.arm_icon]"
@@ -543,24 +543,24 @@
 
 	proc/remove_from_mob(delete = 0)
 
-		if (isitem(remove_object))
-			remove_object.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
-			remove_object.cant_self_remove = (original_flags & ORIGINAL_FLAGS_CANT_SELF_REMOVE) ? 1 : 0
-			remove_object.cant_other_remove = (original_flags & ORIGINAL_FLAGS_CANT_OTHER_REMOVE) ? 1 : 0
+		if (isitem(attached_item))
+			attached_item.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
+			attached_item.cant_self_remove = (original_flags & ORIGINAL_FLAGS_CANT_SELF_REMOVE) ? 1 : 0
+			attached_item.cant_other_remove = (original_flags & ORIGINAL_FLAGS_CANT_OTHER_REMOVE) ? 1 : 0
 
-			remove_object.temp_flags &= ~IS_LIMB_ITEM
+			attached_item.temp_flags &= ~IS_LIMB_ITEM
 		if (src.holder)
-			src.holder.u_equip(remove_object)
+			src.holder.u_equip(attached_item)
 
 			var/mob/living/carbon/human/H = null
 			if (ishuman(src.holder))
 				H = src.holder
-			if (H && H.l_hand == remove_object)
+			if (H && H.l_hand == attached_item)
 				H.l_hand = null
 
-		if (delete && remove_object)
-			qdel(remove_object)
-			remove_object = null
+		if (delete && attached_item)
+			qdel(attached_item)
+			attached_item = null
 
 	getHandIconState()
 		if (handlistPart && !(handlistPart in icon_states(special_icons)))
@@ -588,8 +588,8 @@
 		..()
 
 	on_holder_examine()
-		if (src.remove_object)
-			return "has [bicon(src.remove_object)] \an [src.remove_object] attached as a"
+		if (src.attached_item)
+			return "has [bicon(src.attached_item)] \an [src.attached_item] attached as a"
 
 /obj/item/parts/human_parts/arm/right/item
 	name = "right item arm"
@@ -598,7 +598,7 @@
 	streak_decal = /obj/decal/cleanable/oil // what streaks everywhere when it's cut off?
 	streak_descriptor = "oily" //bloody, oily, etc
 	can_hold_items = 0
-	remove_object = null
+	attached_item = null
 	handlistPart = null
 	partlistPart = null
 	no_icon = TRUE
@@ -635,9 +635,9 @@
 			H.update_inhands()
 
 		name = "right [I.name] arm"
-		remove_object = I//.type
+		attached_item = I//.type
 		I.set_loc(src)
-		remove_object.temp_flags |= IS_LIMB_ITEM
+		attached_item.temp_flags |= IS_LIMB_ITEM
 		if (istype(I))
 			//if(I.over_clothes) handlistPart += "r_arm_[I.arm_icon]"
 			//else partlistPart += "r_arm_[I.arm_icon]"
@@ -670,23 +670,23 @@
 				H.hud.add_other_object(H.r_hand,H.hud.layouts[H.hud.layout_style]["rhand"])
 
 	proc/remove_from_mob(delete = 0)
-		if (isitem(remove_object))
-			remove_object.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
-			remove_object.cant_self_remove = (original_flags & ORIGINAL_FLAGS_CANT_SELF_REMOVE) ? 1 : 0
-			remove_object.cant_other_remove = (original_flags & ORIGINAL_FLAGS_CANT_OTHER_REMOVE) ? 1 : 0
+		if (isitem(attached_item))
+			attached_item.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
+			attached_item.cant_self_remove = (original_flags & ORIGINAL_FLAGS_CANT_SELF_REMOVE) ? 1 : 0
+			attached_item.cant_other_remove = (original_flags & ORIGINAL_FLAGS_CANT_OTHER_REMOVE) ? 1 : 0
 
-			remove_object.temp_flags &= ~IS_LIMB_ITEM
+			attached_item.temp_flags &= ~IS_LIMB_ITEM
 		if (src.holder)
-			src.holder.u_equip(remove_object)
+			src.holder.u_equip(attached_item)
 
 			var/mob/living/carbon/human/H = null
 			if (ishuman(src.holder))
 				H = src.holder
-			if (H && H.r_hand == remove_object)
+			if (H && H.r_hand == attached_item)
 				H.r_hand = null
 
-		if (delete && remove_object)
-			qdel(remove_object)
+		if (delete && attached_item)
+			qdel(attached_item)
 
 	getHandIconState()
 		if (handlistPart && !(handlistPart in icon_states(special_icons)))
@@ -713,8 +713,189 @@
 		..()
 
 	on_holder_examine()
-		if (src.remove_object)
-			return "has [bicon(src.remove_object)] \an [src.remove_object] attached as a"
+		if (src.attached_item)
+			return "has [bicon(src.attached_item)] \an [src.attached_item] attached as a"
+
+/datum/targetable/item_leg_ability
+	name = "Use Item Leg"
+	icon = 'icons/mob/artifact_limb_abilities.dmi'
+	icon_state = "template-eldritch"
+	last_cast = 0
+	target_anything = TRUE
+	max_range = 1
+
+	// in case the ability needs to reference the legs
+	var/obj/item/parts/human_parts/leg/right/item/right_leg = null
+	var/obj/item/parts/human_parts/leg/left/item/left_leg = null
+
+	// used for quickly assigning items
+	var/item_type = /obj/item
+
+	// in case the ability needs to reference the item
+	var/obj/item/assigned_item = null
+
+	onAttach(var/datum/abilityHolder/H)
+		if (ishuman(src.holder.owner))
+			var/mob/living/carbon/human/guy = src.holder.owner
+
+			// check both legs
+			src.right_leg = guy.limbs.r_leg
+			src.left_leg = guy.limbs.l_leg
+
+			if (src.right_leg?.attached_item && istype(src.right_leg?.attached_item, src.item_type))
+				src.assigned_item = src.right_leg.attached_item
+			if (src.left_leg?.attached_item && istype(src.left_leg?.attached_item, src.item_type))
+				src.assigned_item = src.left_leg.attached_item
+
+	castcheck()
+		if (isliving(src.holder.owner))
+			var/mob/living/M = src.holder.owner
+			return can_act(M)
+		return FALSE
+
+	cast(atom/target)
+		..()
+		if (!src.holder)
+			return
+		if (!src.right_leg || !src.left_leg || !src.assigned_item)
+			return
+
+/datum/targetable/item_leg_ability/crowbar
+	name = "Crowbar Leg"
+	desc = "Allows you to crowbar things with your leg! Kind of!"
+	icon_state = "template-eldritch"
+	targeted = TRUE
+	item_type = /obj/item/crowbar
+
+	cast(atom/target)
+		..()
+		var/turf/T = get_turf(target)
+		if (istype(T, /turf/simulated/floor))
+			SETUP_GENERIC_ACTIONBAR(src.holder.owner, src, 1 SECOND, /turf/simulated/floor/proc/pry_tile, src.assigned_item, src.assigned_item.icon, src.assigned_item.icon_state, null, INTERRUPT_ACT | INTERRUPT_STUNNED | INTERRUPT_ACTION | INTERRUPT_MOVE)
+
+		if (istype(target, /obj/machinery/door/airlock))
+			SETUP_GENERIC_ACTIONBAR(src.holder.owner, src, 1 SECOND, /obj/machinery/door/airlock/proc/unpowered_open_close, src.assigned_item, src.assigned_item.icon, src.assigned_item.icon_state, null, INTERRUPT_ACT | INTERRUPT_STUNNED | INTERRUPT_ACTION | INTERRUPT_MOVE)
+
+/datum/targetable/item_leg_ability/chainsaw
+	name = "Toggle Chainsaw Boost"
+	desc = "Toggles a chainsaw-fueled speed boost. Try not to hit anything."
+	icon_state = "batform"
+	targeted = FALSE
+	max_range = 0
+	do_logs = FALSE
+	item_type = /obj/item/saw
+	// Overlay for sprinting
+	var/datum/special_sprint/sprint_datum = new /datum/special_sprint/chainaw
+
+	// definitely not copied from bat form and blood sprint
+	cast(mob/target)
+		var/mob/living/carbon/human/M = src.holder.owner
+		if (!M)
+			return FALSE
+
+		. = ..()
+		if (istype(M.special_sprint, /datum/special_sprint/chainaw))
+			M.special_sprint = null
+			icon_state = "batform"
+			UnregisterSignal(src.holder.owner, COMSIG_MOVABLE_PRE_MOVE)
+			UnregisterSignal(src.holder.owner, COMSIG_MOVABLE_MOVED)
+		else
+			M.special_sprint = src.sprint_datum
+			icon_state = "batform-on"
+			RegisterSignal(src.holder.owner, COMSIG_MOVABLE_PRE_MOVE, PROC_REF(check_bump))
+			RegisterSignal(src.holder.owner, COMSIG_MOVABLE_MOVED, PROC_REF(chainsaw_move))
+
+		boutput(M, SPAN_NOTICE("[src.name] toggled [M.special_sprint ? "on" : "off"]. (Hold Sprint to activate - consumes stamina)"))
+
+		return FALSE
+
+	proc/chainsaw_move(mob/living/mover, new_loc, direction)
+		if (mover.client?.check_key(KEY_RUN) && istype(mover.special_sprint, /datum/special_sprint/chainaw))
+
+			var/stamina = STAMINA_COST_SPRINT * 4
+			var/do_overlay = FALSE
+
+			// apply movement modifier
+			// it's annoying to do this twice but this is kind of the best way to do it
+			// we adjust the movement modifier / stamina / damage etc.
+			if (istype(src.right_leg?.attached_item, src.item_type))
+				var/obj/item/saw/chainsaw = src.right_leg?.attached_item
+				src.right_leg.limb_hit_bonus = chainsaw.active_force // chainsaws do more damage when revved
+				src.right_leg.movement_modifier = /datum/movement_modifier/robot_part/tread_right
+				do_overlay = TRUE
+				stamina = stamina / 2
+			if (istype(src.left_leg?.attached_item, src.item_type))
+				var/obj/item/saw/chainsaw = src.left_leg?.attached_item
+				src.left_leg.limb_hit_bonus = chainsaw.active_force
+				src.left_leg.movement_modifier = /datum/movement_modifier/robot_part/tread_left
+				do_overlay = TRUE
+				stamina = stamina / 2
+			mover.add_stamina(stamina)
+
+			// Apply speed overlay
+			if (do_overlay)
+				var/image/speed_overlay = new
+				speed_overlay.overlays = image('icons/mob/robots.dmi', "up-speed")
+				mover.AddOverlays(speed_overlay, "chainsawing", TRUE)
+
+		mover.ClearSpecificOverlays("chainsawing")
+
+	// Check if bump, returns TRUE if crashed
+	proc/check_bump(atom/movable/thing, new_loc, direction)
+		if (!thing)
+			return FALSE
+
+		if(ON_COOLDOWN(thing, "chainsaw_bump", 5 SECONDS))
+			return FALSE
+
+		var/crashed = FALSE
+		var/mob/mover = src.holder.owner
+
+		if(iswall(new_loc) || istype(new_loc, /obj/window) || istype(new_loc, /obj/machinery/door/airlock))
+			mover.visible_message(SPAN_ALERT("<b>[mover] crashes into the wall!</b>"))
+			JOB_XP(mover, "Clown", 1)
+			crashed = TRUE
+
+		if(ismob(thing))
+			var/mob/target_mob = thing
+			mover.tri_message(target_mob, SPAN_ALERT("<b>[mover] crashes into [target_mob]!</b>"),
+									SPAN_ALERT("<b>[mover] crashes into [target_mob]!</b>"),
+									SPAN_ALERT("<b>[mover] crashes into you!</b>"))
+
+			if (ishuman(target_mob))
+				if(!istype(target_mob:shoes, /obj/item/clothing/shoes/sandal/magic))
+					target_mob.changeStatus("stunned", 5 SECONDS)
+					target_mob.changeStatus("knockdown", 5 SECONDS)
+					target_mob.force_laydown_standup()
+				else
+					target_mob.visible_message(SPAN_ALERT("<b>[target_mob] is kept upright by magical sandals!</b>"), SPAN_ALERT("<b>Your magical sandals keep you upright!</b>"))
+			else
+				target_mob.changeStatus("stunned", 5 SECONDS)
+				target_mob.changeStatus("knockdown", 5 SECONDS)
+			crashed = TRUE
+
+		if(crashed)
+			playsound(mover.loc, 'sound/impact_sounds/Generic_Hit_3.ogg', 40, 1)
+			playsound(mover.loc, 'sound/machines/chainsaw_green.ogg', 50, 1)
+			mover.changeStatus("stunned", 8 SECONDS)
+			mover.changeStatus("knockdown", 5 SECONDS)
+			mover.force_laydown_standup()
+			return TRUE
+
+/datum/targetable/item_leg_ability/mop
+	name = "Mop Leg"
+	desc = "Allows you to clean the floor with your leg! Kind of!"
+	icon_state = "template-martian"
+	item_type = /obj/item/mop
+
+	cast(atom/target)
+		..()
+		var/turf/T = get_turf(target)
+
+		if (istype(T, /turf/simulated/floor))
+			if (istype(src.assigned_item, src.item_type))
+				var/obj/item/mop/mopper = src.assigned_item
+				mopper.attack(T, src.holder.owner)
 
 /obj/item/parts/human_parts/leg/left/item
 	name = "left item leg"
@@ -722,7 +903,7 @@
 	limb_type = /datum/limb/item
 	streak_decal = /obj/decal/cleanable/blood // what streaks everywhere when it's cut off?
 	streak_descriptor = "bloody" //bloody, oily, et
-	remove_object = null
+	attached_item = null
 	handlistPart = null
 	partlistPart = null
 	no_icon = TRUE
@@ -737,20 +918,30 @@
 	limb_is_unnatural = TRUE
 	kind_of_limb = (LIMB_ITEM)
 	movement_modifier = /datum/movement_modifier/item_legs/left
+	var/datum/abilityHolder/ability_holder = null
+	var/datum/targetable/ability = null
 
 	New(new_holder, var/obj/item/I)
 		..()
 		if (I)
 			src.set_item(I)
+			src.set_abilities(I)
 
+	proc/set_abilities(var/obj/item/I)
+		// Apply abilities
+		if (isliving(src.holder))
+			var/mob/living/H = src.holder
+			src.ability_holder = H.abilityHolder
 			if(istype(I, /obj/item/crowbar))
-				// TBD
+				src.ability = /datum/targetable/item_leg_ability/crowbar
 			else if(istype(I, /obj/item/saw))
-				step_image_state = "tracksL"
-				movement_modifier = /datum/movement_modifier/robot_part/tread_left
-			// else if(istype(I, /obj/item/mop))
-			// 	// TBD
+				src.step_image_state = "tracksL"
+				src.ability = /datum/targetable/item_leg_ability/chainsaw
+			else if(istype(I, /obj/item/mop))
+				src.ability = /datum/targetable/item_leg_ability/mop
 
+		if (src.ability)
+			src.ability_holder.addAbility(src.ability)
 
 	proc/set_item(var/obj/item/I)
 		var/mob/living/carbon/human/H = null
@@ -761,9 +952,10 @@
 
 		name = "left [I.name] leg"
 		partlistPart = "legL-item-[I.name]"
-		remove_object = I//.type
+		attached_item = I//.type
+		limb_hit_bonus = I.force // bonus for kicking people
 		I.set_loc(src)
-		remove_object.temp_flags |= IS_LIMB_ITEM
+		attached_item.temp_flags |= IS_LIMB_ITEM
 
 		if (istype(I))
 
@@ -777,6 +969,7 @@
 			I.cant_drop = 1
 			I.cant_self_remove = 1
 			I.cant_other_remove = 1
+			src.set_abilities(I)
 
 			if (H)
 				H.update_clothing()
@@ -785,17 +978,20 @@
 				H.update_bloody_feet()
 
 	proc/remove_from_mob(delete = 0)
-		if (isitem(remove_object))
-			remove_object.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
-			remove_object.cant_self_remove = (original_flags & ORIGINAL_FLAGS_CANT_SELF_REMOVE) ? 1 : 0
-			remove_object.cant_other_remove = (original_flags & ORIGINAL_FLAGS_CANT_OTHER_REMOVE) ? 1 : 0
+		if (isitem(attached_item))
+			attached_item.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
+			attached_item.cant_self_remove = (original_flags & ORIGINAL_FLAGS_CANT_SELF_REMOVE) ? 1 : 0
+			attached_item.cant_other_remove = (original_flags & ORIGINAL_FLAGS_CANT_OTHER_REMOVE) ? 1 : 0
+			attached_item.temp_flags &= ~IS_LIMB_ITEM
 
-			remove_object.temp_flags &= ~IS_LIMB_ITEM
+			if(src.ability)
+				src.ability_holder?.removeAbility(src.ability)
+
 		if (src.holder)
-			src.holder.u_equip(remove_object)
+			src.holder.u_equip(attached_item)
 
-		if (delete && remove_object)
-			qdel(remove_object)
+		if (delete && attached_item)
+			qdel(attached_item)
 
 	getHandIconState()
 		if (handlistPart && !(handlistPart in icon_states(special_icons)))
@@ -822,8 +1018,8 @@
 		..()
 
 	on_holder_examine()
-		if (src.remove_object)
-			return "has [bicon(src.remove_object)] \an [src.remove_object] attached as a"
+		if (src.attached_item)
+			return "has [bicon(src.attached_item)] \an [src.attached_item] attached as a"
 
 /obj/item/parts/human_parts/leg/right/item
 	name = "right item leg"
@@ -831,7 +1027,7 @@
 	limb_type = /datum/limb/item
 	streak_decal = /obj/decal/cleanable/blood // what streaks everywhere when it's cut off?
 	streak_descriptor = "bloody" //bloody, oily, et
-	remove_object = null
+	attached_item = null
 	handlistPart = null
 	partlistPart = "legR-item"
 	side = "right"
@@ -847,11 +1043,30 @@
 	limb_is_unnatural = TRUE
 	kind_of_limb = (LIMB_ITEM)
 	movement_modifier = /datum/movement_modifier/item_legs/right
+	var/datum/abilityHolder/ability_holder = null
+	var/datum/targetable/ability = null
 
 	New(new_holder, var/obj/item/I)
 		..()
 		if (I)
 			src.set_item(I)
+			src.set_abilities(I)
+
+	proc/set_abilities(var/obj/item/I)
+		// Apply abilities
+		if (isliving(src.holder))
+			var/mob/living/H = src.holder
+			src.ability_holder = H.abilityHolder
+			if(istype(I, /obj/item/crowbar))
+				src.ability = /datum/targetable/item_leg_ability/crowbar
+			else if(istype(I, /obj/item/saw))
+				src.step_image_state = "tracksL"
+				src.ability = /datum/targetable/item_leg_ability/chainsaw
+			else if(istype(I, /obj/item/mop))
+				src.ability = /datum/targetable/item_leg_ability/mop
+
+		if (src.ability)
+			src.ability_holder.addAbility(src.ability)
 
 	proc/set_item(var/obj/item/I)
 		var/mob/living/carbon/human/H = null
@@ -862,9 +1077,10 @@
 
 		name = "right [I.name] leg"
 		partlistPart = "legR-item-[I.name]"
-		remove_object = I//.type
+		attached_item = I//.type
+		limb_hit_bonus = I.force // bonus for kicking people
 		I.set_loc(src)
-		remove_object.temp_flags |= IS_LIMB_ITEM
+		attached_item.temp_flags |= IS_LIMB_ITEM
 
 		if (istype(I))
 
@@ -878,6 +1094,7 @@
 			I.cant_drop = 1
 			I.cant_self_remove = 1
 			I.cant_other_remove = 1
+			src.set_abilities(I)
 
 			if (H)
 				H.update_clothing()
@@ -886,17 +1103,21 @@
 				H.update_bloody_feet()
 
 	proc/remove_from_mob(delete = 0)
-		if (isitem(remove_object))
-			remove_object.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
-			remove_object.cant_self_remove = (original_flags & ORIGINAL_FLAGS_CANT_SELF_REMOVE) ? 1 : 0
-			remove_object.cant_other_remove = (original_flags & ORIGINAL_FLAGS_CANT_OTHER_REMOVE) ? 1 : 0
+		if (isitem(attached_item))
+			attached_item.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
+			attached_item.cant_self_remove = (original_flags & ORIGINAL_FLAGS_CANT_SELF_REMOVE) ? 1 : 0
+			attached_item.cant_other_remove = (original_flags & ORIGINAL_FLAGS_CANT_OTHER_REMOVE) ? 1 : 0
+			attached_item.temp_flags &= ~IS_LIMB_ITEM
 
-			remove_object.temp_flags &= ~IS_LIMB_ITEM
+			if(src.ability)
+				src.ability_holder?.removeAbility(src.ability)
+
 		if (src.holder)
-			src.holder.u_equip(remove_object)
+			src.holder.u_equip(attached_item)
 
-		if (delete && remove_object)
-			qdel(remove_object)
+		if (delete && attached_item)
+			qdel(attached_item)
+
 
 	getHandIconState()
 		if (handlistPart && !(handlistPart in icon_states(special_icons)))
@@ -923,8 +1144,8 @@
 		..()
 
 	on_holder_examine()
-		if (src.remove_object)
-			return "has [bicon(src.remove_object)] \an [src.remove_object] attached as a"
+		if (src.attached_item)
+			return "has [bicon(src.attached_item)] \an [src.attached_item] attached as a"
 
 /obj/item/parts/human_parts/arm/left/brullbar
 	name = "left brullbar arm"

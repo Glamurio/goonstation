@@ -2031,17 +2031,16 @@ DEFINE_FLOORS(solidcolor/black/fullbright,
 				var/obj/item/parts/human_parts/leg/right/item/R = H.limbs.r_leg
 				var/obj/item/parts/human_parts/leg/left/item/L = H.limbs.l_leg
 
-				if (R && (R.remove_object?.tool_flags & TOOL_PRYING))
-					pry_leg = R.remove_object
-				if (L && (L.remove_object?.tool_flags & TOOL_PRYING))
-					pry_leg = L.remove_object
+				if (R && (R.attached_item?.tool_flags & TOOL_PRYING))
+					pry_leg = R.attached_item
+				if (L && (L.attached_item?.tool_flags & TOOL_PRYING))
+					pry_leg = L.attached_item
 
 			var/obj/P = pry_leg ? pry_leg : user.find_tool_in_hand(TOOL_PRYING)
 			if (!P)
 				return
 			// Call ourselves w/ the tool, then continue
-			var/list/newParams = list()
-			newParams["quick_replace"] = TRUE
+			var/list/newParams = list("quick_replace" = TRUE)
 			src.Attackby(P, user, newParams)
 			do_hide = FALSE //don't stuff things under the floor if we're just swapping/replacing a broken tile
 

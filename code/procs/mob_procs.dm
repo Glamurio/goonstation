@@ -674,8 +674,8 @@
 			if (old.limbs.l_arm && (old.limbs.l_arm.type != newbody.limbs.l_arm.type))
 				if (istype(old.limbs.l_arm, /obj/item/parts/human_parts/arm/left/item))
 					var/obj/item/parts/human_parts/arm/left/item/NL_item = new old.limbs.l_arm.type(newbody)
-					if (old.limbs.l_arm.remove_object)
-						var/obj/item/new_LAI = new old.limbs.l_arm.remove_object.type(NL_item)
+					if (old.limbs.l_arm.attached_item)
+						var/obj/item/new_LAI = new old.limbs.l_arm.attached_item.type(NL_item)
 						NL_item.set_item(new_LAI)
 					NL_item.holder = newbody
 					qdel(newbody.limbs.l_arm)
@@ -688,8 +688,8 @@
 			if (old.limbs.r_arm && (old.limbs.r_arm.type != newbody.limbs.r_arm.type))
 				if (istype(old.limbs.r_arm, /obj/item/parts/human_parts/arm/right/item))
 					var/obj/item/parts/human_parts/arm/right/item/NL2_item = new old.limbs.r_arm.type(newbody)
-					if (old.limbs.r_arm.remove_object)
-						var/obj/item/new_RAI = new old.limbs.r_arm.remove_object.type(NL2_item)
+					if (old.limbs.r_arm.attached_item)
+						var/obj/item/new_RAI = new old.limbs.r_arm.attached_item.type(NL2_item)
 						NL2_item.set_item(new_RAI)
 					NL2_item.holder = newbody
 					qdel(newbody.limbs.r_arm)

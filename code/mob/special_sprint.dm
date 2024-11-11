@@ -43,3 +43,26 @@
 /datum/special_sprint/poof/fire
 	do_sprint(mob/M)
 		new /obj/dummy/spell_batpoof/firepoof(get_turf(M), M, 0)
+
+/datum/special_sprint/chainaw
+
+	can_sprint(mob/M)
+		if (!..())
+			return
+		if (!M || !ismob(M))
+			return
+		if (!isturf(M.loc))
+			M.show_text("You can't seem to boost here.", "red")
+			return
+		if (isdead(M))
+			return
+		if (!M.canmove)
+			return
+		if(isrestrictedz(M.loc.z))
+			return
+		return TRUE
+
+	do_sprint(mob/M)
+		if (M.traitHolder.hasTrait("slowstrider"))
+			src.no_sprint_boost = TRUE
+		playsound(get_turf(M), 'sound/machines/chainsaw.ogg', 50, 1)

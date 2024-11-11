@@ -169,6 +169,7 @@ TRASH BAG
 	throwforce = 10
 	throw_speed = 5
 	throw_range = 10
+	object_flags = LEG_ATTACH
 	w_class = W_CLASS_NORMAL
 	stamina_damage = 40
 	stamina_cost = 15
