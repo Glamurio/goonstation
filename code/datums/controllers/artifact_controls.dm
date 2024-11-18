@@ -677,13 +677,13 @@ var/datum/artifact_controller/artifact_controls
 	fx_green_max = 100
 	fx_blue_min = 20
 	fx_blue_max = 50
-	adjectives = list("gleaming", "ornate", "intricate", "rusty", "polished", "brassy", "corroded", "artisanal")
+	adjectives = list("gleaming", "ornate", "intricate", "rusty", "polished", "brassy", "corroded", "artisanal", "annular")
 	nouns_large = list("contraption", "mechanism", "machine", "apparatus", "engine", "framework", "device", "automaton")
 	nouns_small = list("cog", "gear", "sprocket", "spring", "lever", "pinion", "dial", "wheel")
 	touch_descriptors = list("It feels cold.","It feels uneven.","You can feel a faint vibration.")
-	prefix = list("chrono", "mechano", "auto", "meta", "gyro", "pneumo", "optico", "magne", "cogno", "astro")
-	thingy = list("kinetic", "resonant", "cyclic", "perpetual", "recursive", "harmonic", "mechanical", "hydraulic", "regular")
-	action = list("timer", "regulator", "calibrator", "actuator", "navigator", "crank", "pump", "clock", "modulator")
+	var/prefix = list("chrono", "mechano", "auto", "meta", "gyro", "pneumo", "optico", "magne", "cogno", "astro")
+	var/thingy = list("kinetic", "resonant", "cyclic", "perpetual", "recursive", "harmonic", "mechanical", "hydraulic", "regular")
+	var/action = list("timer", "regulator", "calibrator", "actuator", "navigator", "crank", "pump", "clock", "modulator")
 
 	post_setup(obj/artifact)
 		. = ..()
@@ -703,9 +703,9 @@ var/datum/artifact_controller/artifact_controls
 
 	generate_name()
 		var/namestring = ""
-		namestring += "[pick(prefix)]"
-		namestring += "[pick(thingy)] "
-		namestring += "[pick(action)]"
+		namestring += "[pick(src.prefix)]"
+		namestring += "[pick(src.thingy)] "
+		namestring += "[pick(src.action)]"
 		return namestring
 
 

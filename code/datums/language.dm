@@ -162,3 +162,75 @@ var/global/datum/languages/languages = new()
 			subChar = uppertext(subChar)
 		assembled += subChar
 	. = assembled.Join()
+
+/datum/language/clockwork
+	id = "clockwork"
+	var/static/list/wingdings_map = getWingDingsMap()
+
+	proc/translate(var/message)
+		var/list/newwords = list()
+		for (var/i = 1, i <= length(message), i++)
+			var/char = copytext(message, i, i + 1)
+			var/lower_char = lowertext(char)
+			if (lower_char in wingdings_map)
+				newwords += wingdings_map[lower_char]
+			else
+				newwords += char // Retain untranslatable characters
+		return jointext(newwords, "")
+
+	heard_not_understood(var/orig_message)
+		return translate(orig_message)
+
+/proc/getWingDingsMap()
+    return list(
+        "a" = "\u2702", // Scissors
+        "b" = "\u2705", // Checkmark
+        "c" = "\u2708", // Airplane
+        "d" = "\u2709", // Envelope
+        "e" = "\u270F", // Pencil
+        "f" = "\u2713", // Checkmark
+        "g" = "\u2714", // Heavy Checkmark
+        "h" = "\u2716", // Heavy Multiplication X
+        "i" = "\u271D", // Latin Cross
+        "j" = "\u2721", // Star of David
+        "k" = "\u2728", // Sparkles
+        "l" = "\u2736", // Six Pointed Star
+        "m" = "\u273D", // Heavy Teardrop Spoked Asterisk
+        "n" = "\u2744", // Snowflake
+        "o" = "\u2747", // Sparkle
+        "p" = "\u274C", // Cross Mark
+        "q" = "\u274E", // Negative Squared Cross Mark
+        "r" = "\u2756", // Black Diamond Minus White X
+        "s" = "\u2764", // Heart
+        "t" = "\u2794", // Arrow
+        "u" = "\u279E", // Triangle Arrowhead
+        "v" = "\u27A1", // Rightwards Arrow
+        "w" = "\u27B2", // Curly Loop
+        "x" = "\u27B3", // Arrowhead
+        "y" = "\u27BF", // Double Curved Arrow
+        "z" = "\u2600", // Sun
+
+        // Digits
+        "0" = "\u278A", // Circled Digit Zero
+        "1" = "\u278B", // Circled Digit One
+        "2" = "\u278C", // Circled Digit Two
+        "3" = "\u278D", // Circled Digit Three
+        "4" = "\u278E", // Circled Digit Four
+        "5" = "\u278F", // Circled Digit Five
+        "6" = "\u2790", // Circled Digit Six
+        "7" = "\u2791", // Circled Digit Seven
+        "8" = "\u2792", // Circled Digit Eight
+        "9" = "\u2793", // Circled Digit Nine
+
+        // Common punctuation
+        "." = "\u2022", // Bullet
+        "," = "\u2044", // Fraction Slash
+        "!" = "\u2757", // Heavy Exclamation Mark
+        "?" = "\u2753", // Black Question Mark
+        "@" = "\u272A", // Circled Asterisk
+        "#" = "\u273F", // Black Florette
+        "$" = "\u260E", // Telephone
+        "%" = "\u262F", // Yin Yang
+        "&" = "\u2692", // Hammer and Pick
+        "*" = "\u2605"  // Black Star
+    )

@@ -679,3 +679,238 @@
 		. = ..()
 		if (isturf(src.loc)) //not inside a frame or something
 			new /obj/item/paper/book/from_file/interdictor_guide(src.loc)
+
+/// Artifact manufacturer used internally for /obj/artifact/fabricator, basically invisible
+/obj/machinery/manufacturer/artifact
+	name = "Artifact Manufacturer"
+	desc = "You have no idea what this one fabricates."
+	icon = 'icons/obj/artifacts/artifacts.dmi'
+	icon_state = "unknown-1"
+	accept_blueprints = FALSE
+	free_resources = list(/obj/item/material_piece/steel = 2,
+		/obj/item/material_piece/copper = 2,
+		/obj/item/material_piece/glass = 2)
+	// Availability of recipes determined by origin and RNG
+	// This gets set in New() on the artifact itself because the manufacturer doesn't know its own origin
+	available = list()
+	// TODO: Implement other languages
+	var/datum/language/lingo = new /datum/language/martian()
+
+	New()
+		..()
+		src.available = concrete_typesof(/datum/manufacture)
+		src.available -= concrete_typesof(/datum/manufacture/mechanics)
+
+	build_icon()
+		src.icon_state = src.icon_base ? "[src.icon_base]-[rand(1-7)]" : src.icon_state
+
+	begin_work(new_production = TRUE)
+		src.error = null
+		if (status & NOPOWER || status & BROKEN)
+			return
+		if (!length(src.queue))
+			src.mode = "ready"
+			src.build_icon()
+			return
+		if (!istype(src.queue[1],/datum/manufacture/))
+			src.mode = "halt"
+			src.error = "Corrupted entry purged from production queue."
+			src.queue -= src.queue[1]
+			src.visible_message(SPAN_ALERT("[src] emits an angry buzz!"))
+			playsound(src.loc, src.sound_grump, 50, 1)
+			src.build_icon()
+			return
+		var/datum/manufacture/M = src.queue[1]
+
+		//Wire: Fix for href exploit creating arbitrary items
+		if (!(M in src.available))
+			src.mode = "halt"
+			src.error = "Corrupted entry purged from production queue."
+			src.queue -= src.queue[1]
+			src.visible_message(SPAN_ALERT("[src] emits an angry buzz!"))
+			playsound(src.loc, src.sound_grump, 50, 1)
+			src.build_icon()
+			return
+
+		if (src.malfunction && prob(40))
+			src.flip_out()
+
+		if (new_production)
+			var/list/mats_used = get_materials_needed(M)
+			if (!(length(mats_used) == length(M.item_requirements)))
+				src.mode = "halt"
+				src.error = "Insufficient usable materials to continue queue production."
+				src.visible_message(SPAN_ALERT("[src] emits an angry buzz!"))
+				playsound(src.loc, src.sound_grump, 50, 1)
+				src.build_icon()
+				return
+
+		playsound(src.loc, src.sound_beginwork, 50, 1, 0, 3)
+		src.mode = "working"
+		src.build_icon()
+
+		src.action_bar = actions.start(new/datum/action/bar/manufacturer(src, src.time_left, null), src)
+
+	/// Change interface language of the fabricator to be based on origin
+	/// This is a cursed approach for now, ideally I'd like to atomize all of this into one singular function
+	manufacture_as_list(datum/manufacture/M, mob/user)
+		var/generated_names = list()
+		var/generated_descriptions = list()
+
+		// Fix not having generated material names for blueprints like multitools
+		if (isnull(M.item_names))
+			M.item_names = list()
+			for (var/datum/manufacturing_requirement/R as anything in M.item_requirements)
+				M.item_names += src.lingo.heard_not_understood(R.getName())
+
+		for (var/i in 1 to length(M.item_outputs))
+			var/T
+			if (istype(M, /datum/manufacture/mechanics))
+				var/datum/manufacture/mechanics/mech = M
+				T = mech.frame_path
+			else
+				T = M.item_outputs[i]
+
+			if (ispath(T, /atom/))
+				var/atom/A = T
+				generated_names += src.lingo.heard_not_understood(initial(A.name))
+				generated_descriptions += "[src.lingo.heard_not_understood(initial(A.desc))]"
+
+		var/img
+		if (istype(M, /datum/manufacture/mechanics))
+			var/datum/manufacture/mechanics/mech = M
+			img = getItemIcon(mech.frame_path, C = user.client)
+		else
+			img = getItemIcon(M.item_outputs[1], C = user.client)
+
+		var/requirement_data = list()
+		for (var/datum/manufacturing_requirement/R as anything in M.item_requirements)
+			requirement_data += list(list("name" = src.lingo.heard_not_understood(R.getName()), "id" = R.getID(), "amount" = M.item_requirements[R]))
+
+		return list(
+			"name" = src.lingo.heard_not_understood(M.name),
+			"category" = src.lingo.heard_not_understood(M.category),
+			"requirement_data" = requirement_data,
+			"item_names" = generated_names,
+			"item_descriptions" = generated_descriptions,
+			"item_outputs" = M.item_outputs,
+			"create" = M.create,
+			"time" = M.time,
+			"apply_material" = M.apply_material,
+			"img" = img,
+			"byondRef" = "\ref[M]",
+			"isMechBlueprint" = istype(M, /datum/manufacture/mechanics),
+		)
+
+	blueprints_as_list(var/list/L, mob/user, var/static_elements = FALSE)
+		var/list/as_list = list()
+		for (var/datum/manufacture/M as anything in L)
+			if (isnull(M.category) || !(M.category in src.categories)) // fix for not displaying blueprints/manudrives
+				M.category = "Miscellaneous"
+				logTheThing(LOG_DEBUG, src, "Manufacturing blueprint [M] has category [M.category], which is not on the list of categories for [src]!")
+			var/translated_category = src.lingo.heard_not_understood(M.category)
+			if (length(as_list[translated_category]) == 0)
+				as_list[translated_category] = list()
+			as_list[translated_category] += list(manufacture_as_list(M, user, static_elements))
+		return as_list
+
+	ui_data(mob/user)
+		// When we update the UI, we must regenerate the blueprint data if the blueprints known to us has changed since last time
+		// No need to do this if we're depowered/broken though
+		if (should_update_static && !src.is_disabled())
+			should_update_static = FALSE
+			src.update_static_data(user)
+
+		// Send material data as tuples of material name, material id, material amount
+		var/resource_data = list()
+		for (var/obj/item/material_piece/P as anything in src.get_contents())
+			if (!P.material)
+				continue
+			resource_data += list(
+				list(
+					"name" = src.lingo.heard_not_understood(P.material.getName()),
+					"id" = P.material.getID(),
+					"amount" = P.amount,
+					"byondRef" = "\ref[P]",
+					"satisfies" = src.material_patterns_by_ref["\ref[P.material]"]
+				)
+			)
+
+		// Package additional information into each queued item for the badges so that it can lookup its already sent information
+		var/queue_data = list()
+		for (var/datum/manufacture/M in src.queue)
+			queue_data += list(
+				list(
+					"name" = src.lingo.heard_not_understood(M.name),
+				 	"category" = src.lingo.heard_not_understood(M.category),
+				  	"type" = src.get_blueprint_type(M)
+				)
+			)
+
+		// This calculates the percentage progress of a blueprint by the time that already elapsed before a pause (0 if never paused)
+		// added to the current time that has been elapsed, divided by the total time to be elapsed.
+		// But we keep the pct a constant if we're paused, and just do time that was elapsed / time to elapse
+		var/progress_pct = null // TODO: use predicted end time to have clientside progress animation instead of sending percentage
+		if (length(src.queue))
+			if (src.mode != "working")
+				progress_pct = 1 - (src.time_left / src.original_duration)
+			else
+				progress_pct = ((src.original_duration - src.time_left) + (TIME - src.time_started)) / src.original_duration
+
+		return list(
+			"delete_allowed" = src.allowed(user),
+			"queue" = queue_data,
+			"progress_pct" = progress_pct,
+			"panel_open" = src.panel_open,
+			"hacked" = src.hacked,
+			"malfunction" = src.malfunction,
+			"mode" = src.mode,
+			"wire_bitflags" = src.wires,
+			"banking_info" = src.get_bank_data(),
+			"speed" = src.speed,
+			"repeat" = src.repeat,
+			"error" = src.error,
+			"resource_data" = resource_data,
+			"manudrive_uses_left" = src.get_drive_uses_left(),
+			"indicators" = list("electrified" = src.is_electrified(),
+							    "malfunctioning" = src.malfunction,
+								"hacked" = src.hacked,
+								"hasPower" = !src.is_disabled(),
+							   ),
+		)
+
+	ui_static_data(mob/user)
+		var/list/translated_categories = list()
+		for (var/cat in src.categories)
+			translated_categories += src.lingo.heard_not_understood(cat)
+		return list (
+			"fabricator_name" = src.lingo.heard_not_understood(src.name),
+			"all_categories" = translated_categories,
+			"available_blueprints" = blueprints_as_list(src.available, user),
+			"hidden_blueprints" = blueprints_as_list(src.hidden, user),
+			"downloaded_blueprints" = blueprints_as_list(src.download, user),
+			"recipe_blueprints" = blueprints_as_list(src.drive_recipes, user),
+			"wires" = APCWireColorToIndex,
+			"rockboxes" = rockboxes_as_list(),
+			"manudrive" = list ("name" = "[src.manudrive]",
+							   	"limit" = src.manudrive?.fablimit,
+							   ),
+			"min_speed" = 1,
+			"max_speed_normal" = 3,
+			"max_speed_hacked" = 3,
+		)
+
+/obj/machinery/manufacturer/artifact/martian
+	name = "Martian Manufacturer"
+	icon_base = "martian"
+	lingo = new /datum/language/martian()
+
+/obj/machinery/manufacturer/artifact/ancient
+	name = "Ancient Manufacturer"
+	icon_base = "ancient"
+	lingo = new /datum/language/binary()
+
+/obj/machinery/manufacturer/artifact/clockwork
+	name = "Clockwork Manufacturer"
+	icon_base = "wizard"
+	lingo = new /datum/language/clockwork()
