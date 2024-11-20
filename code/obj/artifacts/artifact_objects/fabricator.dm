@@ -26,12 +26,11 @@
 	var/recharge_time = 60 SECONDS
 	var/recharging = FALSE
 
-	New()
-		..()
-		src.recipes = concrete_typesof(/datum/manufacture)
-		src.recipes -= concrete_typesof(/datum/manufacture/mechanics)
-
-		src.internal_fabricator.available = src.recipes
+	// New()
+	// 	..()
+	// 	src.recipes = concrete_typesof(/datum/manufacture) - concrete_typesof(/datum/manufacture/mechanics)
+	// 	for (var/i in 1 to 10)
+	// 		src.internal_fabricator.available += pick(src.recipes)
 
 	effect_touch(var/obj/O, var/mob/living/user)
 		if (..())

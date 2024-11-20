@@ -698,11 +698,12 @@
 
 	New()
 		..()
-		src.available = concrete_typesof(/datum/manufacture)
-		src.available -= concrete_typesof(/datum/manufacture/mechanics)
+		var/recipes = concrete_typesof(/datum/manufacture) - concrete_typesof(/datum/manufacture/mechanics)
+		for (var/i in 1 to 10)
+			src.available += pick(recipes)
 
 	build_icon()
-		src.icon_state = src.icon_base ? "[src.icon_base]-[rand(1-7)]" : src.icon_state
+		return
 
 	begin_work(new_production = TRUE)
 		src.error = null
@@ -902,15 +903,12 @@
 
 /obj/machinery/manufacturer/artifact/martian
 	name = "Martian Manufacturer"
-	icon_base = "martian"
 	lingo = new /datum/language/martian()
 
 /obj/machinery/manufacturer/artifact/ancient
 	name = "Ancient Manufacturer"
-	icon_base = "ancient"
 	lingo = new /datum/language/binary()
 
 /obj/machinery/manufacturer/artifact/clockwork
 	name = "Clockwork Manufacturer"
-	icon_base = "wizard"
 	lingo = new /datum/language/clockwork()
