@@ -93,12 +93,12 @@
 	//calls attack specials if we got em
 	//Ok look i know this isn't a true pixelaction() but it fits into the itemspecial call so i'm doin it
 	proc/attack_range(atom/target, var/mob/user, params)
-		if(user.a_intent == "disarm")
+		if(user.a_intent == "disarm" || params["disarm"])
 			if(disarm_special)
 				SEND_SIGNAL(user, COMSIG_MOB_CLOAKING_DEVICE_DEACTIVATE)
 				disarm_special.pixelaction(target,params,user)
 				return TRUE
-		else if (user.a_intent == "harm")
+		else if (user.a_intent == "harm"|| params["harm"])
 			if(harm_special)
 				for (var/obj/item/cloaking_device/I in user)
 					SEND_SIGNAL(user, COMSIG_MOB_CLOAKING_DEVICE_DEACTIVATE)

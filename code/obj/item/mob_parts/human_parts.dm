@@ -810,6 +810,9 @@
 		return FALSE
 
 	proc/chainsaw_move(mob/living/mover, new_loc, direction)
+		var/has_right_leg = istype(src.right_leg?.attached_item, src.item_type)
+		var/has_left_leg = istype(src.left_leg?.attached_item, src.item_type)
+
 		if (mover.client?.check_key(KEY_RUN) && istype(mover.special_sprint, /datum/special_sprint/chainaw))
 
 			var/stamina = STAMINA_COST_SPRINT * 4
@@ -818,19 +821,23 @@
 			// apply movement modifier
 			// it's annoying to do this twice but this is kind of the best way to do it
 			// we adjust the movement modifier / stamina / damage etc.
-			if (istype(src.right_leg?.attached_item, src.item_type))
+			if (has_right_leg)
 				var/obj/item/saw/chainsaw = src.right_leg?.attached_item
-				src.right_leg.limb_hit_bonus = chainsaw.active_force // chainsaws do more damage when revved
+				chainsaw.active = !(chainsaw.active)
+				src.right_leg.limb_hit_bonus = chainsaw.force // chainsaws do more damage when revved
 				src.right_leg.movement_modifier = /datum/movement_modifier/robot_part/tread_right
+				src.right_leg.update_item_icon(chainsaw.base_state)
 				do_overlay = TRUE
 				stamina = stamina / 2
-			if (istype(src.left_leg?.attached_item, src.item_type))
+			if (has_left_leg)
 				var/obj/item/saw/chainsaw = src.left_leg?.attached_item
-				src.left_leg.limb_hit_bonus = chainsaw.active_force
+				chainsaw.active = !(chainsaw.active)
+				src.left_leg.limb_hit_bonus = chainsaw.force
 				src.left_leg.movement_modifier = /datum/movement_modifier/robot_part/tread_left
+				src.left_leg.update_item_icon(chainsaw.base_state)
 				do_overlay = TRUE
 				stamina = stamina / 2
-			mover.add_stamina(stamina)
+			mover.remove_stamina(stamina)
 
 			// Apply speed overlay
 			if (do_overlay)
@@ -838,6 +845,19 @@
 				speed_overlay.overlays = image('icons/mob/robots.dmi', "up-speed")
 				mover.AddOverlays(speed_overlay, "chainsawing", TRUE)
 
+		// Reset values
+		if (has_right_leg)
+			var/obj/item/saw/chainsaw = src.right_leg?.attached_item
+			chainsaw.active = !(chainsaw.active)
+			src.right_leg.limb_hit_bonus = chainsaw.force // chainsaws do more damage when revved
+			src.right_leg.movement_modifier = initial(src.right_leg.movement_modifier)
+			src.right_leg.update_item_icon(chainsaw.icon_state)
+		if (has_left_leg)
+			var/obj/item/saw/chainsaw = src.left_leg?.attached_item
+			chainsaw.active = !(chainsaw.active)
+			src.left_leg.limb_hit_bonus = chainsaw.force
+			src.left_leg.movement_modifier = initial(src.left_leg.movement_modifier)
+			src.left_leg.update_item_icon(chainsaw.icon_state)
 		mover.ClearSpecificOverlays("chainsawing")
 
 	// Check if bump, returns TRUE if crashed
@@ -897,6 +917,23 @@
 				var/obj/item/mop/mopper = src.assigned_item
 				mopper.attack(T, src.holder.owner)
 
+/datum/targetable/item_leg_ability/sword
+	name = "Sword Leg"
+	desc = "Allows you to attack with your leg! Kind of!"
+	icon_state = "template-martian"
+	item_type = /obj/item/sword
+
+	cast(atom/target)
+		..()
+		if (istype(src.assigned_item, src.item_type))
+			var/mob/living/carbon/human/M = src.holder.owner
+			var/list/params = list()
+			params["left"] = TRUE
+			params["disarm"] = TRUE
+			var/datum/limb/L = M.equipped_limb(check_leg = TRUE)
+			if (L)
+				L.attack_range(target, M, params)
+
 /obj/item/parts/human_parts/leg/left/item
 	name = "left item leg"
 	decomp_affected = FALSE
@@ -904,14 +941,13 @@
 	streak_decal = /obj/decal/cleanable/blood // what streaks everywhere when it's cut off?
 	streak_descriptor = "bloody" //bloody, oily, et
 	attached_item = null
-	handlistPart = null
 	partlistPart = null
 	no_icon = TRUE
 	skintoned = FALSE
 	/// uses defines and flags to determine if you can drop or remove it.
 	var/original_flags = 0
-	var/image/handimage = 0
-	var/special_icons = 'icons/mob/human.dmi'
+	var/image/legimage = 0
+	var/special_icons = 'icons/mob/item_legs.dmi'
 	step_image_state = "itemprintsL"
 	random_limb_blacklisted = TRUE
 	/// Also, item legs are supposedly junk jammed into a severed limb's socket
@@ -939,6 +975,8 @@
 				src.ability = /datum/targetable/item_leg_ability/chainsaw
 			else if(istype(I, /obj/item/mop))
 				src.ability = /datum/targetable/item_leg_ability/mop
+			else if(istype(I, /obj/item/sword))
+				src.ability = /datum/targetable/item_leg_ability/sword
 
 		if (src.ability)
 			src.ability_holder.addAbility(src.ability)
@@ -951,8 +989,8 @@
 			H = src.loc
 
 		name = "left [I.name] leg"
-		partlistPart = "legL-item-[I.name]"
-		attached_item = I//.type
+		partlistPart = "[I.icon_state]-L"
+		attached_item = I
 		limb_hit_bonus = I.force // bonus for kicking people
 		I.set_loc(src)
 		attached_item.temp_flags |= IS_LIMB_ITEM
@@ -977,6 +1015,9 @@
 				H.set_body_icon_dirty()
 				H.update_bloody_feet()
 
+	proc/update_item_icon(var/new_name)
+		partlistPart = "[new_name]-L"
+
 	proc/remove_from_mob(delete = 0)
 		if (isitem(attached_item))
 			attached_item.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
@@ -993,15 +1034,9 @@
 		if (delete && attached_item)
 			qdel(attached_item)
 
-	getHandIconState()
-		if (handlistPart && !(handlistPart in icon_states(special_icons)))
-			.= handimage
-		else
-			.=..()
-
 	getPartIconState()
 		if (partlistPart && !(partlistPart in icon_states(special_icons)))
-			.= handimage
+			.= src.legimage
 		else
 			.=..()
 
@@ -1028,15 +1063,14 @@
 	streak_decal = /obj/decal/cleanable/blood // what streaks everywhere when it's cut off?
 	streak_descriptor = "bloody" //bloody, oily, et
 	attached_item = null
-	handlistPart = null
 	partlistPart = "legR-item"
 	side = "right"
 	no_icon = TRUE
 	skintoned = FALSE
 	/// uses defines and flags to determine if you can drop or remove it.
 	var/original_flags = 0
-	var/image/handimage = 0
-	var/special_icons = 'icons/mob/human.dmi'
+	var/image/legimage = 0
+	var/special_icons = 'icons/mob/item_legs.dmi'
 	step_image_state = "itemprintsR"
 	random_limb_blacklisted = TRUE
 	/// Also, item legs are supposedly junk jammed into a severed limb's socket
@@ -1064,6 +1098,8 @@
 				src.ability = /datum/targetable/item_leg_ability/chainsaw
 			else if(istype(I, /obj/item/mop))
 				src.ability = /datum/targetable/item_leg_ability/mop
+			else if(istype(I, /obj/item/sword))
+				src.ability = /datum/targetable/item_leg_ability/sword
 
 		if (src.ability)
 			src.ability_holder.addAbility(src.ability)
@@ -1076,8 +1112,8 @@
 			H = src.loc
 
 		name = "right [I.name] leg"
-		partlistPart = "legR-item-[I.name]"
-		attached_item = I//.type
+		partlistPart = "[I.icon_state]-R"
+		attached_item = I
 		limb_hit_bonus = I.force // bonus for kicking people
 		I.set_loc(src)
 		attached_item.temp_flags |= IS_LIMB_ITEM
@@ -1102,6 +1138,9 @@
 				H.set_body_icon_dirty()
 				H.update_bloody_feet()
 
+	proc/update_item_icon(var/new_name)
+		partlistPart = "[new_name]-L"
+
 	proc/remove_from_mob(delete = 0)
 		if (isitem(attached_item))
 			attached_item.cant_drop = (original_flags & ORIGINAL_FLAGS_CANT_DROP) ? 1 : 0
@@ -1118,16 +1157,9 @@
 		if (delete && attached_item)
 			qdel(attached_item)
 
-
-	getHandIconState()
-		if (handlistPart && !(handlistPart in icon_states(special_icons)))
-			.= handimage
-		else
-			.=..()
-
 	getPartIconState()
 		if (partlistPart && !(partlistPart in icon_states(special_icons)))
-			.= handimage
+			.= src.legimage
 		else
 			.=..()
 

@@ -603,11 +603,17 @@
 		return HH.limb
 	return null
 
-/mob/living/carbon/human/equipped_limb()
-	if (!hand && limbs?.r_arm)
-		return limbs.r_arm.limb_data
-	else if (hand && limbs?.l_arm)
-		return limbs.l_arm.limb_data
+/mob/living/carbon/human/equipped_limb(var/check_leg = FALSE)
+	if (check_leg)
+		if (limbs?.r_leg)
+			return limbs.r_leg.limb_data
+		else if (limbs?.l_leg)
+			return limbs.l_leg.limb_data
+	else
+		if (!hand && limbs?.r_arm)
+			return limbs.r_arm.limb_data
+		else if (hand && limbs?.l_arm)
+			return limbs.l_arm.limb_data
 	return null
 
 
