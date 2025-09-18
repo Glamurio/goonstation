@@ -710,14 +710,16 @@
 	// Availability of recipes determined by origin and RNG
 	// This gets set in New() on the artifact itself because the manufacturer doesn't know its own origin
 	available = list()
-	// TODO: Implement other languages
-	var/datum/language/lingo = new /datum/language/martian()
+	// Abstract say source to translate the interface
+	var/atom/movable/abstract_say_source/artifact_fabricator/interface_text = new()
+	var/datum/language/lingo = /datum/language/martian
 
 	New()
-		..()
+		src.interface_text.update_language(lingo)
 		var/recipes = concrete_typesof(/datum/manufacture) - concrete_typesof(/datum/manufacture/mechanics)
 		for (var/i in 1 to 10)
 			src.available += pick(recipes)
+		..()
 
 	build_icon()
 		return
@@ -779,7 +781,7 @@
 		if (isnull(M.item_names))
 			M.item_names = list()
 			for (var/datum/manufacturing_requirement/R as anything in M.item_requirements)
-				M.item_names += src.lingo.heard_not_understood(R.getName())
+				M.item_names += src.interface_text.process_message(R.getName()).content
 
 		for (var/i in 1 to length(M.item_outputs))
 			var/T
@@ -791,8 +793,8 @@
 
 			if (ispath(T, /atom/))
 				var/atom/A = T
-				generated_names += src.lingo.heard_not_understood(initial(A.name))
-				generated_descriptions += "[src.lingo.heard_not_understood(initial(A.desc))]"
+				generated_names += src.interface_text.process_message(initial(A.name)).content
+				generated_descriptions += "[src.interface_text.process_message(initial(A.desc)).content]"
 
 		var/img
 		if (istype(M, /datum/manufacture/mechanics))
@@ -803,11 +805,11 @@
 
 		var/requirement_data = list()
 		for (var/datum/manufacturing_requirement/R as anything in M.item_requirements)
-			requirement_data += list(list("name" = src.lingo.heard_not_understood(R.getName()), "id" = R.getID(), "amount" = M.item_requirements[R]))
+			requirement_data += list(list("name" = src.interface_text.process_message(R.getName()).content, "id" = R.getID(), "amount" = M.item_requirements[R]))
 
 		return list(
-			"name" = src.lingo.heard_not_understood(M.name),
-			"category" = src.lingo.heard_not_understood(M.category),
+			"name" = src.interface_text.process_message(M.name).content,
+			"category" = src.interface_text.process_message(M.category).content,
 			"requirement_data" = requirement_data,
 			"item_names" = generated_names,
 			"item_descriptions" = generated_descriptions,
@@ -826,7 +828,7 @@
 			if (isnull(M.category) || !(M.category in src.categories)) // fix for not displaying blueprints/manudrives
 				M.category = "Miscellaneous"
 				logTheThing(LOG_DEBUG, src, "Manufacturing blueprint [M] has category [M.category], which is not on the list of categories for [src]!")
-			var/translated_category = src.lingo.heard_not_understood(M.category)
+			var/translated_category = src.interface_text.process_message(M.category).content
 			if (length(as_list[translated_category]) == 0)
 				as_list[translated_category] = list()
 			as_list[translated_category] += list(manufacture_as_list(M, user, static_elements))
@@ -846,7 +848,7 @@
 				continue
 			resource_data += list(
 				list(
-					"name" = src.lingo.heard_not_understood(P.material.getName()),
+					"name" = src.interface_text.process_message(P.material.getName()).content,
 					"id" = P.material.getID(),
 					"amount" = P.amount,
 					"byondRef" = "\ref[P]",
@@ -859,8 +861,8 @@
 		for (var/datum/manufacture/M in src.queue)
 			queue_data += list(
 				list(
-					"name" = src.lingo.heard_not_understood(M.name),
-				 	"category" = src.lingo.heard_not_understood(M.category),
+					"name" = src.interface_text.process_message(M.name).content,
+				 	"category" = src.interface_text.process_message(M.category).content,
 				  	"type" = src.get_blueprint_type(M)
 				)
 			)
@@ -900,9 +902,9 @@
 	ui_static_data(mob/user)
 		var/list/translated_categories = list()
 		for (var/cat in src.categories)
-			translated_categories += src.lingo.heard_not_understood(cat)
+			translated_categories += src.interface_text.process_message(cat).content
 		return list (
-			"fabricator_name" = src.lingo.heard_not_understood(src.name),
+			"fabricator_name" = src.interface_text.process_message(src.name).content,
 			"all_categories" = translated_categories,
 			"available_blueprints" = blueprints_as_list(src.available, user),
 			"hidden_blueprints" = blueprints_as_list(src.hidden, user),
@@ -920,12 +922,12 @@
 
 /obj/machinery/manufacturer/artifact/martian
 	name = "Martian Manufacturer"
-	lingo = new /datum/language/martian()
+	lingo = /datum/language/martian
 
 /obj/machinery/manufacturer/artifact/ancient
 	name = "Ancient Manufacturer"
-	lingo = new /datum/language/binary()
+	lingo = /datum/language/binary
 
-/obj/machinery/manufacturer/artifact/clockwork
-	name = "Clockwork Manufacturer"
-	lingo = new /datum/language/clockwork()
+// /obj/machinery/manufacturer/artifact/clockwork
+// 	name = "Clockwork Manufacturer"
+// 	lingo = new /datum/language/clockwork()

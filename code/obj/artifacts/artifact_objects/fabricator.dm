@@ -14,8 +14,7 @@
 	type_size = ARTIFACT_SIZE_LARGE
 	rarity_weight = 200
 	validtypes = list("martian")
-	validtriggers = list(/datum/artifact_trigger/force,/datum/artifact_trigger/electric,/datum/artifact_trigger/heat,
-	/datum/artifact_trigger/carbon_touch,/datum/artifact_trigger/data)
+	validtriggers = list(/datum/artifact_trigger/carbon_touch)
 	fault_blacklist = list(ITEM_ONLY_FAULTS)
 	activated = 0
 	activ_text = "rattles and opens up a compartment."
