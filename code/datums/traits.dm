@@ -26,6 +26,7 @@
 		"hemophilia",
 		"nohair",
 		"nowig",
+		"infrared",
 	)
 
 	var/list/traitData = list()
@@ -239,7 +240,15 @@
 		ASSERT(src.name)
 		..()
 
-	proc/preventAddTrait(mob/owner, var/resolved_role)
+	/// Returns TRUE if a trait should NOT be added to a mob.
+	proc/preventAddTrait(mob/owner, resolved_role)
+		if (resolved_role == "tutorial")
+			for (var/trait_cateogry in src.category)
+				if (trait_cateogry == "species")
+					return FALSE
+				if (trait_cateogry == "language")
+					return FALSE
+			return TRUE
 		. = FALSE
 
 	proc/onAdd(var/mob/owner)
@@ -296,24 +305,13 @@
 	onRemove(mob/owner)
 		owner.bioHolder?.RemoveEffect("deaf")
 
-/datum/trait/nolegs
-	name = "Stumped"
-	desc = "Because of a freak accident involving a piano, a forklift, and lots of vodka, both of your legs had to be amputated. Fortunately, NT has kindly supplied you with a wheelchair out of the goodness of their heart. (due to regulations)"
-	id = "nolegs"
-	icon_state = "stumped"
-	category = list("body")
-	points = 0
-	disability_type = TRAIT_DISABILITY_MAJOR
-	disability_name = "Legless"
-	disability_desc = "Legs have been severed"
-
 /datum/trait/plasmalungs
 	name = "Plasma Lungs"
 	desc = "You signed up for a maintenance experiment involving someone who was definitely a scientist and your lungs are now only capable of breathing in plasma. At least they gave you a free tank to breathe from."
 	id = "plasmalungs"
 	icon_state = "plasmalungs"
 	category = list("body")
-	points = 1
+	points = 2
 	afterlife_blacklisted = TRUE
 	disability_type = TRAIT_DISABILITY_MAJOR
 	disability_name = "Plasma Lungs"
@@ -464,7 +462,7 @@
 	category =  list("language")
 
 	onAdd(var/mob/owner)
-		owner.bioHolder?.AddEffect("accent_german")
+		owner.bioHolder?.AddEffect("accent_german", 0, 0, 0, 1)
 
 /datum/trait/finnish
 	name = "Finnish Accent"
@@ -486,7 +484,7 @@
 	category = list("language")
 
 	onAdd(var/mob/owner)
-		owner.bioHolder?.AddEffect("accent_tyke")
+		owner.bioHolder?.AddEffect("accent_tyke", 0, 0, 0, 1)
 
 // VISION/SENSES - Green Border
 
@@ -504,7 +502,7 @@
 	id = "infravision"
 	icon_state = "infravisionG"
 	points = -1
-	category = list("vision")
+	category = list("vision", "infrared")
 
 /datum/trait/wasitsomethingisaid
 	name = "Was It Something I Said?"
@@ -669,6 +667,13 @@
 	points = 0
 	category = list("trinkets", "nopug","nowig")
 
+/datum/trait/wheelchair
+	name = "Wheelchair"
+	desc = "Because of a freak accident involving a piano, a forklift, and lots of vodka, you have been placed on the disability list. Fortunately, NT has kindly supplied you with a wheelchair out of the goodness of their heart. (due to regulations)"
+	id = "wheelchair"
+	icon_state = "stumped"
+	category = list("trinkets")
+	points = 0
 
 // Skill - White Border
 
@@ -688,6 +693,14 @@
 	category = list("skill")
 	points = -2
 
+/datum/trait/martyrdom
+	name = "Martyrdom"
+	id = "martyrdom"
+	desc = "If you have a grenade in-hand, arm it on death"
+	icon_state = "no"
+	category = list("skill")
+	points = -1
+
 /datum/trait/happyfeet
 	name = "Happyfeet"
 	desc = "Sometimes people can't help but dance along with you."
@@ -703,6 +716,27 @@
 	icon_state = "claw"
 	category = list("skill")
 	points = -1
+
+/datum/trait/anti_headpat
+	name = "Touch Shy"
+	id = "touchshy"
+	desc = "You really don't like people touching your head (or anywhere else), and will reflexively shove anyone who tries."
+	icon_state = "touchshy"
+	category = list("skill")
+	points = -1
+
+	onAdd(mob/owner)
+		. = ..()
+		RegisterSignal(owner, COMSIG_ATTACKHAND, PROC_REF(defend_personal_space))
+
+	onRemove(mob/owner)
+		. = ..()
+		UnregisterSignal(owner, COMSIG_ATTACKHAND)
+
+	proc/defend_personal_space(mob/owner, mob/target)
+		if(owner != target && can_act(owner) && target.a_intent == INTENT_HELP)
+			owner.disarm(target, is_special = TRUE)
+			playsound(owner, 'sound/impact_sounds/Generic_Swing_1.ogg', 50, TRUE)
 
 /* Hey dudes, I moved these over from the old bioEffect/Genetics system so they work on clone */
 
@@ -726,7 +760,7 @@ ABSTRACT_TYPE(/datum/trait/job)
 	id = "training_chaplain"
 
 	var/faith = FAITH_STARTING
-	///multiplier for faith gain only - faith losses ignore this
+	/// multiplier for faith gain only - faith losses ignore this
 	var/faith_mult = 1
 
 	New()
@@ -794,8 +828,8 @@ ABSTRACT_TYPE(/datum/trait/job)
 
 	onAdd(var/mob/owner)
 		owner.AddComponent(/datum/component/death_confetti)
-		owner.bioHolder?.AddEffect("accent_comic", magical = TRUE)
-		owner.bioHolder?.AddEffect("clumsy", magical = TRUE)
+		owner.bioHolder?.AddEffect("accent_comic", innate = TRUE)
+		owner.bioHolder?.AddEffect("clumsy", innate = TRUE)
 
 /datum/trait/job/mime
 	name = "Mime Training"
@@ -803,8 +837,8 @@ ABSTRACT_TYPE(/datum/trait/job)
 	id = "training_mime"
 
 	onAdd(var/mob/owner)
-		owner.bioHolder?.AddEffect("mute", magical = TRUE)
-		owner.bioHolder?.AddEffect("blankman", magical = TRUE)
+		owner.bioHolder?.AddEffect("mute", innate = TRUE)
+		owner.bioHolder?.AddEffect("blankman", innate = TRUE)
 
 /datum/trait/job/miner
 	name = "Miner Training"
@@ -1079,6 +1113,7 @@ TYPEINFO(/datum/trait/partyanimal)
 	proc/turnOn(mob/owner)
 		for(var/image/I as anything in global.clown_disbelief_images)
 			owner.client.images += I
+		owner.ensure_listen_tree().AddListenModifier(LISTEN_MODIFIER_CLOWN_DISBELIEF)
 
 	proc/examined(mob/owner, mob/examiner, list/lines)
 		if(examiner.job == "Clown")
@@ -1093,6 +1128,7 @@ TYPEINFO(/datum/trait/partyanimal)
 	proc/turnOff(mob/owner)
 		for(var/image/I as anything in global.clown_disbelief_images)
 			owner.last_client.images -= I
+		owner.ensure_listen_tree().RemoveListenModifier(LISTEN_MODIFIER_CLOWN_DISBELIEF)
 
 
 /datum/trait/unionized
@@ -1133,6 +1169,54 @@ TYPEINFO(/datum/trait/partyanimal)
 	disability_type = TRAIT_DISABILITY_MAJOR
 	disability_name = "Clone Instability"
 	disability_desc = "Genetic structure incompatible with cloning"
+
+/datum/trait/defect_prone
+	name = "Defect Prone"
+	desc = "You gain more cloning defects than normal."
+	id = "defect_prone"
+	icon_state = "defect_prone"
+	points = 1
+	category = list("cloner_stuff")
+	disability_type = TRAIT_DISABILITY_MINOR
+	disability_name = "Fragmentary Cloning"
+	disability_desc = "Genetic structure significantly more likely to result in defects upon cloning."
+
+/datum/trait/cyber_incompatible
+	name = "Cyber-Incompatible"
+	desc = "All cybernetic limbs and organs will fail, including cyborgification."
+	id = "cyber_incompatible"
+	icon_state = "cyber_incompatible"
+	points = 1
+	disability_type = TRAIT_DISABILITY_MAJOR
+	disability_name = "Cybernetics Incompatibility"
+	disability_desc = "Patient is incompatible with all forms of cybernetic augmentation, including cyborgification."
+
+	onAdd(mob/owner)
+		. = ..()
+		var/mob/living/carbon/human/H = owner
+		H.organHolder?.brain?.cyber_incompatible = TRUE
+
+	onLife(mob/owner, mult)
+		. = ..()
+		var/mob/living/carbon/human/H = owner
+		var/cyber_rejected = FALSE
+		for (var/obj/item/parts/P in list(H.limbs.l_arm, H.limbs.r_arm, H.limbs.l_leg, H.limbs.r_leg))
+			if (isrobolimb(P))
+				boutput(H, SPAN_ALERT("Your body is incompatible with [P] and rejects it!"))
+				P.sever()
+				cyber_rejected = TRUE
+		for (var/organ_slot in H.organHolder.organ_list)
+			var/obj/item/organ/O = H.organHolder.organ_list[organ_slot]
+			if (istype(O) && O.robotic)
+				boutput(H, SPAN_ALERT("Your body is incompatible with [O] and rejects it!"))
+				H.organHolder.drop_and_throw_organ(O)
+				cyber_rejected = TRUE
+		if (cyber_rejected)
+			H.visible_message(SPAN_ALERT("[H]'s body convulses for a moment as it rejects the cybernetic augments!"))
+			elecflash(H, exclude_center=FALSE)
+			H.force_laydown_standup()
+			violent_standup_twitch(H) // duping vamp fx on purpose to increase vampire ambiguity
+			playsound(H.loc, 'sound/effects/bones_break.ogg', 60, 1)
 
 /datum/trait/survivalist
 	name = "Survivalist"
@@ -1182,6 +1266,7 @@ TYPEINFO(/datum/trait/partyanimal)
 		if(probmult(0.01))
 			owner.setStatus("burning", 100 SECONDS, 60 SECONDS)
 			playsound(owner.loc, 'sound/effects/mag_fireballlaunch.ogg', 50, 0)
+			logTheThing(LOG_COMBAT, owner, "gets set on fire by their spontaneous combustion trait")
 			owner.visible_message(SPAN_ALERT("<b>[owner.name]</b> suddenly bursts into flames!"))
 
 /datum/trait/carpenter
@@ -1222,6 +1307,27 @@ TYPEINFO(/datum/trait/partyanimal)
 	icon_state = "clutz"
 	points = 2
 	afterlife_blacklisted = TRUE
+
+/datum/trait/butterfingers
+	name = "Butterfingers"
+	desc = "You have difficulty keeping hold of things."
+	id = "butterfingers"
+	icon_state = "butterfingers"
+	points = 2
+	afterlife_blacklisted = TRUE
+
+	onLife(var/mob/owner, var/mult)
+		if(!can_act(owner) || !istype(owner))
+			return
+		if(!probmult(10))
+			return
+		var/obj/item/target_item = owner.equipped() //prioritise actively held items
+		if(!target_item)
+			target_item = owner.find_type_in_hand(/obj/item)
+		if(!target_item || target_item.cant_drop)
+			return
+		owner.drop_item(target_item)
+		owner.visible_message(SPAN_ALERT("<b>[owner.name]</b> accidentally drops [target_item]!"))
 
 /datum/trait/leftfeet
 	name = "Two left feet"
@@ -1273,6 +1379,7 @@ TYPEINFO(/datum/trait/partyanimal)
 	onAdd(mob/living/owner)
 		if (istype(owner))
 			owner.remove_lifeprocess(/datum/lifeprocess/faith)
+		// If they're a chaplain, reduce their faith gain rate
 		var/datum/trait/job/chaplain/chap_trait = owner.traitHolder?.getTrait("training_chaplain")
 		chap_trait?.faith_mult = 0.2
 
@@ -1289,7 +1396,7 @@ TYPEINFO(/datum/trait/partyanimal)
 	desc = "You are an abhorrent humanoid reptile, cold-blooded and ssssibilant."
 	id = "lizard"
 	points = -1
-	category = list("species")
+	category = list("species", "infrared")
 	mutantRace = /datum/mutantrace/lizard
 
 /datum/trait/cow
@@ -1316,7 +1423,7 @@ TYPEINFO(/datum/trait/partyanimal)
 	desc = "One space-morning, on the shuttle-ride to the station, you found yourself transformed in your seat into a horrible vermin. A cockroach, specifically."
 	id = "roach"
 	points = -1
-	category = list("species")
+	category = list("species", "infrared")
 	mutantRace = /datum/mutantrace/roach
 
 /datum/trait/pug
@@ -1327,6 +1434,34 @@ TYPEINFO(/datum/trait/partyanimal)
 	points = -4 //Subject to change- -3 feels too low as puritan is relatively common. Though Puritan Pug DOES make for a special sort of Hard Modes
 	category = list("species", "nopug", "nohair")
 	mutantRace = /datum/mutantrace/pug
+
+/datum/trait/random_species
+	name = "Random Species"
+	icon_state = "randomspecies"
+	desc = "You feel like something's different today, but you can't quite put your finger/tail/hoof/antennae on it."
+	id = "random_species"
+	points = -1
+	category = list("species", "infrared", "cloner_stuff", "nohair", "hemophilia")
+
+	onAdd(mob/owner)
+		if (ishuman(owner))
+			var/mob/living/carbon/human/H = owner
+			var/datum/mutantrace/new_mutantrace_type = null
+			if (prob(1) && prob(1)) // 0.01% chance of a weird mutantrace
+				new_mutantrace_type = pick(filtered_concrete_typesof(/datum/mutantrace, /proc/safe_mutantrace_nogenepool_filter))
+			else // otherwise, pick any -1 point mutrace
+				new_mutantrace_type = pick(/datum/mutantrace/lizard, /datum/mutantrace/cow, /datum/mutantrace/skeleton,	/datum/mutantrace/roach)
+			if (isnull(new_mutantrace_type)) // safety
+				logTheThing(LOG_DEBUG, src, "Failed to generate a random species for [owner].")
+				new_mutantrace_type = /datum/mutantrace/human
+			H.default_mutantrace = new_mutantrace_type
+			H.set_mutantrace(H.default_mutantrace)
+
+	onRemove(mob/owner)
+		if(ishuman(owner))
+			var/mob/living/carbon/human/H = owner
+			H.default_mutantrace = /datum/mutantrace/human
+			H.set_mutantrace(H.default_mutantrace)
 
 /datum/trait/super_slips
 	name = "Slipping Hazard"
@@ -1381,8 +1516,13 @@ TYPEINFO(/datum/trait/partyanimal)
 	category = list("body", "nohair","nowig")
 	icon_state = "hair"
 
+	preventAddTrait(mob/owner, resolved_role)
+		. = ..()
+		if (resolved_role == "tutorial")
+			. = FALSE
+
 	onAdd(mob/owner)
-		owner.bioHolder.AddEffect("hair_growth", magical = TRUE)
+		owner.bioHolder.AddEffect("hair_growth", innate = TRUE)
 
 	onRemove(mob/owner)
 		owner.bioHolder.RemoveEffect("hair_growth")
@@ -1423,3 +1563,15 @@ TYPEINFO(/datum/trait/partyanimal)
 		if(ishuman(owner) && prob(10))
 			var/mob/living/carbon/human/H = owner
 			randomize_mob_limbs(H)
+
+// organ removal associated traits
+// removal is handled in part customization, tracked here for equipping sensory item
+/datum/trait/missing_left_eye
+	name = "Missing Left Eye"
+	id = "eye_missing_left"
+	unselectable = TRUE
+
+/datum/trait/missing_right_eye
+	name = "Missing Right Eye"
+	id = "eye_missing_right"
+	unselectable = TRUE

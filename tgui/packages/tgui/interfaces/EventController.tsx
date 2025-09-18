@@ -7,12 +7,13 @@ import { numberOfDecimalDigits } from 'common/math';
 import { useState } from 'react';
 import {
   Button,
-  Flex,
+  Icon,
   LabeledList,
   NumberInput,
   Section,
   Stack,
   Tabs,
+  Tooltip,
 } from 'tgui-core/components';
 import { toFixed } from 'tgui-core/math';
 import type { BooleanLike } from 'tgui-core/react';
@@ -75,17 +76,17 @@ const QueuedSection = (props: QueuedSectionProps) => {
 
   return (
     <Section title="Scheduled Events">
-      <Flex direction="column">
+      <Stack vertical>
         {sortedQueue.length ? (
           sortedQueue.map((queuedEvent, i) => (
-            <Flex.Item mb={1} key={i}>
+            <Stack.Item key={i}>
               <QueuedEvent {...queuedEvent} />
-            </Flex.Item>
+            </Stack.Item>
           ))
         ) : (
-          <Flex.Item>None</Flex.Item>
+          <Stack.Item>None</Stack.Item>
         )}
-      </Flex>
+      </Stack>
     </Section>
   );
 };
@@ -98,10 +99,10 @@ const RoundStartSection = (props: RoundStartProps) => {
   const { act } = useBackend();
   return (
     <Section title="Round Start Events">
-      <Flex direction="column">
+      <Stack vertical>
         {props.roundStartData.length ? (
           props.roundStartData.map((startEvent, i) => (
-            <Flex.Item mb={1} key={i}>
+            <Stack.Item mb={1} key={i}>
               <Stack align="left">
                 <Stack.Item grow>{startEvent.name}</Stack.Item>
                 <Stack.Item>
@@ -118,12 +119,12 @@ const RoundStartSection = (props: RoundStartProps) => {
                   />
                 </Stack.Item>
               </Stack>
-            </Flex.Item>
+            </Stack.Item>
           ))
         ) : (
-          <Flex.Item>None</Flex.Item>
+          <Stack.Item>None</Stack.Item>
         )}
-      </Flex>
+      </Stack>
     </Section>
   );
 };
@@ -158,15 +159,10 @@ const getEventIconColor = (enabled: BooleanLike, active: BooleanLike) => {
 };
 
 const getEventIconToolTip = (enabled: BooleanLike, active: BooleanLike) => {
-  if (enabled) {
-    if (active) {
-      return 'Active';
-    } else {
-      return 'Enabled';
-    }
-  } else {
-    return 'Disabled';
-  }
+  return (
+    (enabled ? 'Enabled and ' : 'Disabled and ') +
+    (active ? 'Active' : 'Inactive')
+  );
 };
 
 const Event = (props: EventData) => {
@@ -174,10 +170,9 @@ const Event = (props: EventData) => {
   return (
     <Stack>
       <Stack.Item>
-        <Button
-          icon="circle"
-          color={getEventIconColor(props.enabled, props.available)}
-          tooltip={getEventIconToolTip(props.enabled, props.available)}
+        <Button.Checkbox
+          checked={props.enabled}
+          tooltip="Toggle Enablement"
           onClick={() =>
             act('toggle_event', {
               name: props.name,
@@ -185,13 +180,21 @@ const Event = (props: EventData) => {
             })
           }
         />
+        <Tooltip content={getEventIconToolTip(props.enabled, props.available)}>
+          <Icon
+            name="circle"
+            color={getEventIconColor(props.enabled, props.available)}
+          />
+        </Tooltip>
       </Stack.Item>
       <Stack.Item>{props.name}</Stack.Item>
       <Stack.Item grow opacity={0.3} />
       <Stack.Item>
         <Button
           icon="gun"
-          tooltip="Fire Event"
+          tooltip={
+            props.customizable ? 'Fire Customizable Event' : 'Fire Event'
+          }
           color={props.customizable ? 'green' : 'blue'}
           onClick={() =>
             act('trigger_event', {
@@ -232,7 +235,6 @@ const EventCategory = (props: EventTypeData) => {
     <Section
       title={
         <Stack align="center">
-          <Stack.Item>{capitalize(props.name)} Events</Stack.Item>
           <Stack.Item>
             <Button.Checkbox
               checked={props.enabled}
@@ -246,12 +248,13 @@ const EventCategory = (props: EventTypeData) => {
               }
             />
           </Stack.Item>
+          <Stack.Item>{capitalize(props.name)} Events</Stack.Item>
         </Stack>
       }
     >
       {props.startTime ? (
-        <Flex>
-          <Flex.Item mb={1}>
+        <Stack>
+          <Stack.Item mb={1}>
             <Stack>
               <Stack.Item>
                 Next Time:
@@ -264,7 +267,7 @@ const EventCategory = (props: EventTypeData) => {
                   width="50px"
                   format={(value) => toFixed(value, numberOfDecimalDigits(0.1))}
                   unit="Min"
-                  onDrag={(value) =>
+                  onChange={(value) =>
                     act('set_category_value', {
                       name: 'nextEvent',
                       category: props.name,
@@ -284,7 +287,7 @@ const EventCategory = (props: EventTypeData) => {
                   width="50px"
                   format={(value) => toFixed(value, numberOfDecimalDigits(0.1))}
                   unit="Min"
-                  onDrag={(value) =>
+                  onChange={(value) =>
                     act('set_category_value', {
                       name: 'startTime',
                       category: props.name,
@@ -304,7 +307,7 @@ const EventCategory = (props: EventTypeData) => {
                   width="50px"
                   format={(value) => toFixed(value, numberOfDecimalDigits(0.1))}
                   unit="Min"
-                  onDrag={(value) =>
+                  onChange={(value) =>
                     act('set_category_value', {
                       name: 'delayLow',
                       category: props.name,
@@ -322,7 +325,7 @@ const EventCategory = (props: EventTypeData) => {
                   width="50px"
                   format={(value) => toFixed(value, numberOfDecimalDigits(0.1))}
                   unit="Min"
-                  onDrag={(value) =>
+                  onChange={(value) =>
                     act('set_category_value', {
                       name: 'delayHigh',
                       category: props.name,
@@ -332,23 +335,23 @@ const EventCategory = (props: EventTypeData) => {
                 />
               </Stack.Item>
             </Stack>
-          </Flex.Item>
-        </Flex>
+          </Stack.Item>
+        </Stack>
       ) : (
         ''
       )}
       {/* TODO: consider not rendering if no contents? */}
-      <Flex direction="column">
+      <Stack vertical>
         {props.eventList ? (
           props.eventList.map((event) => (
-            <Flex.Item key={event.name}>
+            <Stack.Item key={event.name} m={0}>
               <Event {...event} />
-            </Flex.Item>
+            </Stack.Item>
           ))
         ) : (
-          <Flex.Item />
+          <Stack.Item />
         )}
-      </Flex>
+      </Stack>
     </Section>
   );
 };
@@ -422,8 +425,8 @@ export const EventController = () => {
             </Stack>
           }
         >
-          <Flex direction="column">
-            <Flex.Item mb={1}>
+          <Stack vertical>
+            <Stack.Item>
               <Stack>
                 <Stack.Item>
                   Minimum Population:
@@ -434,7 +437,7 @@ export const EventController = () => {
                     stepPixelSize={4}
                     step={1}
                     width="30px"
-                    onDrag={(value) =>
+                    onChange={(value) =>
                       act('set_value', {
                         name: 'minPopulation',
                         new_data: value,
@@ -451,7 +454,7 @@ export const EventController = () => {
                     stepPixelSize={4}
                     step={0.01}
                     width="40px"
-                    onDrag={(value) =>
+                    onChange={(value) =>
                       act('set_value', {
                         name: 'aliveAntagonistThreshold',
                         new_data: value,
@@ -468,7 +471,7 @@ export const EventController = () => {
                     stepPixelSize={4}
                     step={0.01}
                     width="40px"
-                    onDrag={(value) =>
+                    onChange={(value) =>
                       act('set_value', {
                         name: 'deadPlayersThreshold',
                         new_data: value,
@@ -477,8 +480,8 @@ export const EventController = () => {
                   />
                 </Stack.Item>
               </Stack>
-            </Flex.Item>
-            <Flex.Item mb={1}>
+            </Stack.Item>
+            <Stack.Item mb={1}>
               <Stack>
                 <Stack.Item>
                   <Button
@@ -501,8 +504,8 @@ export const EventController = () => {
                   </LabeledList>
                 </Stack.Item>
               </Stack>
-            </Flex.Item>
-          </Flex>
+            </Stack.Item>
+          </Stack>
         </Section>
 
         <RoundStartSection roundStartData={data.roundStart} />
@@ -522,15 +525,15 @@ export const EventController = () => {
           ))}
         </Tabs>
 
-        <Flex>
+        <Stack>
           {data.eventData
             .filter((eventCat) => eventCat.name === groupName)
             .map((eventCat) => (
-              <Flex.Item mb={1} key={eventCat.name}>
+              <Stack.Item mb={1} key={eventCat.name}>
                 <EventCategory {...eventCat} />
-              </Flex.Item>
+              </Stack.Item>
             ))}
-        </Flex>
+        </Stack>
       </Window.Content>
     </Window>
   );

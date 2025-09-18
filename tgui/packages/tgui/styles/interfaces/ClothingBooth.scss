@@ -1,35 +1,27 @@
-@use '../base.scss';
-@use '../colors.scss';
-@use '../functions.scss' as *;
+@use 'sass:color';
+@use '../base';
+@use '../colors';
+@use '../functions' as *;
 
 .clothingbooth {
   &__boothitem {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
     cursor: pointer;
 
     &:hover {
-      background-color: darken(colors.$good, 30%);
+      background-color: hsl(
+        from var(--color-good) h s calc(l + var(--adjust-hover))
+      );
     }
 
     &--selected,
     &--selected:hover {
-      background-color: colors.$good;
+      background-color: var(--color-good);
     }
-
-    > div {
-      pointer-events: none;
-    }
-  }
-
-  &__boothitem &__boothitem &__preview {
-    width: 64px;
-    height: 128px;
   }
 
   &__swatch-box {
     &:hover {
-      outline: 0.167rem solid colors.$good;
+      outline: 0.167rem solid var(--color-good);
     }
   }
 
@@ -50,6 +42,6 @@
   }
 
   &__groupingtag {
-    border-radius: base.$border-radius;
+    border-radius: var(--border-radius-medium);
   }
 }

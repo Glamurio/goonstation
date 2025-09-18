@@ -1,9 +1,10 @@
-version: '3'
+name: "ss13-${SS13_ID:-main}"
 
 services:
   ss13:
     container_name: "ss13-${SS13_ID:-main}"
     restart: unless-stopped
+    image: "ss13:1"
     build: .
     volumes:
       - /pop/ss13/byond:/byond:ro
@@ -12,7 +13,14 @@ services:
       - ../../:/ss13_server:rw
     ports:
       - "${SS13_PORT:-6969}:${SS13_PORT:-6969}"
+    extra_hosts:
+      - "api.goonhub.com:192.168.0.1"
     environment:
       - SS13_ID=${SS13_ID:-main}
-    labels:
-      - monocker.enable=true
+      - SS13_PORT=${SS13_PORT:-6969}
+    healthcheck:
+      test: /usr/bin/bash /ss13_server/tools/server/healthcheck.sh
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 60s

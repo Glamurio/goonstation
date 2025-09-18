@@ -34,6 +34,7 @@ interface ChemMasterData {
   default_name;
   patch_icons;
   pill_icons;
+  name_max_len;
 }
 
 export const ReagentDisplay = (props) => {
@@ -73,7 +74,7 @@ export const ReagentDisplay = (props) => {
               minValue={1}
               maxValue={max_volume}
               step={1}
-              onDrag={(value) => set_remove_amount(Math.round(value))}
+              onChange={(value) => set_remove_amount(Math.round(value))}
             />
           </Box>
         </>
@@ -241,7 +242,7 @@ export const AmountInputControl = (props) => {
         minValue={5}
         maxValue={max_amount}
         step={1}
-        onDrag={(value) => set_amount(Math.round(value))}
+        onChange={(value) => set_amount(Math.round(value))}
       />
     </LabeledControls.Item>
   );
@@ -386,7 +387,7 @@ export const MakePills = (props) => {
   );
 };
 
-export const MakeBottle = (props, context) => {
+export const MakeBottle = (props) => {
   const { act, data } = useBackend<ChemMasterData>();
 
   const [bottle_amount, set_bottle_amount] = useSharedState(
@@ -561,7 +562,7 @@ export const MakePatches = (props) => {
 
 export const OperationsSection = (props) => {
   const { placeholder, item_name, set_item_name, max_volume } = props;
-
+  const { data } = useBackend<ChemMasterData>();
   const operation_height = 3;
   const margin_bottom = -0.5;
 
@@ -574,9 +575,10 @@ export const OperationsSection = (props) => {
           <Input
             value={item_name}
             placeholder={placeholder}
-            onChange={(e, value) => {
+            onBlur={(value) => {
               set_item_name(value);
             }}
+            maxLength={data.name_max_len}
           />
         </Box>
       }

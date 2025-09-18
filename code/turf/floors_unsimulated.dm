@@ -352,6 +352,26 @@
 /turf/unsimulated/floor/darkblue/checker/other
 	icon_state = "blue-dblue2"
 
+/turf/unsimulated/floor/darkblue/side
+	icon_state = "dblue"
+
+/turf/unsimulated/floor/darkblue/corner
+	icon_state = "dbluecorner"
+
+/turf/unsimulated/floor/darkblue/checker
+	icon_state = "dbluechecker"
+
+/turf/unsimulated/floor/darkblueblack
+	icon_state = "dblueblack"
+
+/turf/unsimulated/floor/darkblueblack/corner
+	icon_state = "dblueblackcorner"
+
+/turf/unsimulated/floor/darkbluewhite
+	icon_state = "dbluewhite"
+
+/turf/unsimulated/floor/darkbluewhite/corner
+	icon_state = "dbluewhitecorner"
 /////////////////////////////////////////
 
 /turf/unsimulated/floor/darkpurple
@@ -363,6 +383,20 @@
 /turf/unsimulated/floor/darkpurple/corner
 	icon_state = "dpurplecorner"
 
+/turf/unsimulated/floor/darkpurple/checker
+	icon_state = "dpurplechecker"
+
+/turf/unsimulated/floor/darkpurpleblack
+	icon_state = "dpurpleblack"
+
+/turf/unsimulated/floor/darkpurpleblack/corner
+	icon_state = "dpurpleblackcorner"
+
+/turf/unsimulated/floor/darkpurplewhite
+	icon_state = "dpurplewhite"
+
+/turf/unsimulated/floor/darkpurplewhite/corner
+	icon_state = "dpurplewhitecorner"
 /////////////////////////////////////////
 
 /turf/unsimulated/floor/bluegreen
@@ -539,15 +573,15 @@ TYPEINFO(/turf/unsimulated/floor/circuit)
 
 /turf/unsimulated/floor/carpet
 	name = "carpet"
-	icon = 'icons/turf/carpet.dmi'
+	icon = 'icons/turf/floors/carpet.dmi'
 	icon_state = "red1"
 
 /turf/unsimulated/floor/carpet/grime
-	icon = 'icons/turf/floors.dmi'
+	icon = 'icons/turf/floors/carpet.dmi'
 	icon_state = "grimy"
 
 /turf/unsimulated/floor/carpet/arcade
-	icon = 'icons/turf/floors.dmi'
+	icon = 'icons/turf/floors/carpet.dmi'
 	icon_state = "arcade_carpet"
 
 /turf/unsimulated/floor/carpet/arcade/half
@@ -557,11 +591,10 @@ TYPEINFO(/turf/unsimulated/floor/circuit)
 	icon_state = "arcade_carpet_blank"
 
 /turf/unsimulated/floor/carpet/office
-	icon = 'icons/turf/floors.dmi'
+	icon = 'icons/turf/floors/carpet.dmi'
 	icon_state = "office_carpet"
 
 /turf/unsimulated/floor/carpet/office/other
-	icon = 'icons/turf/floors.dmi'
 	icon_state = "office_carpet2"
 
 /////////////////////////////////////////
@@ -946,6 +979,8 @@ TYPEINFO(/turf/unsimulated/floor/wood)
 /turf/unsimulated/floor/snow
 	name = "snow"
 	icon_state = "snow1"
+	step_material = "step_snow"
+	turf_flags = MOB_STEP
 
 	New()
 		..()
@@ -956,6 +991,10 @@ TYPEINFO(/turf/unsimulated/floor/wood)
 		else if (prob(5))
 			icon_state = "snow4"
 		src.set_dir(pick(cardinal))
+
+	Uncrossed(atom/movable/AM)
+		. = ..()
+		src.snow_prints(AM)
 
 /turf/unsimulated/floor/snow/green
 	name = "snow-covered floor"
@@ -1146,6 +1185,20 @@ TYPEINFO(/turf/unsimulated/floor/auto)
 					edge_overlay.plane = PLANE_FLOOR
 					T.UpdateOverlays(edge_overlay, "edge_[direction]")
 
+/turf/unsimulated/floor/auto/grass
+	name = "grass"
+	icon = 'icons/turf/outdoors.dmi'
+	#ifdef SEASON_AUTUMN
+	icon_state = "grass_autumn"
+	#else
+	icon_state = "grass"
+	#endif
+	mat_changename = 0
+	mat_changedesc = 0
+	step_material = "step_outdoors"
+	step_priority = STEP_PRIORITY_MED
+	can_dig = TRUE
+
 /turf/unsimulated/floor/auto/grass/swamp_grass
 	name = "swamp grass"
 	desc = "Grass. In a swamp. Truly fascinating."
@@ -1180,6 +1233,7 @@ TYPEINFO(/turf/unsimulated/floor/auto)
 	icon_state_edge = "dirtedge"
 	step_material = "step_outdoors"
 	step_priority = STEP_PRIORITY_MED
+	can_dig = TRUE
 
 /turf/unsimulated/floor/auto/sand
 	name = "sand"
@@ -1189,6 +1243,7 @@ TYPEINFO(/turf/unsimulated/floor/auto)
 	edge_priority_level = FLOOR_AUTO_EDGE_PRIORITY_DIRT + 1
 	icon_state_edge = "sand_edge"
 	var/tuft_prob = 2
+	can_dig = TRUE
 
 	New()
 		..()
@@ -1288,13 +1343,19 @@ TYPEINFO(/turf/unsimulated/floor/auto/water/ice)
 	icon_state = "snow1"
 	edge_priority_level = FLOOR_AUTO_EDGE_PRIORITY_GRASS + 1
 	icon_state_edge = "snow_edge"
-	step_material = "step_outdoors"
+	step_material = "step_snow"
 	step_priority = STEP_PRIORITY_MED
+	turf_flags = MOB_STEP
+	can_dig = TRUE
 
 	New()
 		. = ..()
 		if(src.type == /turf/unsimulated/floor/auto/snow && prob(10))
 			src.icon_state = "snow[rand(1,5)]"
+
+	Uncrossed(atom/movable/AM)
+		. = ..()
+		src.snow_prints(AM)
 
 /turf/unsimulated/floor/auto/snow/rough
 	name = "snow"

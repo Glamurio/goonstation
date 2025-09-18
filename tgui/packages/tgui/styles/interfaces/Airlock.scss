@@ -1,10 +1,9 @@
-@use '../colors.scss';
-@use '../components/Button.scss';
-@use '../base.scss';
+@use '../colors';
+@use '../base';
 
 .AccessPanel-wires-btn {
   &.Button--selected {
-    background-color: colors.bg(colors.$average) !important;
+    background-color: colors.bg(var(--color-average)) !important;
   }
 }
 

@@ -48,7 +48,7 @@ ABSTRACT_TYPE(/datum/random_event/minor/fault)
 		var/obj/machinery/camera/C
 		var/list/obj/machinery/camera/possible_cameras = list()
 		for(var/i=1 to amount*3)
-			C = pick(camnets["SS13"])
+			C = pick(camnets[CAMERA_NETWORK_STATION])
 
 			if(istype(C, /obj/machinery/camera/television))
 				continue
@@ -68,7 +68,7 @@ ABSTRACT_TYPE(/datum/random_event/minor/fault)
 				areas += get_area(C)
 
 			SPAWN(rand(30 SECONDS, 70 SECONDS))
-				pda_msg( "Camera failure(s) detected.  Investigate: [list2text(areas, ", ")]", sender_name="CAMERA-DAEMON", group=list(MGO_AI, MGO_SILICON))
+				pda_msg( "Camera failure(s) detected.  Investigate: [jointext(areas, ", ")]", sender_name="CAMERA-DAEMON", group=list(MGO_AI, MGO_SILICON))
 
 
 /datum/random_event/minor/fault/door
@@ -101,4 +101,4 @@ ABSTRACT_TYPE(/datum/random_event/minor/fault)
 				areas += get_area(D)
 
 			SPAWN(rand(30 SECONDS, 70 SECONDS))
-				pda_msg( "Door failure(s) detected. Investigate: [list2text(areas, ", ")]", sender_name="EQUIPMENT-DAEMON", group=list(MGO_SILICON, MGD_STATIONREPAIR))
+				pda_msg( "Door failure(s) detected. Investigate: [jointext(areas, ", ")]", sender_name="EQUIPMENT-DAEMON", group=list(MGO_SILICON, MGD_STATIONREPAIR))

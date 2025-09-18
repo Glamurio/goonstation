@@ -27,7 +27,7 @@ interface GimmickObjectData {
 
 export const GimmickObject = () => {
   const { act, data } = useBackend<GimmickObjectData>();
-  const { eventList, interactiveTypes, activeStage, icon, iconState } = data;
+  const { eventList, interactiveTypes, activeStage } = data;
 
   return (
     <Window title="Gimmick Object Editor" width={675} height={600}>
@@ -106,7 +106,7 @@ export const GimmickObject = () => {
                           <Input
                             fluid
                             value={eventList[event].description}
-                            onInput={(e, description) =>
+                            onChange={(description) =>
                               act('description', {
                                 event: eventIndex,
                                 value: description,
@@ -140,7 +140,7 @@ export const GimmickObject = () => {
                           <Input
                             fluid
                             value={eventList[event].message}
-                            onInput={(e, message) =>
+                            onChange={(message) =>
                               act('message', {
                                 event: eventIndex,
                                 value: message,

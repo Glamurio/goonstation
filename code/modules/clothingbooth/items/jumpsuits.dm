@@ -86,7 +86,24 @@ ABSTRACT_TYPE(/datum/clothingbooth_item/w_uniform/diner_waitress_dress)
 		item_path = /obj/item/clothing/under/gimmick/dinerdress_pink
 
 /datum/clothingbooth_item/w_uniform/dirty_vest
-	item_path = /obj/item/clothing/under/misc/dirty_vest
+	name = "Red Pants"
+	swatch_background_color = "#8d1422"
+	item_path = /obj/item/clothing/under/misc/dirty_vest/
+
+	blackpants
+		name = "Black Jeans"
+		swatch_background_color = "#323232"
+		item_path = /obj/item/clothing/under/misc/dirty_vest/blackpants
+
+	bluepants
+		name = "Blue Jeans"
+		swatch_background_color = "#0f5b70"
+		item_path = /obj/item/clothing/under/misc/dirty_vest/bluepants
+
+	brownpants
+		name = "Brown Pants"
+		swatch_background_color = "#724f29"
+		item_path = /obj/item/clothing/under/misc/dirty_vest/brownpants
 
 ABSTRACT_TYPE(/datum/clothingbooth_item/w_uniform/dress_shirt_wcoat)
 /datum/clothingbooth_item/w_uniform/dress_shirt_wcoat
@@ -152,9 +169,6 @@ ABSTRACT_TYPE(/datum/clothingbooth_item/w_uniform/little_dress)
 		swatch_background_color = "#c8193a"
 		item_path = /obj/item/clothing/under/misc/dress/red
 
-/datum/clothingbooth_item/w_uniform/long_sleeved_shirt
-	item_path = /obj/item/clothing/suit/lshirt
-
 /datum/clothingbooth_item/w_uniform/maid
 	cost = PAY_TRADESMAN/3
 	item_path = /obj/item/clothing/under/gimmick/maid
@@ -172,9 +186,6 @@ ABSTRACT_TYPE(/datum/clothingbooth_item/w_uniform/masquerade)
 		name = "Peacock"
 		swatch_background_color = "#30457c"
 		item_path = /obj/item/clothing/under/peacockdress
-
-/datum/clothingbooth_item/w_uniform/pink_collared_shirt
-	item_path = /obj/item/clothing/under/misc/collar_pink
 
 /datum/clothingbooth_item/w_uniform/redtie
 	cost = PAY_TRADESMAN/3
@@ -490,3 +501,226 @@ ABSTRACT_TYPE(/datum/clothingbooth_item/w_uniform/yoga)
 		swatch_foreground_color = "#ffe244"
 		swatch_foreground_shape = SWATCH_BISECT_LEFT
 		item_path = /obj/item/clothing/under/misc/yoga/communist
+
+ABSTRACT_TYPE(/datum/clothingbooth_item/w_uniform/blouse_skirt)
+/datum/clothingbooth_item/w_uniform/blouse_skirt
+	name = "Blouse and Skirt"
+
+	white
+		name = "White"
+		swatch_background_color = "#ffffff"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/white
+	cream
+		name = "Cream"
+		swatch_background_color = "#fff3dd"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/cream
+	khaki
+		name = "Khaki"
+		swatch_background_color = "#c7b491"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/khaki
+	pink
+		name = "Pink"
+		swatch_background_color = "#f8aaaa"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/pink
+	red
+		name = "Red"
+		swatch_background_color = "#8d1422"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/red
+	dark_red
+		name = "Dark Red"
+		swatch_background_color = "#510f22"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/dark_red
+	orange
+		name = "Orange"
+		swatch_background_color = "#ffc074"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/orange
+	brown
+		name = "Brown"
+		swatch_background_color = "#724f29"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/brown
+	yellow
+		name = "Yellow"
+		swatch_background_color = "#fcf574"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/yellow
+	green
+		name = "Green"
+		swatch_background_color = "#9eee80"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/green
+	dark_green
+		name = "Dark Green"
+		swatch_background_color = "#3fb43f"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/dark_green
+	mint
+		name = "Mint"
+		swatch_background_color = "#86ddc9"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/mint
+	blue
+		name = "Blue"
+		swatch_background_color = "#62a5ee"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/blue
+	dark_blue
+		name = "Dark Blue"
+		swatch_background_color = "#1a378d"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/dark_blue
+	purple
+		name = "Purple"
+		swatch_background_color = "#5a1d8a"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/purple
+	black
+		name = "Black"
+		swatch_background_color = "#1d223c"
+		item_path = /obj/item/clothing/under/misc/blouse_skirt/black
+
+ABSTRACT_TYPE(/datum/clothingbooth_item/w_uniform/collar_shirt)
+/datum/clothingbooth_item/w_uniform/collar_shirt
+	name = "Collar Shirt"
+
+	white
+		name = "White"
+		swatch_background_color = "#ffffff"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/white
+	cream
+		name = "Cream"
+		swatch_background_color = "#fff3dd"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/cream
+	khaki
+		name = "Khaki"
+		swatch_background_color = "#c7b491"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/khaki
+	pink
+		name = "Pink"
+		swatch_background_color = "#f8aaaa"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/pink
+	red
+		name = "Red"
+		swatch_background_color = "#8d1422"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/red
+	dark_red
+		name = "Dark Red"
+		swatch_background_color = "#510f22"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/dark_red
+	orange
+		name = "Orange"
+		swatch_background_color = "#ffc074"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/orange
+	brown
+		name = "Brown"
+		swatch_background_color = "#724f29"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/brown
+	yellow
+		name = "Yellow"
+		swatch_background_color = "#fcf574"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/yellow
+	green
+		name = "Green"
+		swatch_background_color = "#9eee80"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/green
+	dark_green
+		name = "Dark Green"
+		swatch_background_color = "#3fb43f"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/dark_green
+	mint
+		name = "Mint"
+		swatch_background_color = "#86ddc9"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/mint
+	blue
+		name = "Blue"
+		swatch_background_color = "#62a5ee"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/blue
+	dark_blue
+		name = "Dark Blue"
+		swatch_background_color = "#1a378d"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/dark_blue
+	purple
+		name = "Purple"
+		swatch_background_color = "#5a1d8a"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/purple
+	black
+		name = "Black"
+		swatch_background_color = "#1d223c"
+		item_path = /obj/item/clothing/under/misc/collar_shirt/black
+
+ABSTRACT_TYPE(/datum/clothingbooth_item/w_uniform/tea_party_dress)
+/datum/clothingbooth_item/w_uniform/tea_party_dress
+	name = "Tea Party Dress"
+
+	pink
+		name = "Pink"
+		swatch_background_color = "#ffbcea"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/pink
+
+	pink_and_black
+		name = "Pink and Black"
+		swatch_background_color = "#ffbcea"
+		swatch_foreground_color = "#000000"
+		swatch_foreground_shape = SWATCH_BISECT_RIGHT
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/pink_and_black
+
+	black_and_white
+		name = "Black and White"
+		swatch_background_color = "#000000"
+		swatch_foreground_color = "#ffffff"
+		swatch_foreground_shape = SWATCH_BISECT_RIGHT
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/black_and_white
+
+	black
+		name = "Black"
+		swatch_background_color = "#000000"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/black
+
+	white
+		name = "White"
+		swatch_background_color = "#ffffff"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/white
+
+	white_and_black
+		name = "White and Black"
+		swatch_background_color = "#ffffff"
+		swatch_foreground_color = "#000000"
+		swatch_foreground_shape = SWATCH_BISECT_RIGHT
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/white_and_black
+
+	blue
+		name = "Blue"
+		swatch_background_color = "#3946b7"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/blue
+
+	dark_blue
+		name = "Dark Blue"
+		swatch_background_color = "#1c1192"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/dark_blue
+
+	light_blue
+		name = "Light Blue"
+		swatch_background_color = "#8bdbf2"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/light_blue
+
+	cyan
+		name = "Cyan"
+		swatch_background_color = "#9edbdb"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/cyan
+
+	green
+		name = "Green"
+		swatch_background_color = "#61bf71"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/green
+
+	light_green
+		name = "Light Green"
+		swatch_background_color = "#8be099"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/light_green
+
+	orange
+		name = "Orange"
+		swatch_background_color = "#ff9042"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/orange
+
+	red
+		name = "Red"
+		swatch_background_color = "#bf2a1d"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/red
+
+	yellow
+		name = "Yellow"
+		swatch_background_color = "#ffe156"
+		item_path = /obj/item/clothing/under/misc/tea_party_dress/yellow

@@ -155,6 +155,9 @@ ABSTRACT_TYPE(/datum/bioEffect)
 	proc/onPowerChange(oldval, newval)
 		return
 
+	proc/onResearched()
+		return
+
 	onVarChanged(variable, oldval, newval)
 		. = ..()
 		if(variable == "power")
@@ -327,12 +330,6 @@ ABSTRACT_TYPE(/datum/bioEffect)
 		..()
 
 	cast(atom/target)
-		if (ismob(target))
-			logTheThing(LOG_COMBAT, owner, "used the [linked_power.name] power on [constructTarget(target,"combat")].")
-		else if (target)
-			logTheThing(LOG_COMBAT, owner, "used the [linked_power.name] power on [target].")
-		else
-			logTheThing(LOG_COMBAT, owner, "used the [linked_power.name] power.")
 		if (!has_misfire)
 			return ..(target)
 		var/success_prob = 100
@@ -343,13 +340,17 @@ ABSTRACT_TYPE(/datum/bioEffect)
 		else
 			return cast_misfire(target)
 
+	logCast(atom/target)
+		if (target)
+			logTheThing(LOG_COMBAT, src.holder?.owner, "used the [linked_power.name] power on [constructTarget(target,"combat")] at [log_loc(target)].")
+		else if (!linked_power.ability_path:targeted)
+			logTheThing(LOG_COMBAT, src.holder?.owner, "used the [linked_power.name] power at [log_loc(src.holder?.owner)].")
+
 	proc/cast_misfire(atom/target)
-		if (ismob(target))
-			logTheThing(LOG_COMBAT, owner, "misfired the [linked_power.name] power on [constructTarget(target,"combat")].")
-		else if (target)
-			logTheThing(LOG_COMBAT, owner, "misfired the [linked_power.name] power on [target].")
+		if (target)
+			logTheThing(LOG_COMBAT, owner, "misfired the [linked_power.name] power on [constructTarget(target,"combat")] at [log_loc(target)].")
 		else
-			logTheThing(LOG_COMBAT, owner, "misfired the [linked_power.name] power.")
+			logTheThing(LOG_COMBAT, owner, "misfired the [linked_power.name] power at [log_loc(owner)].")
 		return 0
 
 
@@ -396,7 +397,7 @@ ABSTRACT_TYPE(/datum/bioEffect)
 		src.action_key_number = ability.action_key_number
 		src.waiting_for_hotkey = ability.waiting_for_hotkey
 		src.theme = ability.theme
-		src.tooltip_flags = ability.tooltip_flags
+		src.tooltip_options = ability.tooltip_options
 
 		..()
 

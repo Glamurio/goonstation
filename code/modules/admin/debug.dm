@@ -116,79 +116,6 @@ var/global/debug_messages = 0
 	src.Browse(html, "window=deletedImageData;size=400x600")
 #endif
 
-/client/proc/debug_pools()
-	SET_ADMIN_CAT(ADMIN_CAT_DEBUG)
-	set name = "Debug Object Pools"
-	ADMIN_ONLY
-	SHOW_VERB_DESC
-
-	#ifndef DETAILED_POOL_STATS
-	var/poolsJson = "\[{pool:null,count:0}"
-	for(var/pool in object_pools)
-		var/list/poolList = object_pools[pool]
-		poolsJson += ",{pool:'[pool]',count:[poolList.len]}\n"
-	poolsJson += "]"
-	var/html = {"<!doctype html><html>
-	<head><title>object pool counts</title>
-	<script type="text/javascript">
-	function display() {
-		var i, html,
-			listing = document.getElementById('listing'),
-			objectPools = [poolsJson].sort(function(a, b) { return b.count - a.count; });
-		html = '';
-		var total = 0;
-		for(i = 0;i < objectPools.length; i++) {
-			total += objectPools\[i].count;
-			html += '<li><strong>' + objectPools\[i].pool
-				+ '</strong>: ' + objectPools\[i].count.toString()
-				+ '</li>';
-		}
-		html = '<li><span style="color:red;font-weight:bold">Total</span>: ' + total.toString() + "</li>" + html;
-		listing.innerHTML = html;
-	}
-	</script>
-	</head><body onload="display()">
-	<h1>Object Pool Counts:</h1>
-	<ul id="listing"></ul>
-	</body></html>"}
-	#else
-	var/poolsJson = getPoolingJson()
-	var/html = {"<!doctype html><html>
-				<head><title>object pool counts</title>
-				<style>
-					table {
-						border: 1px solid black;
-						border-collapse:collapse;
-					}
-					th, td {
-						padding:5px;
-						border: 1px solid black;
-					}
-				</style>
-				</head><body>
-				<h1>Object Pool Counts:</h1>
-				<span id="listing"></span>
-				<script type="text/javascript">
-					function display() {
-						var i, html,
-							listing = document.getElementById('listing'),
-							objectPools = [poolsJson].sort(function(a, b) { return b.count - a.count; });
-						html = '';
-						var total = 0;
-						for(i = 0;i < objectPools.length; i++) {
-							var p = objectPools\[i];
-							total += p.count;
-							html += '<tr><td>' + p.path + '</td><td>' + p.count.toString() + '</td><td>' + p.hits.toString() + '</td><td>' + p.misses.toString() + '</td><td>' + p.poolings.toString() + '</td><td>' + p.unpoolings.toString() + '</td><td>' + p.evictions.toString() + '</td></tr>';
-						}
-						html = '<table><tr><th>Path</th><th>Count</th><th>Hits</th><th>Misses</th><th>Poolings</th><th>Unpoolings</th><th>Evictions</th></tr>' + html + '<tr><th>Total:</th><td>' + total.toString() + '</td></tr></table>';
-						listing.innerHTML = html;
-					};
-				display();
-				</script>
-				</body></html>"}
-	#endif
-	src.Browse(html, "window=poolCounts;size=400x800")
-
 /client/proc/call_proc_atom(atom/target as null|area|obj|mob|turf in world)
 	set name = "Call Proc"
 	set desc = "Calls a proc associated with the targeted atom"
@@ -306,6 +233,7 @@ var/global/debug_messages = 0
 
 /datum/proccall_editor
 	var/atom/movable/target
+	/// The current key value state of the arguments we want to return
 	var/list/listargs
 	var/list/initialization_args
 	/// Boolean field describing if the tgui_color_picker was closed by the user.
@@ -315,7 +243,7 @@ var/global/debug_messages = 0
 	..()
 	src.target = target
 	initialization_args = init_args
-	src.listargs = list()
+	src.setup_listargs()
 
 /datum/proccall_editor/disposing()
 	src.target = null
@@ -345,35 +273,46 @@ var/global/debug_messages = 0
 	. = ..()
 	closed = TRUE
 
-
-/datum/proccall_editor/ui_static_data(mob/user)
-	. = ui_data()
-	.["name"] = "Variables"
+///Set up the default values stored in listargs before we open the interface
+/datum/proccall_editor/proc/setup_listargs()
+	src.listargs = list()
 	for(var/customization in initialization_args)
-		.["options"][customization[ARG_INFO_NAME]] += list(
-			"type" = customization[ARG_INFO_TYPE],
-			"description" = customization[ARG_INFO_DESC])
 		if(length(customization) >= ARG_INFO_DEFAULT)
-			.["options"][customization[ARG_INFO_NAME]]["value"] = customization[ARG_INFO_DEFAULT]
+			if (customization[ARG_INFO_TYPE] == DATA_INPUT_LIST_PROVIDED)
+				var/list/supplied_list = customization[ARG_INFO_DEFAULT]
+				src.listargs[customization[ARG_INFO_NAME]] = supplied_list[1]
+			else
+				src.listargs[customization[ARG_INFO_NAME]] = customization[ARG_INFO_DEFAULT]
 		else
-			.["options"][customization[ARG_INFO_NAME]]["value"] = null
+			src.listargs[customization[ARG_INFO_NAME]] = null
 
-/datum/proccall_editor/ui_data()
+/datum/proccall_editor/ui_data(mob/user)
 	. = list()
+	.["name"] = "Variables"
 	.["options"] = list()
 	for(var/customization in initialization_args)
 		.["options"][customization[ARG_INFO_NAME]] += list(
 			"type" = customization[ARG_INFO_TYPE],
-			"description" = customization[ARG_INFO_DESC],
-			"value" = src.listargs[customization[ARG_INFO_NAME]]
-		)
+			"description" = customization[ARG_INFO_DESC])
+
+		//show coordinates as well as actual value
 		if(customization[ARG_INFO_TYPE] == DATA_INPUT_REFPICKER)
 			var/atom/target = src.listargs[customization[ARG_INFO_NAME]]
 			if(isatom(target))
 				.["options"][customization[ARG_INFO_NAME]]["value"] = "([target.x],[target.y],[target.z]) [target]"
 			else
 				.["options"][customization[ARG_INFO_NAME]]["value"] = "null"
-
+			continue
+		//supplied lists have a different interface with a `list` var and `value` being the currently selected list item
+		//confusing!!
+		if (customization[ARG_INFO_TYPE] == DATA_INPUT_LIST_PROVIDED)
+			var/list/key_list = list()
+			for (var/key in customization[ARG_INFO_DEFAULT])
+				key_list += "[key]" //stringify here to prevent encoding issues with letting the frontend do it
+			.["options"][customization[ARG_INFO_NAME]]["list"] = key_list
+			.["options"][customization[ARG_INFO_NAME]]["value"] = src.listargs[customization[ARG_INFO_NAME]]
+		//normal variable
+		.["options"][customization[ARG_INFO_NAME]]["value"] = src.listargs[customization[ARG_INFO_NAME]]
 
 /datum/proccall_editor/ui_act(action, list/params, datum/tgui/ui)
 	USR_ADMIN_ONLY
@@ -409,7 +348,16 @@ var/global/debug_messages = 0
 					listargs[params["name"]] = target
 					. = TRUE
 					break;
-
+		if ("modify_list_value")
+			for(var/customization in initialization_args)
+				if(params["name"]==customization[ARG_INFO_NAME] \
+				&& params["type"]==customization[ARG_INFO_TYPE])
+					//go through the actual values and compare their stringified value to the one we got from the frontend
+					//so we don't end up returning a string instead of a type for instance
+					for (var/list_option in customization[ARG_INFO_DEFAULT])
+						if (strip_illegal_characters("[list_option]") == params["value"])
+							src.listargs[params["name"]] = list_option
+							return TRUE
 		if("activate")
 			closed = TRUE
 			ui.close()
