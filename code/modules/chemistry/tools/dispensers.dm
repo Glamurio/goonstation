@@ -10,6 +10,7 @@
 	icon_state = "watertank"
 	density = 1
 	anchored = UNANCHORED
+	var/rc_flags = RC_SCALE | RC_SPECTRO
 	flags = FLUID_SUBMERGE | ACCEPTS_MOUSEDROP_REAGENTS
 	object_flags = NO_GHOSTCRITTER
 	pressure_resistance = 2*ONE_ATMOSPHERE
@@ -27,7 +28,7 @@
 
 	get_desc(dist, mob/user)
 		if (dist <= 2 && reagents)
-			. += "<br>[SPAN_NOTICE("[reagents.get_description(user,RC_SCALE)]")]"
+			. += "<br>[SPAN_NOTICE("[reagents.get_description(user,src.rc_flags)]")]"
 
 	proc/smash()
 		var/turf/T = get_turf(src)
@@ -272,7 +273,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 	get_desc(dist, mob/user)
 		. += "There's [cup_amount] paper cup[s_es(src.cup_amount)] in [src]'s cup dispenser."
 		if (dist <= 2 && reagents)
-			. += "<br>[SPAN_NOTICE("[reagents.get_description(user,RC_SCALE)]")]"
+			. += "<br>[SPAN_NOTICE("[reagents.get_description(user, src.rc_flags)]")]"
 
 	attackby(obj/W, mob/user)
 		if (has_tank)
@@ -436,6 +437,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 	icon_state = "barrel-blue"
 	amount_per_transfer_from_this = 25
 	p_class = 3
+	rc_flags = RC_SCALE | RC_SPECTRO | RC_VISIBLE
 	flags = FLUID_SUBMERGE | OPENCONTAINER | ACCEPTS_MOUSEDROP_REAGENTS
 	var/base_icon_state = "barrel-blue"
 	var/funnel_active = TRUE //if TRUE, allows players pouring liquids from beakers with just one click instead of clickdrag, for convenience
@@ -498,6 +500,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 			src.name = t
 
 			src.desc = "For storing medical chemicals and less savory things."
+			return
 
 		if (istype(W, /obj/item/reagent_containers/synthflesh_pustule))
 			if (src.reagents.total_volume >= src.reagents.maximum_volume)
@@ -510,7 +513,21 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 			W.reagents.trans_to(src, W.reagents.total_volume)
 			user.u_equip(W)
 			qdel(W)
+			return
 
+		if (src.is_open_container() &&\
+			istypes(W, list(/obj/item/sheet, /obj/item/material_piece)) &&\
+			(W.material?.isSameMaterial(getMaterial("wood")) || W.material?.isSameMaterial(getMaterial("bamboo")))
+		)
+			if (W.amount < 5)
+				boutput(user, SPAN_ALERT("You need at least 5 pieces to fill the barrel."))
+				return
+			W.change_stack_amount(-5)
+			var/obj/burning_barrel/woodbarrel = new /obj/burning_barrel{on = FALSE}(src.loc)
+			woodbarrel.anchored = src.anchored
+			boutput(user, SPAN_NOTICE("The barrel follows narrative causality and instantly becomes shabbier as you shove the wood into it."))
+			qdel(src)
+			return
 		if (istool(W, TOOL_WRENCHING))
 			if(src.flags & OPENCONTAINER)
 				user.visible_message("<b>[user]</b> wrenches [src]'s lid closed!")
@@ -519,8 +536,9 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 			playsound(src.loc, 'sound/items/Screwdriver.ogg', 50, 1)
 			src.set_open_container(!src.is_open_container())
 			UpdateIcon()
-		else
-			..()
+			return
+
+		. = ..()
 
 	mouse_drop(atom/over_object, src_location, over_location)
 		if (istype(over_object, /obj/machinery/chem_master))
@@ -674,7 +692,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 					boutput(user, SPAN_ALERT("[src] is full!"))
 					break
 				if (user.loc != staystill) break
-				if (P.type != itemtype) continue
+				if (P.type != itemtype || P.equipped_in_slot) continue
 				var/amount = 20
 				if (istype(P,/obj/item/reagent_containers/food/snacks/mushroom/))
 					amount = 25

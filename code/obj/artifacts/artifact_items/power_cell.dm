@@ -79,7 +79,7 @@
 
 /datum/artifact/powercell
 	associated_object = /obj/item/cell/artifact
-	type_name = "Large power cell"
+	type_name = "Large Power Cell"
 	type_size = ARTIFACT_SIZE_TINY
 	rarity_weight = 350
 	validtypes = list("ancient","martian","wizard","precursor","clockwork")
@@ -95,8 +95,7 @@
 	post_setup()
 		..()
 		var/obj/item/cell/artifact/O = src.holder
-		O.chargeCap = rand(15,1000)
-		O.chargeCap *= 100
+		O.chargeCap = rand(15,1000) * 100
 		src.react_elec[2] = O.chargeCap
 
 		// effects
@@ -114,11 +113,12 @@
 				O.noise = pick('sound/misc/automaton_scratch.ogg', 'sound/misc/automaton_ratchet.ogg')
 			else
 				O.noise = 'sound/effects/electric_shock_short.ogg'
+				O.noise = pick('sound/effects/singsuck.ogg', 'sound/effects/screech_tone.ogg','sound/effects/gust.ogg')
 
-		if(prob(O.chargeCap/1000)) 			// the more charge the bigger the chance it does dumb stuff
+		if(prob(O.chargeCap/1000)) // the more charge the bigger the chance it does dumb stuff
 			switch(src.artitype.name) 		// leakage
 				if ("martian")
-					O.leakChem = pick("space_fungus","blood","vomit","gvomit","meat_slurry","grease","butter","synthflesh","bread","poo","ants","spiders")
+					O.leakChem = pick("space_fungus","blood","vomit","gvomit","meat_slurry","grease","butter","synthflesh","bread","poo","ants","spiders","slime")
 				if ("ancient")
 					O.leakChem = pick("voltagen","ash","cleaner", "oil", "thermite", "acid", "fuel", "nanites", "radium", "mercury")
 				if ("wizard")

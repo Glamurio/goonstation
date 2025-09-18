@@ -421,6 +421,33 @@
 
 /////////////////////////////////////////
 
+
+/turf/simulated/floor/airless/darkpurple
+	icon_state = "fulldpurple"
+
+/turf/simulated/floor/airless/darkpurple/side
+	icon_state = "dpurple"
+
+/turf/simulated/floor/airless/darkpurple/corner
+	icon_state = "dpurplecorner"
+
+/turf/simulated/floor/airless/darkpurple/checker
+	icon_state = "dpurplechecker"
+
+/turf/simulated/floor/airless/darkpurpleblack
+	icon_state = "dpurpleblack"
+
+/turf/simulated/floor/airless/darkpurpleblack/corner
+	icon_state = "dpurpleblackcorner"
+
+/turf/simulated/floor/airless/darkpurplewhite
+	icon_state = "dpurplewhite"
+
+/turf/simulated/floor/airless/darkpurplewhite/corner
+	icon_state = "dpurplewhitecorner"
+
+/////////////////////////////////////////
+
 /turf/simulated/floor/airless/green
 	icon_state = "fullgreen"
 
@@ -586,7 +613,7 @@ TYPEINFO(/turf/simulated/floor/airless/carpet)
 	mat_appearances_to_ignore = list("cotton")
 /turf/simulated/floor/airless/carpet
 	name = "carpet"
-	icon = 'icons/turf/carpet.dmi'
+	icon = 'icons/turf/floors/carpet.dmi'
 	icon_state = "red1"
 	mat_changename = 0
 	default_material = "cotton"
@@ -600,11 +627,11 @@ TYPEINFO(/turf/simulated/floor/airless/carpet)
 		icon = 'icons/turf/floors.dmi'
 
 /turf/simulated/floor/airless/carpet/grime
-	icon = 'icons/turf/floors.dmi'
+	icon = 'icons/turf/floors/carpet.dmi'
 	icon_state = "grimy"
 
 /turf/simulated/floor/airless/carpet/arcade
-	icon = 'icons/turf/floors.dmi'
+	icon = 'icons/turf/floors/carpet.dmi'
 	icon_state = "arcade_carpet"
 
 /turf/simulated/floor/airless/carpet/arcade/half
@@ -614,11 +641,10 @@ TYPEINFO(/turf/simulated/floor/airless/carpet)
 	icon_state = "arcade_carpet_blank"
 
 /turf/simulated/floor/airless/carpet/office
-	icon = 'icons/turf/floors.dmi'
+	icon = 'icons/turf/floors/carpet.dmi'
 	icon_state = "office_carpet"
 
 /turf/simulated/floor/airless/carpet/office/other
-	icon = 'icons/turf/floors.dmi'
 	icon_state = "office_carpet2"
 
 /////////////////////////////////////////

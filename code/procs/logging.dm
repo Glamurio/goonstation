@@ -26,6 +26,9 @@ var/global/logLength = 0
 	var/forceNonDiaryLoggingToo = FALSE
 	var/area/A
 
+	if (length(trimtext(text)) == 0)
+		CRASH("Attempted to log without text with type \[[type]\] and source \[[source]\].")
+
 	if(istype(source, /mob/living/carbon/human/preview) && type == LOG_COMBAT)
 		return //we don't give a flying fuck about the preview mobs maving mutations - but maybe we care about debug etc.?
 
@@ -92,7 +95,6 @@ var/global/logLength = 0
 		if (!diaryLogging)
 			var/datum/eventRecord/Log/logEvent = new()
 			logEvent.send(type, source && source != "<span class='blank'>(blank)</span>" ? source : null, text)
-	return
 
 ///Check config for whether a message should be logged to the diary
 /proc/should_diary_log(diaryType)
@@ -165,7 +167,7 @@ var/global/logLength = 0
 	var/name
 	var/ckey
 	var/key
-	var/traitor
+	var/traitor_roles
 	var/online
 	var/dead = 1
 	var/mobType = null
@@ -174,7 +176,7 @@ var/global/logLength = 0
 	var/mob/mobRef
 	if (ismob(ref))
 		mobRef = ref
-		traitor = mobRef.mind?.is_antagonist()
+		traitor_roles = mobRef.mind?.list_antagonist_roles()
 		if (mobRef.name)
 			if (ishuman(mobRef))
 				var/mob/living/carbon/human/humanRef = mobRef
@@ -213,7 +215,7 @@ var/global/logLength = 0
 		online = 1
 		if (clientRef.mob)
 			mobRef = clientRef.mob
-			traitor = mobRef.mind?.is_antagonist()
+			traitor_roles = mobRef.mind?.list_antagonist_roles()
 			if (mobRef.name)
 				if (ishuman(clientRef.mob))
 					var/mob/living/carbon/human/humanRef = clientRef.mob
@@ -298,17 +300,29 @@ var/global/logLength = 0
 		if (type == "diary")
 			data += "[name ? " (" : ""][key][name ? ")" : ""]"
 		else
-			data += "[name ? " (" : ""]<a href='?src=%admin_ref%;action=adminplayeropts;targetckey=[ckey]' title='Player Options'>[key]</a>[name ? ")" : ""]"
+			data += "[name ? " (" : ""]<a href='byond://?src=%admin_ref%;action=adminplayeropts;targetckey=[ckey]' title='Player Options'>[key]</a>[name ? ")" : ""]"
 	else if(mobRef.last_ckey)
 		if (type == "diary")
 			data += "[name ? " (" : ""]last: [ckey][name ? ")" : ""]"
 		else
-			data += "[name ? " (" : ""]last: <a href='?src=%admin_ref%;action=adminplayeropts;targetckey=[ckey]' title='Player Options'>[ckey]</a>[name ? ")" : ""]"
-	if (traitor)
+			data += "[name ? " (" : ""]last: <a href='byond://?src=%admin_ref%;action=adminplayeropts;targetckey=[ckey]' title='Player Options'>[ckey]</a>[name ? ")" : ""]"
+	if (traitor_roles)
 		if (type == "diary")
 			data += " \[TRAITOR\]"
 		else
-			data += " \[<span class='traitorTag'>T</span>\]"
+			data += "<a class='traitorTag' href=\"#\" 						\
+				onMouseOver=\"this.children\[0\].style.display = 'block'\"	\
+				onMouseOut=\"this.children\[0\].style.display = 'none';\"	\
+				>T															\
+				<span id=\"innerContent\" style=\"							\
+					display: none;											\
+					background: #ffffff;									\
+					margin-left: 28px;										\
+					padding: 10px;											\
+					position: absolute;										\
+					z-index: 1000;											\
+				\">[traitor_roles]</span>									\
+				</a>"
 	if (type != "diary" && !online && ckey)
 		data += " \[<span class='offline'>OFF</span>\]"
 	if (dead && ticker && current_state > GAME_STATE_PREGAME)
