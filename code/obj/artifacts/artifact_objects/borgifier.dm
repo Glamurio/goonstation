@@ -18,12 +18,27 @@
 	examine_hint = "It looks vaguely foreboding."
 	var/escapable = TRUE //Can you be dragged out to cancel the borgifying
 	var/loops_per_conversion_step //Number of 0.4 second loops per 'step'- on each step a robolimb is added, and if all 4 limbs are robotic, they're borged
+	var/l_arm_type = /obj/item/parts/robot_parts/arm/left/light
+	var/r_arm_type = /obj/item/parts/robot_parts/arm/right/light
+	var/l_leg_type = /obj/item/parts/robot_parts/leg/left/light
+	var/r_leg_type = /obj/item/parts/robot_parts/leg/right/light
+	var/borgtype = /mob/living/silicon/robot/
 
 	New()
 		..()
 		if (prob(15))
 			escapable = FALSE
 		loops_per_conversion_step = escapable ? rand(4, 7) : rand(2, 4)
+
+	post_setup()
+		. = ..()
+		switch(artitype.name)
+			if ("clockwork")
+				src.l_arm_type = /obj/item/parts/robot_parts/arm/left/clockwork
+				src.r_arm_type = /obj/item/parts/robot_parts/arm/right/clockwork
+				src.l_leg_type = /obj/item/parts/robot_parts/leg/left/treads/wheel
+				src.r_leg_type = /obj/item/parts/robot_parts/leg/right/treads/wheel
+				src.borgtype = /mob/living/silicon/robot/clockwork
 
 	effect_touch(var/obj/O,var/mob/living/user)
 		if (..())
@@ -71,13 +86,13 @@
 					var/obj/item/parts/limb_to_replace = pick(convertable_limbs)
 					switch(limb_to_replace.slot)
 						if ("l_arm")
-							humanuser.limbs.replace_with("l_arm", /obj/item/parts/robot_parts/arm/left/light, null, 0)
+							humanuser.limbs.replace_with("l_arm", src.l_arm_type, null, 0)
 						if ("r_arm")
-							humanuser.limbs.replace_with("r_arm", /obj/item/parts/robot_parts/arm/right/light, null, 0)
+							humanuser.limbs.replace_with("r_arm", src.r_arm_type, null, 0)
 						if ("l_leg")
-							humanuser.limbs.replace_with("l_leg", /obj/item/parts/robot_parts/leg/left/light, null, 0)
+							humanuser.limbs.replace_with("l_leg", src.l_leg_type, null, 0)
 						if ("r_leg")
-							humanuser.limbs.replace_with("r_leg", /obj/item/parts/robot_parts/leg/right/light, null, 0)
+							humanuser.limbs.replace_with("r_leg", src.r_leg_type, null, 0)
 					convertable_limbs -= limb_to_replace
 					humanuser.update_body()
 				sleep(0.4 SECONDS)
@@ -103,7 +118,7 @@
 				qdel(user)
 			else
 				var/mob/living/carbon/human/M = user
-				M.Robotize_MK2(1)
+				M.Robotize_MK2(1, borgtype = src.borgtype)
 			converting = FALSE
 		else if (issilicon(user))
 			boutput(user, SPAN_ALERT("An imperious voice rings out in your head... \"<b>UPGRADE COMPLETE, RETURN TO ASSIGNED TASK</b>\""))

@@ -364,6 +364,15 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/head)
 	visible_eyes = 0
 	robot_movement_modifier = /datum/movement_modifier/robot_part/light_head
 
+/obj/item/parts/robot_parts/head/clockwork
+	name = "clockwork cyborg head"
+	desc = "An old-looking cyborg head with a rotating cog sticking out on the side. Weird..."
+	appearanceString = "clockwork"
+	icon_state = "head-clockwork"
+	max_health = 180
+	visible_eyes = 0
+	robot_movement_modifier = /datum/movement_modifier/robot_part/standard_head
+
 /obj/item/parts/robot_parts/head/screen
 	name = "cyborg screen head"
 	desc = "A somewhat fragile head unit with a screen addressable by the cyborg."
@@ -520,6 +529,15 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/chest)
 	max_health = 75
 	robot_movement_modifier = /datum/movement_modifier/robot_part/light_chest
 	kind_of_limb = (LIMB_ROBOT | LIMB_LIGHT) // hush
+
+/obj/item/parts/robot_parts/chest/clockwork
+	name = "clockwork cyborg chest"
+	desc = "An old, clunky cyborg chest that looks like it was made in 1500."
+	appearanceString = "clockwork"
+	icon_state = "body-clockwork"
+	material_amt = ROBOT_CHEST_COST
+	max_health = 300
+	robot_movement_modifier = /datum/movement_modifier/robot_part/standard_chest
 
 ABSTRACT_TYPE(/obj/item/parts/robot_parts/arm)
 /obj/item/parts/robot_parts/arm
@@ -739,6 +757,16 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/arm/left)
 	kind_of_limb = (LIMB_ROBOT | LIMB_LIGHT)
 	breaks_cuffs = FALSE
 
+/obj/item/parts/robot_parts/arm/left/clockwork
+	name = "clockwork cyborg left arm"
+	appearanceString = "clockwork"
+	icon_state = "l_arm-clockwork"
+	material_amt = ROBOT_LIMB_COST
+	max_health = 100
+	weight = 0.2
+	robot_movement_modifier = /datum/movement_modifier/robot_part/sturdy_arm_left
+	kind_of_limb = (LIMB_ROBOT | LIMB_HEAVY)
+
 ABSTRACT_TYPE(/obj/item/parts/robot_parts/arm/right)
 /obj/item/parts/robot_parts/arm/right
 	name = "cyborg right arm"
@@ -793,6 +821,16 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/arm/right)
 	robot_movement_modifier = /datum/movement_modifier/robot_part/light_arm_right
 	kind_of_limb = (LIMB_ROBOT | LIMB_LIGHT)
 	breaks_cuffs = FALSE
+
+/obj/item/parts/robot_parts/arm/right/clockwork
+	name = "clockwork cyborg right arm"
+	appearanceString = "clockwork"
+	icon_state = "r_arm-clockwork"
+	material_amt = ROBOT_LIMB_COST
+	max_health = 100
+	weight = 0.2
+	robot_movement_modifier = /datum/movement_modifier/robot_part/sturdy_arm_right
+	kind_of_limb = (LIMB_ROBOT | LIMB_HEAVY)
 
 ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg)
 /obj/item/parts/robot_parts/leg
@@ -918,6 +956,13 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/left)
 	robot_movement_modifier = /datum/movement_modifier/robot_part/tread_left
 	kind_of_limb = (LIMB_ROBOT | LIMB_TREADS)
 
+/obj/item/parts/robot_parts/leg/left/treads/wheel
+	name = "left clockwork wheel assembly"
+	desc = "A single, large wheel. Cyborgs better know how to keep their balance..."
+	appearanceString = "wheel"
+	icon_state = "l_leg-wheel"
+	handlistPart = "legL-wheel" // THIS ONE gets to layer with the hands because aloe said so
+
 ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/right)
 /obj/item/parts/robot_parts/leg/right
 	name = "cyborg right leg"
@@ -956,6 +1001,13 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/right)
 	movement_modifier = /datum/movement_modifier/robottread_right
 	robot_movement_modifier = /datum/movement_modifier/robot_part/tread_right
 	kind_of_limb = (LIMB_ROBOT | LIMB_TREADS)
+
+/obj/item/parts/robot_parts/leg/right/treads/wheel
+	name = "right clockwork wheel assembly"
+	desc = "A single, large wheel. Cyborgs better know how to keep their balance..."
+	appearanceString = "wheel"
+	icon_state = "r_leg-wheel"
+	handlistPart = "legR-wheel" // THIS ONE gets to layer with the hands because aloe said so
 
 /obj/item/parts/robot_parts/leg/left/thruster
 	name = "left thruster assembly"

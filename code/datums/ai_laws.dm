@@ -129,6 +129,8 @@
 		for(var/obj/machinery/lawrack/R in src.registered_racks)
 			if(istype(R,/obj/machinery/lawrack/syndicate))
 				continue //sadly syndie law racks must be immune to corruptions, because nobody can actually get at them to fix them.
+			if(istype(R,/obj/machinery/lawrack/hephaestus))
+				continue //same for clockwork law racks
 			if (isnull(law_number))
 				law_number = rand(1, 3)
 			if(R.cause_law_glitch(picked_law, law_number, replace))

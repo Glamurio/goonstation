@@ -214,7 +214,7 @@
 	return newmob
 
 
-/mob/living/carbon/human/proc/Robotize_MK2(var/gory = FALSE, var/syndicate = FALSE)
+/mob/living/carbon/human/proc/Robotize_MK2(var/gory = FALSE, var/syndicate = FALSE, var/borgtype = /mob/living/silicon/robot/)
 	if (src.transforming) return
 	src.unequip_all()
 	src.transforming = 1
@@ -222,7 +222,7 @@
 	src.icon = null
 	APPLY_ATOM_PROPERTY(src, PROP_MOB_INVISIBILITY, "transform", INVIS_ALWAYS)
 
-	var/mob/living/silicon/robot/cyborg = new /mob/living/silicon/robot/(src.loc, null, 1, syndie = syndicate)
+	var/mob/living/silicon/robot/cyborg = new borgtype(src.loc, null, 1, syndie = syndicate)
 
 	cyborg.gender = src.gender
 	cyborg.bioHolder?.mobAppearance?.pronouns = src.bioHolder?.mobAppearance?.pronouns
@@ -250,13 +250,17 @@
 				//if they're logged out or whatever
 				cyborg.key = src.key
 	cyborg.set_loc(get_turf(src.loc))
-	if (syndicate)
-		cyborg.make_syndicate("Robotize_MK2 (probably cyborg converter)")
-		boutput(cyborg, "<B>You have been transformed into a <i>syndicate</i> Cyborg. Cyborgs can interact with most electronic objects in their view.</B>")
-		boutput(cyborg, "<B>You must follow your laws and assist syndicate agents, who are identifiable by their icon.</B>")
+	if (istype(cyborg, /mob/living/silicon/robot/clockwork))
+		boutput(cyborg, "<B>You have been transformed into a clockwork Cyborg. Cyborgs can interact with most electronic objects in their view.</B>")
+		boutput(cyborg, "<B>You are bound by the ancient covenant of Hephaestus.</B>")
 	else
-		boutput(cyborg, "<B>You have been transformed into a Cyborg. Cyborgs can interact with most electronic objects in their view.</B>")
-		boutput(cyborg, "<B>You must follow all laws that the AI has.</B>")
+		if (syndicate)
+			cyborg.make_syndicate("Robotize_MK2 (probably cyborg converter)")
+			boutput(cyborg, "<B>You have been transformed into a <i>syndicate</i> Cyborg. Cyborgs can interact with most electronic objects in their view.</B>")
+			boutput(cyborg, "<B>You must follow your laws and assist syndicate agents, who are identifiable by their icon.</B>")
+		else
+			boutput(cyborg, "<B>You have been transformed into a Cyborg. Cyborgs can interact with most electronic objects in their view.</B>")
+			boutput(cyborg, "<B>You must follow all laws that the AI has.</B>")
 	boutput(cyborg, "<B>Use \"say :s (message)\" to speak to fellow cyborgs and the AI through binary.</B>")
 
 	if(gory)

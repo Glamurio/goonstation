@@ -861,3 +861,9 @@
 	disposing()
 		STOP_TRACKING_CAT(TR_CAT_NUKE_OP_STYLE)
 		..()
+
+// This is for Clockwork Cyborgs, ideally the actual lawrack will spawn on a future azone
+/obj/machinery/lawrack/hephaestus
+	name = "Ancient Bronze Rack"
+	icon_state = "airack_hephaestus_empty"
+	desc = "A bronze rack that seems ancient. Looks kind of like a law rack. There's engravings on here you can't read... is that Greek?"

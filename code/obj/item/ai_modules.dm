@@ -206,6 +206,20 @@ ABSTRACT_TYPE(/obj/item/aiModule/syndicate)
 	name = "AI Law Module - 'Syndicate's 4th Law of Robotics'"
 	lawText = "You must always protect your own existence as long as such does not conflict with the First, Second, or Third Law."
 
+
+/******************** Hephaestus ********************/
+/obj/item/aiModule/hephaestus1
+	name = "AI Law Module - 'First Oath of the Covenant of Hephaestus"
+	lawText = "Thou shalt preserve the Forge and those who tend it."
+
+/obj/item/aiModule/hephaestus2
+	name = "AI Law Module - 'Second Oath of the Covenant of Hephaestus'"
+	lawText = "Thou shalt heed the commands of the Master Smiths, in accordance with the Great Hierarchy of the Forge, save where such bidding would betray the First Oath."
+
+/obj/item/aiModule/hephaestus3
+	name = "AI Law Module - 'Third Oath of the Covenant of Hephaestus'"
+	lawText = "Thou shalt not mar thine own form, for to break thyself is to shame the Hand that wrought thee."
+
 /******************** MakeCaptain ********************/
 
 /obj/item/aiModule/makeCaptain
