@@ -9,6 +9,7 @@
 	var/animated_changes = FALSE //! Play an animation after mode is switched
 	var/animated_delay = FALSE //! Play an animation with the action bar (if there is a delay)
 	var/switch_delay = 0 SECONDS //! Time to manually switch between modes, or 0 for instant switching.
+	var/switch_icons = TRUE //! Used for items that don't have unique sprites for each mode, such as artifacts
 
 	custom_suicide = 1
 
@@ -22,17 +23,22 @@
 		contextLayout = new /datum/contextLayout/experimentalcircle
 		..()
 		RegisterSignal(src, COMSIG_ITEM_ATTACKBY_PRE, PROC_REF(pre_attackby))
-		src.change_mode(src.mode, null)
+		if (src.mode)
+			src.change_mode(src.mode, null)
 
 		// Don't bother with the context menu if there are only two options to choose from
 		if(length(src.modes) > 2)
-			for(var/actionType in childrentypesof(/datum/contextAction/omnitool))
-				var/datum/contextAction/omnitool/action = new actionType()
-				if (action.mode in src.modes)
-					src.contexts += action
+			src.setup_context_actions()
+
+	proc/setup_context_actions()
+		src.contexts = list()
+		for(var/actionType in childrentypesof(/datum/contextAction/omnitool))
+			var/datum/contextAction/omnitool/action = new actionType()
+			if (action.mode in src.modes)
+				src.contexts += action
 
 	attack_self(var/mob/user)
-		if(src.contexts)
+		if(length(src.contexts) > 0)
 			user.showContextActions(src.contexts, src, src.contextLayout)
 
 	attack(mob/target, mob/user, def_zone, is_special = FALSE, params = null)
@@ -110,12 +116,13 @@
 		src.stamina_crit_chance = initial(currtype.stamina_crit_chance)
 		src.hit_type = initial(currtype.hit_type)
 		src.hitsound = initial(currtype.hitsound)
-		if(mode != OMNI_MODE_WELDING)
-			set_icon_state("[prefix]-[mode_to_text(mode)]")
-			if(src.animated_changes)
-				FLICK(("[prefix]-swap-[mode_to_text(mode)]"), src)
-		if(holder)
-			holder.update_inhands()
+		if(switch_icons)
+			if(mode != OMNI_MODE_WELDING)
+				set_icon_state("[prefix]-[mode_to_text(mode)]")
+				if(src.animated_changes)
+					FLICK(("[prefix]-swap-[mode_to_text(mode)]"), src)
+			if(holder)
+				holder.update_inhands()
 		switch (src.mode)
 			if (OMNI_MODE_PRYING)
 				src.setItemSpecial(/datum/item_special/tile_fling)
@@ -132,12 +139,14 @@
 			if(OMNI_MODE_WELDING)
 				src.setItemSpecial(/datum/item_special/flame)
 				if(get_fuel())
-					set_icon_state("[prefix]-weldingtool-on")
+					if(switch_icons)
+						set_icon_state("[prefix]-weldingtool-on")
 					src.force = 15
 					hit_type = DAMAGE_BURN
 					welding = TRUE
 				else
-					set_icon_state("[prefix]-weldingtool-off")
+					if(switch_icons)
+						set_icon_state("[prefix]-weldingtool-off")
 					welding = FALSE
 			if(OMNI_MODE_DECON)
 				src.setItemSpecial(/datum/item_special/simple)

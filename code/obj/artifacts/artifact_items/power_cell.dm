@@ -110,7 +110,7 @@
 			if ("precursor") // what does precursor stuff even sound like???
 				O.noise = pick('sound/effects/singsuck.ogg', 'sound/effects/screech_tone.ogg')
 			if ("clockwork")
-				O.noise = pick('sound/misc/automaton_scratch.ogg', 'sound/misc/automaton_ratchet.ogg')
+				O.noise = pick('sound/misc/automaton_scratch.ogg', 'sound/misc/automaton_ratchet.ogg', 'sound/effects/steamrelease.ogg')
 			else
 				O.noise = 'sound/effects/electric_shock_short.ogg'
 				O.noise = pick('sound/effects/singsuck.ogg', 'sound/effects/screech_tone.ogg','sound/effects/gust.ogg')

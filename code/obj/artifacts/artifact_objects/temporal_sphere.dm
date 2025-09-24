@@ -8,7 +8,7 @@
 	type_size = ARTIFACT_SIZE_LARGE
 	rarity_weight = 350
 	validtriggers = list(/datum/artifact_trigger/carbon_touch, /datum/artifact_trigger/silicon_touch,
-	/datum/artifact_trigger/force, /datum/artifact_trigger/electric, /datum/artifact_trigger/heat)
+	/datum/artifact_trigger/force, /datum/artifact_trigger/electric, /datum/artifact_trigger/heat, /datum/artifact_trigger/repair)
 	validtypes = list("wizard", "clockwork")
 	react_xray = list(15,90,90,11,"NONE")
 	var/field_time = 0

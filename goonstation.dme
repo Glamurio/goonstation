@@ -2325,6 +2325,7 @@
 #include "code\obj\artifacts\artifact_items\power_cell.dm"
 #include "code\obj\artifacts\artifact_items\talisman.dm"
 #include "code\obj\artifacts\artifact_items\teleport_wand.dm"
+#include "code\obj\artifacts\artifact_items\tool.dm"
 #include "code\obj\artifacts\artifact_items\wall_wand.dm"
 #include "code\obj\artifacts\artifact_items\watering_can.dm"
 #include "code\obj\artifacts\artifact_machines\emoter.dm"
