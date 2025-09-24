@@ -126,7 +126,7 @@
 				if ("precursor")
 					O.leakChem = pick(all_functional_reagent_ids) // no way this goes wrong
 				if ("clockwork")
-					O.leakChem = pick("oil", "copper_nitrate", "mercury", "copper", "aluminium", "iron", "nickel", "silver", "iron_oxide")
+					O.leakChem = pick("oil", "grease", "copper_nitrate", "mercury", "copper", "aluminium", "iron", "nickel", "silver", "iron_oxide")
 				else
 					O.leakChem = "oil"
 			if(prob(10))

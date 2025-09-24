@@ -167,7 +167,7 @@
 	type_name = "Beaker"
 	type_size = ARTIFACT_SIZE_MEDIUM
 	rarity_weight = 350
-	validtypes = list("martian","wizard","precursor","clockwork")
+	validtypes = list("martian","wizard","precursor")
 	min_triggers = 0
 	max_triggers = 0
 	no_activation = TRUE

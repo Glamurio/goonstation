@@ -151,7 +151,7 @@
 	type_name = "Talisman"
 	type_size = ARTIFACT_SIZE_TINY
 	rarity_weight = 275
-	validtypes = list("wizard", "precursor")
+	validtypes = list("wizard", "precursor","clockwork")
 	validtriggers = list(/datum/artifact_trigger/force, /datum/artifact_trigger/electric, /datum/artifact_trigger/heat,
 		/datum/artifact_trigger/radiation, /datum/artifact_trigger/carbon_touch, /datum/artifact_trigger/silicon_touch, /datum/artifact_trigger/data)
 	react_xray = list(30, 25, 97, 95, "ANOMALOUS")
