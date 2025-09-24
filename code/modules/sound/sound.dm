@@ -242,7 +242,11 @@ var/global/list/default_channel_volumes = list(1, 1, 1, 0.5, 0.5, 1, 1, 1)
 			S.volume = ourvolume
 
 			var/orig_freq = S.frequency
-			S.frequency *= (HAS_ATOM_PROPERTY(C.mob, PROP_MOB_HEARD_PITCH) ? GET_ATOM_PROPERTY(C.mob, PROP_MOB_HEARD_PITCH) : 1)
+			// Apply atom's own pitch modifier
+			if(HAS_ATOM_PROPERTY(source, PROP_ATOM_SOUND_PITCH))
+				S.frequency *= GET_ATOM_PROPERTY(source, PROP_ATOM_SOUND_PITCH)
+			else // Otherwise apply mob hearing modifier, doing both sounds awful
+				S.frequency *= (HAS_ATOM_PROPERTY(C.mob, PROP_MOB_HEARD_PITCH) ? GET_ATOM_PROPERTY(C.mob, PROP_MOB_HEARD_PITCH) : 1)
 
 			// play without spaced for stuff inside the source, for example pod sounds for people in the pod
 			// we might at some point want to make this check multiple levels deep, but for now this is fine

@@ -1213,39 +1213,68 @@ ADMIN_INTERACT_PROCS(/turf/unsimulated/floor, proc/sunset, proc/sunrise, proc/se
 	bound_width = 160
 	bound_height = 160
 	status_effect = "time_slowed"
+	anchored = TRUE
 	var/hue_shift = 0
 	var/radius_in_tiles = 2
 	var/sound = 'sound/effects/mag_forcewall.ogg'
+	var/scale_mod = 1
 	var/pitch
 
-	New(turf/loc, atom/target, var/scale_mod = 1)
+	New(turf/loc, atom/target, var/new_scale_mod)
 		. = ..()
 		if(hue_shift)
 			color = hsv_transform_color_matrix(hue_shift)
-		src.bound_x *= scale_mod
-		src.bound_y *= scale_mod
-		src.bound_width *= scale_mod
-		src.bound_height *= scale_mod
-		SafeScale(0.1 * scale_mod, 0.1 * scale_mod)
+		src.scale_mod = new_scale_mod ? new_scale_mod : src.scale_mod
+		src.bound_x *= src.scale_mod
+		src.bound_y *= src.scale_mod
+		src.bound_width *= src.scale_mod
+		src.bound_height *= src.scale_mod
+		SafeScale(0.1 * src.scale_mod, 0.1 * src.scale_mod)
 		SafeScaleAnim((10/1.4), (10/1.4), anim_time=2 SECONDS, anim_easing=ELASTIC_EASING)
-		SPAWN(2 SECONDS)
+		SPAWN(1 SECONDS)
 			animate_wave(src, waves=5)
 		playsound(get_turf(src), sound, 25, 1, -1, pitch)
 		// Apply effect immediately instead of waiting for them to walk in and out of the radius
-		for (var/mob/guy in view((src.radius_in_tiles * scale_mod), src.source))
-			src.Crossed(guy)
+		for (var/atom/A in view((src.radius_in_tiles * src.scale_mod), src.source))
+			src.Crossed(A)
 
-	check_movable(atom/movable/AM, crossed)
-		if(crossed)
+	check_movable(atom/movable/AM, var/inside)
+		if(inside)
 			if(AM != src.source)
-				if(ismob(AM) || AM.throwing || istype(AM, /obj/projectile))
-					. = TRUE
+				. = TRUE
 		else
-			if(ismob(AM) || AM.throwing || istype(AM, /obj/projectile))
-				if(!locate(/obj/effect/status_area/slow_globe) in obounds(AM,0))
-					REMOVE_ATOM_PROPERTY(AM, PROP_ATOM_TIME_SPEED_MULT, src)
-					REMOVE_ATOM_PROPERTY(AM, PROP_MOB_HEARD_PITCH, src)
-					. = TRUE
+			REMOVE_ATOM_PROPERTY(AM, PROP_ATOM_TIME_SPEED_MULT, src)
+			REMOVE_ATOM_PROPERTY(AM, PROP_ATOM_SOUND_PITCH, src)
+
+	disposing()
+		..()
+		for (var/atom/AM in view((src.radius_in_tiles * src.scale_mod), src.source))
+			src.Uncrossed(AM)
+
+	strong
+		status_effect = "time_slowed_plus"
+		hue_shift = 30
+
+	reversed
+		status_effect = "time_hasted"
+		hue_shift = 60
+		pitch = -1
+
+	reversed_strong
+		status_effect = "time_hasted_plus"
+		hue_shift = 90
+		pitch = -1
+
+/obj/effect/status_area/slow_globe/wall
+	name = "temporal wall"
+	icon = 'icons/effects/224x224.dmi'
+	icon_state = "shockwave"
+	pixel_x = -96
+	pixel_y = -96
+	bound_x = -32
+	bound_y = -64
+	bound_width = 160
+	bound_height = 160
 
 	strong
 		status_effect = "time_slowed_plus"
@@ -1290,7 +1319,8 @@ ADMIN_INTERACT_PROCS(/turf/unsimulated/floor, proc/sunset, proc/sunrise, proc/se
 
 		// Adjust perceived sound / time based on current speed
 		APPLY_ATOM_PROPERTY(owner, PROP_ATOM_TIME_SPEED_MULT, status_source, time_mult)
-		APPLY_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, status_source, base_speed)
+		APPLY_ATOM_PROPERTY(owner, PROP_ATOM_SOUND_PITCH, status_source, base_speed)
+		// APPLY_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, status_source, base_speed)
 
 		if(istype(AM, /obj/projectile))
 			var/obj/projectile/B = AM
@@ -1309,37 +1339,44 @@ ADMIN_INTERACT_PROCS(/turf/unsimulated/floor, proc/sunset, proc/sunrise, proc/se
 		var/scale_factor = (howMuch/2)
 		if(howMuch<0)
 			scale_factor = -1/scale_factor
-
-		if (ismob(owner))
-			var/mob/M = owner
-			var/atom/source = locate(/obj/effect/status_area/slow_globe) in obounds(M,0)
+		var/turf/T = get_turf(owner)
+		if(T)
+			var/atom/source = locate(status_source.type) in obounds(T, 0)
 			if(source)
-				M.changeStatus(src.id, 10 SECONDS, source)
-			else
-				REMOVE_ATOM_PROPERTY(AM, PROP_ATOM_TIME_SPEED_MULT, status_source)
-				REMOVE_ATOM_PROPERTY(AM, PROP_MOB_HEARD_PITCH, status_source)
-		else if(istype(AM, /obj/projectile))
+				AM.changeStatus(src.id, 10 SECONDS, status_source)
+		else
+			REMOVE_ATOM_PROPERTY(AM, PROP_ATOM_TIME_SPEED_MULT, status_source)
+			REMOVE_ATOM_PROPERTY(AM, PROP_ATOM_SOUND_PITCH, status_source)
+		if(istype(AM, /obj/projectile))
 			var/obj/projectile/B = AM
 			if(B?.special_data && B.special_data[src.icon_state])
 				B.internal_speed *= scale_factor
 
 		if(istype(AM) && AM.throwing)
 			var/list/datum/thrown_thing/existing_throws = global.throwing_controller.throws_of_atom(AM)
-			for(var/datum/thrown_thing/T in existing_throws)
-				T.speed *= scale_factor
+			for(var/datum/thrown_thing/TT in existing_throws)
+				TT.speed *= scale_factor
 			AM.throw_speed *= scale_factor
+
+		if(istype(AM, /obj/machinery/manufacturer))
+			var/obj/machinery/manufacturer/MF = AM
+			MF.speed *= scale_factor
 
 	onUpdate(timePassed)
 		. = ..()
+		var/turf/T = get_turf(owner)
+		if(!T)
+			return
 		var/mob/M = null
+		var/atom/source = locate(status_source.type) in obounds(T, 0)
 		if (ismob(owner))
 			M = owner
 		var/obj/item/artifact/A = null
 		if(istype(status_source, /obj/item/artifact))
 			A = status_source
-		if(status_source && QDELETED(status_source) || (A && !A.artifact.activated) || (M && isdead(M)))
+		if(!source || status_source && QDELETED(status_source) || (A && !A.artifact.activated) || (M && isdead(M)))
 			REMOVE_ATOM_PROPERTY(owner, PROP_ATOM_TIME_SPEED_MULT, status_source)
-			REMOVE_ATOM_PROPERTY(owner, PROP_MOB_HEARD_PITCH, status_source)
+			REMOVE_ATOM_PROPERTY(owner, PROP_ATOM_SOUND_PITCH, status_source)
 			owner.delStatus(id)
 
 	extra
