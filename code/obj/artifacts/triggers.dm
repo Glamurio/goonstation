@@ -167,6 +167,8 @@ ABSTRACT_TYPE(/datum/artifact_trigger/)
 	hint_prob = 100
 	do_amount_check = FALSE
 
+	// if the artifact is fully repaired, it activates on tool use
+	var/repaired = FALSE
 	// list of tools to pull from
 	var/list/possible_tools = list(TOOL_SNIPPING, TOOL_PRYING, TOOL_SCREWING, TOOL_WELDING, TOOL_WRENCHING, TOOL_PULSING)
 	// list of tools that are required to repair this artifact
@@ -188,35 +190,35 @@ ABSTRACT_TYPE(/datum/artifact_trigger/)
 	/// Returns advice on the next tool to be used to repair the artifact
 	proc/get_desc()
 		var/verby = src.get_current_tool_data("verb")
-
-		if (length(src.tools_required) < 1)
-			return "Looks like the artifact is fully repaired."
-
 		src.current_thingy = src.current_thingy ? src.current_thingy : pick(src.artifact.artitype.nouns_small)
+
+		if (length(src.tools_required) <= 1)
+			return "Looks like the artifact is mostly repaired. You have to [verby] the [current_thingy] to activate it."
+
 		var/list/action_list = list(
 			"Seems like you need to [verby] the [current_thingy], it's completely busted.",
-			"[capitalize(src.verbying())] the [current_thingy] seems necessary, considering its state.",
+			"[capitalize(src.verbying(verby))] the [current_thingy] seems necessary, considering its state.",
 			"Looks like you'll need to [verby] the [current_thingy] to get this thing running.",
-			"That [current_thingy] looks broken. It's going to need some [src.verbying()].",
-			"Could be that the [current_thingy] needs some [src.verbying()] to proceed. Probably.",
-			"Maybe [src.verbying()] the [current_thingy] will repair it? Only one way to find out.",
-			"Hard to say, but [src.verbying()] the [current_thingy] might be your only shot.",
-			"Unless you enjoy staring at broken junk, start [src.verbying()] that [current_thingy].",
-			"The [current_thingy] isn't fixing itself. Better get to [src.verbying()].",
-			"Pretty sure you read a book that says something about [src.verbying()] the [current_thingy] here.",
+			"That [current_thingy] looks broken. It's going to need some [src.verbying(verby)].",
+			"Could be that the [current_thingy] needs some [src.verbying(verby)] to proceed. Probably.",
+			"Maybe [src.verbying(verby)] the [current_thingy] will repair it? Only one way to find out.",
+			"Hard to say, but [src.verbying(verby)] the [current_thingy] might be your only shot.",
+			"Unless you enjoy staring at broken junk, start [src.verbying(verby)] that [current_thingy].",
+			"The [current_thingy] isn't fixing itself. Better get to [src.verbying(verby)].",
+			"Pretty sure you read a book that says something about [src.verbying(verby)] the [current_thingy] here.",
 			"If you don't [verby] the [current_thingy], nothing else is happening.",
-			"[capitalize(src.verbying())] the [current_thingy] appears like the next logical step.",
-			"Without some [src.verbying()], that [current_thingy] is just dead weight.",
-			"Guess what? The [current_thingy] screams for [src.verbying()]. Figuratively, you hope.",
-			"You could ignore it, but the [current_thingy] clearly requires [src.verbying()].",
-			"All signs point to [src.verbying()] the [current_thingy]. Most signs, anyway."
+			"[capitalize(src.verbying(verby))] the [current_thingy] appears like the next logical step.",
+			"Without some [src.verbying(verby)], that [current_thingy] is just dead weight.",
+			"Guess what? The [current_thingy] screams for [src.verbying(verby)]. Figuratively, you hope.",
+			"You could ignore it, but the [current_thingy] clearly requires [src.verbying(verby)].",
+			"All signs point to [src.verbying(verby)] the [current_thingy]. Most signs, anyway."
 		)
 		src.tool_desc = src.tool_desc ? src.tool_desc : pick(action_list)
 		return src.tool_desc
 
 	// It's worth it, trust me
 	proc/verbying(var/verby)
-		return verby + "ting" ? TOOL_SNIPPING : verby + "ing"
+		return verby + "[src.tools_required[1] == TOOL_SNIPPING ? "ting" : "ing"]"
 
 	proc/remove_tool()
 		src.current_thingy = null
@@ -259,20 +261,32 @@ ABSTRACT_TYPE(/datum/artifact_trigger/)
 	proc/parse_tool(var/obj/item/I, var/mob/user)
 		if(length(src.tools_required) == 0)
 			return
+		if(length(src.tools_required) <= 1)
+			src.use_tool(src, user)
 		if(istool(I, src.tools_required[1]))
 			var/soundy = src.get_current_tool_data("sound")
 			playsound(src.artifact.holder.loc, soundy, 100, 1)
+			// Activate artifact with the last remaining tool
+			if(src.repaired || length(src.tools_required) <= 1)
+				src.activate_artifact()
+				return
 			// Using the artifact object here as a target instead of the /datum because of range checks, but we pass the trigger as a param
 			SETUP_GENERIC_ACTIONBAR(user, src.artifact.holder, rand(1, 3) SECONDS, /datum/artifact_trigger/repair/proc/use_tool, list(src, user), I.icon, I.icon_state, null, INTERRUPT_ACT | INTERRUPT_STUNNED | INTERRUPT_ACTION | INTERRUPT_MOVE)
 		else
 			var/verby = src.get_current_tool_data("verb")
-			boutput(user, SPAN_ALERT("[I] ain't the right tool for the job. You need something that can [verby]."))
+			if (usr && usr.traitHolder?.hasTrait("training_scientist"))
+				boutput(user, SPAN_ALERT("[I] ain't the right tool for the job. You need something that can [verby]."))
+			else
+				boutput(user, SPAN_ALERT("[I] ain't the right tool for the job."))
 
 	proc/use_tool(var/datum/artifact_trigger/repair/trigger, var/mob/user)
+		if(trigger.repaired || length(trigger.tools_required) <= 1)
+			src.activate_artifact()
+			return
 		var/verby = trigger.get_current_tool_data("verb")
 		trigger.current_thingy = trigger.current_thingy ? trigger.current_thingy : pick(trigger.artifact.artitype.nouns_small)
 		user.visible_message(SPAN_ALERT("[user] works on [trigger.artifact]."), "You [verby] the [trigger.current_thingy] inside [src].")
 		trigger.remove_tool()
-		if(length(trigger.tools_required) == 0)
-			var/obj/holder = src
-			holder.ArtifactActivated()
+
+	proc/activate_artifact()
+		src.artifact.holder.ArtifactActivated()
