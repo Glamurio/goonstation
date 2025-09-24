@@ -1358,10 +1358,6 @@ ADMIN_INTERACT_PROCS(/turf/unsimulated/floor, proc/sunset, proc/sunrise, proc/se
 				TT.speed *= scale_factor
 			AM.throw_speed *= scale_factor
 
-		if(istype(AM, /obj/machinery/manufacturer))
-			var/obj/machinery/manufacturer/MF = AM
-			MF.speed *= scale_factor
-
 	onUpdate(timePassed)
 		. = ..()
 		var/turf/T = get_turf(owner)
