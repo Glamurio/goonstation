@@ -199,12 +199,12 @@ ABSTRACT_TYPE(/datum/artifact_trigger/)
 			"Looks like you'll need to [verby] the [current_thingy] to get this thing running.",
 			"That [current_thingy] looks broken. It's going to need some [src.verbying()].",
 			"Could be that the [current_thingy] needs some [src.verbying()] to proceed. Probably.",
-			"Maybe [src.verbying()] the [current_thingy] will repair it? Only one way to find out."
+			"Maybe [src.verbying()] the [current_thingy] will repair it? Only one way to find out.",
 			"Hard to say, but [src.verbying()] the [current_thingy] might be your only shot.",
 			"Unless you enjoy staring at broken junk, start [src.verbying()] that [current_thingy].",
 			"The [current_thingy] isn't fixing itself. Better get to [src.verbying()].",
 			"Pretty sure you read a book that says something about [src.verbying()] the [current_thingy] here.",
-			"If you don't [verby] the [current_thingy], nothing else is happening."
+			"If you don't [verby] the [current_thingy], nothing else is happening.",
 			"[capitalize(src.verbying())] the [current_thingy] appears like the next logical step.",
 			"Without some [src.verbying()], that [current_thingy] is just dead weight.",
 			"Guess what? The [current_thingy] screams for [src.verbying()]. Figuratively, you hope.",
