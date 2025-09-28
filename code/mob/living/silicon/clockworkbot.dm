@@ -9,3 +9,11 @@
 	syndicate_possible = 0
 	movement_delay_modifier = 2 - BASE_SPEED
 	say_language = LANGUAGE_ENGLISH
+
+	// New()
+	// 	// Ideally this will spawn in a physical location at some point
+	// 	if(!ticker.ai_law_rack_manager.first_registered_clockwork)
+	// 		var/obj/machinery/lawrack/hephaestus/rack = new /obj/machinery/lawrack/hephaestus()
+	// 		ticker.ai_law_rack_manager.register_new_rack(rack)
+	// 	src.law_rack_connection = ticker.ai_law_rack_manager.first_registered_clockwork
+	// 	..()

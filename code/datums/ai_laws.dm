@@ -8,10 +8,13 @@
 
 
 /datum/ai_rack_manager
+	// This is really needs to get refactored but that needs to be a separate PR
 	var/first_registered = FALSE
 	var/obj/machinery/lawrack/default_ai_rack = null
 	var/first_registered_syndie = FALSE
 	var/obj/machinery/lawrack/default_ai_rack_syndie = null
+	var/first_registered_clockwork = FALSE
+	var/obj/machinery/lawrack/default_ai_rack_clockwork = null
 	var/list/obj/machinery/lawrack/registered_racks = new()
 	var/list/rack_area_count = list()
 
@@ -86,6 +89,15 @@
 				src.default_ai_rack_syndie.SetLaw(new /obj/item/aiModule/syndicate/law4, 4, TRUE, TRUE)
 				src.first_registered_syndie = TRUE
 				logTheThing(LOG_STATION, src, "the law rack [constructName(new_rack)] claims first registered SYNDICATE, and gets Syndicate laws!")
+
+		if(isnull(src.default_ai_rack_clockwork) && istype(new_rack,/obj/machinery/lawrack/hephaestus))
+			src.default_ai_rack_clockwork = new_rack
+			if(!src.first_registered_clockwork)
+				src.default_ai_rack_clockwork.SetLaw(new /obj/item/aiModule/hephaestus1, 1, TRUE, TRUE)
+				src.default_ai_rack_clockwork.SetLaw(new /obj/item/aiModule/hephaestus2, 2, TRUE, TRUE)
+				src.default_ai_rack_clockwork.SetLaw(new /obj/item/aiModule/hephaestus3, 3, TRUE, TRUE)
+				src.first_registered_clockwork = TRUE
+				logTheThing(LOG_STATION, src, "the law rack [constructName(new_rack)] claims first registered Clockwork, and gets Clockwork laws!")
 
 		src.registered_racks |= new_rack //shouldn't be possible, but just in case - there can only be one instance of rack in registered
 		new_rack.update_last_laws()

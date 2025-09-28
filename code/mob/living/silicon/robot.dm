@@ -3479,6 +3479,20 @@ TYPEINFO(/mob/living/silicon/robot)
 		if (!src.part_leg_r) src.part_leg_r = new/obj/item/parts/robot_parts/leg/right/treads(src)
 		..(loc, frame, starter, syndie, frame_emagged)
 
+/mob/living/silicon/robot/clockwork/spawnable
+	New(loc, var/obj/item/parts/robot_parts/robot_frame/frame = null, var/starter = 0, var/syndie = 0, var/frame_emagged = 0)
+		if (!src.part_chest)
+			src.part_chest = new/obj/item/parts/robot_parts/chest/clockwork(src)
+			src.part_chest.wires = 1
+			src.part_chest.cell = new/obj/item/cell/cerenkite/charged(src.part_chest)
+			src.cell = src.part_chest.cell
+		if (!src.part_head) src.part_head = new/obj/item/parts/robot_parts/head/clockwork(src)
+		if (!src.part_arm_l) src.part_arm_l = new/obj/item/parts/robot_parts/arm/left/clockwork(src)
+		if (!src.part_arm_r) src.part_arm_r = new/obj/item/parts/robot_parts/arm/right/clockwork(src)
+		if (!src.part_leg_l) src.part_leg_l = new/obj/item/parts/robot_parts/leg/left/treads/wheel(src)
+		if (!src.part_leg_r) src.part_leg_r = new/obj/item/parts/robot_parts/leg/right/treads/wheel(src)
+		..(loc, frame, starter, syndie, frame_emagged)
+
 /mob/living/silicon/robot/uber
 
 	New()

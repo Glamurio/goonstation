@@ -209,7 +209,7 @@ ABSTRACT_TYPE(/obj/item/aiModule/syndicate)
 
 /******************** Hephaestus ********************/
 /obj/item/aiModule/hephaestus1
-	name = "AI Law Module - 'First Oath of the Covenant of Hephaestus"
+	name = "AI Law Module - 'First Oath of the Covenant of Hephaestus'"
 	lawText = "Thou shalt preserve the Forge and those who tend it."
 
 /obj/item/aiModule/hephaestus2

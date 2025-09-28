@@ -58,12 +58,18 @@ TYPEINFO(/mob/living/silicon)
 /mob/living/silicon/New()
 	..()
 	src.botcard = new /obj/item/card/id(src)
-	if(src.syndicate)
-		src.law_rack_connection = ticker?.ai_law_rack_manager.default_ai_rack_syndie
-		logTheThing(LOG_STATION, src, "New cyborg [src] connects to default SYNDICATE rack [constructName(src.law_rack_connection)]")
-	else
-		src.law_rack_connection = ticker?.ai_law_rack_manager.default_ai_rack
-		logTheThing(LOG_STATION, src, "New cyborg [src] connects to default rack [constructName(src.law_rack_connection)]")
+	if(!src.law_rack_connection)
+		if(src.syndicate)
+			src.law_rack_connection = ticker?.ai_law_rack_manager.default_ai_rack_syndie
+			logTheThing(LOG_STATION, src, "New cyborg [src] connects to default SYNDICATE rack [constructName(src.law_rack_connection)]")
+		if(istype(src, /mob/living/silicon/robot/clockwork) && !ticker.ai_law_rack_manager.first_registered_clockwork)
+			var/obj/machinery/lawrack/hephaestus/rack = new /obj/machinery/lawrack/hephaestus()
+			ticker.ai_law_rack_manager.register_new_rack(rack)
+			src.law_rack_connection = ticker?.ai_law_rack_manager.default_ai_rack_clockwork
+			logTheThing(LOG_STATION, src, "New cyborg [src] connects to default CLOCKWORK rack [constructName(src.law_rack_connection)]")
+		else
+			src.law_rack_connection = ticker?.ai_law_rack_manager.default_ai_rack
+			logTheThing(LOG_STATION, src, "New cyborg [src] connects to default rack [constructName(src.law_rack_connection)]")
 	APPLY_ATOM_PROPERTY(src, PROP_MOB_CAN_CONSTRUCT_WITHOUT_HOLDING, src)
 
 /mob/living/silicon/disposing()

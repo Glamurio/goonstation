@@ -959,9 +959,9 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/left)
 /obj/item/parts/robot_parts/leg/left/treads/wheel
 	name = "left clockwork wheel assembly"
 	desc = "A single, large wheel. Cyborgs better know how to keep their balance..."
-	appearanceString = "wheel"
-	icon_state = "l_leg-wheel"
-	handlistPart = "legL-wheel" // THIS ONE gets to layer with the hands because aloe said so
+	appearanceString = "clockwork_wheel"
+	icon_state = "l_leg-clockwork_wheel"
+	handlistPart = "legL-clockwork_wheel" // THIS ONE gets to layer with the hands because aloe said so
 
 ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/right)
 /obj/item/parts/robot_parts/leg/right
@@ -1005,9 +1005,9 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/right)
 /obj/item/parts/robot_parts/leg/right/treads/wheel
 	name = "right clockwork wheel assembly"
 	desc = "A single, large wheel. Cyborgs better know how to keep their balance..."
-	appearanceString = "wheel"
-	icon_state = "r_leg-wheel"
-	handlistPart = "legR-wheel" // THIS ONE gets to layer with the hands because aloe said so
+	appearanceString = "clockwork_wheel"
+	icon_state = "r_leg-clockwork_wheel"
+	handlistPart = "legR-clockwork_wheel" // THIS ONE gets to layer with the hands because aloe said so
 
 /obj/item/parts/robot_parts/leg/left/thruster
 	name = "left thruster assembly"
