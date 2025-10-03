@@ -714,6 +714,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 	icon_state = "still"
 	amount_per_transfer_from_this = 25
 	event_handler_flags = NO_MOUSEDROP_QOL
+	capacity = 1000
 
 	// returns whether the inserted item was brewed
 	proc/brew(var/obj/item/W as obj)
@@ -743,15 +744,57 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 		src.visible_message(SPAN_NOTICE("[src] brews up [W]!"))
 		return TRUE
 
-	attackby(obj/item/W, mob/user)
-		if(istool(W, TOOL_SCREWING | TOOL_WRENCHING))
-			bolt_unbolt(user)
+	proc/extract_reagent(var/obj/item/W as obj)
+		if (!W)
+			return FALSE
+		if (istype(W, /obj/item/reagent_containers/food/snacks/plant))
+			var/obj/item/reagent_containers/food/snacks/plant/P = W
+			var/datum/plant/planttype = new P.planttype()
+			var/datum/plantgenes/plantgenes = new P.plantgenes()
+			var/list/reagents = HYPget_assoc_reagents(planttype, plantgenes)
+			qdel(W)
+			return TRUE
+		else if (W.brew_result)
+			var/list/brews = list()
+			if (islist(W.brew_result))
+				brews = W.brew_result
+			else
+				brews.Add(W.brew_result)
+			var/list/mash_data = list(W.name, brews)
+			var/datum/reagent/fooddrink/mash/mash_product = new /datum/reagent/fooddrink/mash()
+			src.reagents.add_reagent("mash", 20, mash_data)
+			return TRUE
+		return FALSE
+
+	mouse_drop(over_object, src_location, over_location)
+		..()
+		if(!isturf(over_object) || !isliving(usr) || isintangible(usr) || isghostcritter(usr))
+			boutput(usr, SPAN_ALERT("You can only empty \the [src] out over a turf!"))
 			return
+		if(BOUNDS_DIST(src, usr) > 0 || BOUNDS_DIST(over_object, usr) > 0)
+			boutput(usr, SPAN_ALERT("You need to be closer to empty \the [src] out!"))
+			return
+		if (tgui_alert(usr, "Empty \the [src] tank?", "[src]", list("Yes", "No")) == "Yes")
+			if(BOUNDS_DIST(src, usr) > 0 || BOUNDS_DIST(over_object, usr) > 0)
+				boutput(usr, SPAN_ALERT("You need to be closer to empty \the [src] out!"))
+				return
+			boutput(usr, SPAN_NOTICE("You empty \the [src] onto \the [over_object]."))
+			src.reagents.reaction(over_object, TOUCH, src.reagents.total_volume)
+			src.reagents.clear_reagents()
+
+	attackby(obj/item/W, mob/user)
+		if(isscrewingtool(W) || iswrenchingtool(W))
+			if(!src.anchored)
+				user.visible_message("<b>[user]</b> secures the [src] to the floor!")
+			else
+				user.visible_message("<b>[user]</b> unbolts the [src] from the floor!")
+			playsound(src.loc, 'sound/items/Screwdriver.ogg', 100, 1)
+			src.anchored = !src.anchored
 
 		var/isfull = src.reagents.is_full()
 		if (W && W.brew_result && !isfull)
 			var/load = 0
-			if (src.brew(W))
+			if (src.extract_reagent(W))
 				load = 1
 			else
 				load = 0
@@ -792,9 +835,8 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 				if (src.reagents.is_full())
 					boutput(user, SPAN_ALERT("[src] is full!"))
 					break
-				if (src.brew(Produce))
+				if (src.extract_reagent(Produce))
 					amtload++
-					qdel(Produce)
 			if (amtload)
 				boutput(user, SPAN_NOTICE("Charged [src] with [amtload] items from [O]!"))
 				playsound(src.loc, 'sound/effects/bubbles_short.ogg', 40, 1)
@@ -816,7 +858,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 					break
 				if (user.loc != staystill) break
 				if (Produce.type != itemtype) continue
-				if (src.brew(Produce))
+				if (src.extract_reagent(Produce))
 					qdel(Produce)
 					playsound(src.loc, 'sound/effects/bubbles_short.ogg', 30, 1)
 					sleep(0.3 SECONDS)

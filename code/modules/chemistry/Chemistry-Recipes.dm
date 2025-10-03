@@ -686,7 +686,60 @@
 					// the rest chars into ash
 					holder.add_reagent("ash", (0.8 - amount_of_oil_produced) * created_volume * 5,,holder.total_temperature, chemical_reaction = TRUE, chem_reaction_priority = 3)
 
+	fermentation
+		name = "fermentation process"
+		id = "fermentation_process"
+		required_reagents = list("space_fungus" = 1)
+		min_temperature = T0C + 80
+		result_amount = 1
+		instant = FALSE
+		reaction_speed = 5
+		mix_phrase = "The mixture inside begins to ferment."
+		drinkrecipe = TRUE
+		mix_sound = 'sound/effects/bubbles_short.ogg'
 
+		does_react(var/datum/reagents/holder)
+			if (!holder.my_atom.is_open_container())
+				return FALSE
+
+		on_reaction(datum/reagents/holder, created_volume)
+			var/max_temp = T0C + 90
+			var/temperature_factor
+
+			// Calculate a temperature factor: 0–1 for out-of-range, >1 for sweet spot
+			if(holder.total_temperature < min_temperature)
+				temperature_factor = holder.total_temperature / min_temperature  // partial efficiency
+			else if(holder.total_temperature > max_temp)
+				temperature_factor = 1 - ((holder.total_temperature - max_temp) / 20)  // penalty above range
+			else
+				temperature_factor = 1.0 + ((holder.total_temperature - min_temperature) / (max_temp - min_temperature)) * 0.25  // sweet spot bonus
+
+			// Base amount produced per tick
+			var/amount_to_produce = created_volume * src.reaction_speed * temperature_factor
+			for (var/reagent in src.required_reagents)
+				holder.remove_reagent(reagent, amount_to_produce)
+			src.add_reagent_to_holder(holder, amount_to_produce)
+
+		proc/add_reagent_to_holder(datum/reagents/holder, amount)
+			if (src.result)
+				holder.add_reagent(src.result, amount)
+				return
+
+	fermentation/brewing
+		name = "brewing process"
+		id = "brewing_process"
+		required_reagents = list("mash" = 0, "space_fungus" = 1) // space fungus remains
+		min_temperature = T0C + 80
+		mix_phrase = "The mixture inside begins to brew."
+		mix_sound = 'sound/effects/bubbles_short.ogg'
+
+		add_reagent_to_holder(datum/reagents/holder, amount)
+			..()
+			var/datum/reagent/fooddrink/mash/mash_product = holder.get_reagent("mash")
+			src.eventual_result = mash_product?.data[2]
+			if (src.eventual_result)
+				for (result in src.eventual_result)
+					holder.add_reagent(result, amount)
 
 	ash
 		name = "Ash"
