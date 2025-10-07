@@ -4956,9 +4956,14 @@ datum
 			fluid_b = 200
 			description = "A pulp created by crushing produce."
 			taste = list("bland")
-			reagent_state = LIQUID
-			data = list("wheat", "beer") // used to track what the mash was made of
+			reagent_state = SOLID
+			thirst_value = 0 // it's like, liquid grain. not hydrating.
 
-			New()
-				..()
-				src.description += " This one seems to be made of [src.data[1]]."
+		fooddrink/mash/wheat
+			name = "wheat mash"
+			id = "wheat_mash"
+			fluid_r = 200
+			fluid_g = 150
+			fluid_b = 20
+			description = "A pulp created by crushing wheat."
+			taste = list("grainy", "bland")

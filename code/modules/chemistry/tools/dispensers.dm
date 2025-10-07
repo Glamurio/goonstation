@@ -653,8 +653,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 		else if (istype(W,/obj/item/reagent_containers/food/snacks/mushroom/)) src.reagents.add_reagent("poo", 25)
 		else if (istype(W,/obj/item/seed/)) src.reagents.add_reagent("poo", 2)
 		else if (istype(W,/obj/item/plant/) \
-				|| istype(W,/obj/item/clothing/head/flower/) \
-				|| istype(W,/obj/item/reagent_containers/food/snacks/ingredient/rice_sprig)) src.reagents.add_reagent("poo", 15)
+				|| istype(W,/obj/item/clothing/head/flower/)) src.reagents.add_reagent("poo", 15)
 		else if (istype(W,/obj/item/organ/)) src.reagents.add_reagent("poo", 35)
 		else load = 0
 
@@ -682,8 +681,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 		if (istype(O, /obj/item/reagent_containers/food/snacks/plant/) \
 			|| istype(O, /obj/item/reagent_containers/food/snacks/mushroom/) \
 			|| istype(O, /obj/item/seed/) || istype(O, /obj/item/plant/) \
-			|| istype(O, /obj/item/clothing/head/flower/) \
-			|| istype(O, /obj/item/reagent_containers/food/snacks/ingredient/rice_sprig))
+			|| istype(O, /obj/item/clothing/head/flower/))
 			user.visible_message(SPAN_NOTICE("[user] begins quickly stuffing [O] into [src]!"))
 			var/itemtype = O.type
 			var/staystill = user.loc
@@ -698,7 +696,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 					amount = 25
 				else if (istype(P,/obj/item/seed/))
 					amount = 2
-				else if (istype(P,/obj/item/plant/) || istype(P,/obj/item/reagent_containers/food/snacks/ingredient/rice_sprig))
+				else if (istype(P,/obj/item/plant/))
 					amount = 15
 				playsound(src.loc, 'sound/impact_sounds/Slimy_Hit_4.ogg', 30, 1)
 				src.reagents.add_reagent("poo", amount)
@@ -715,54 +713,30 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 	amount_per_transfer_from_this = 25
 	event_handler_flags = NO_MOUSEDROP_QOL
 	capacity = 1000
+	var/temp = T20C
 
-	// returns whether the inserted item was brewed
-	proc/brew(var/obj/item/W as obj)
-		if (!istype(W))
-			return FALSE
-		var/list/brew_result = W.brew_result
-		var/list/brew_amount = 20 // how much brew could a brewstill brew if a brewstill still brewed brew?
-
-		if (!brew_result)
-			return FALSE
-
-		if(istype(W, /obj/item/reagent_containers/food/snacks/plant))
-			var/obj/item/reagent_containers/food/snacks/plant/P = W
-			var/datum/plantgenes/DNA = P.plantgenes
-			brew_amount = max(HYPfull_potency_calculation(DNA), 5) //always produce SOMETHING
-
-		if (islist(brew_result))
-			for(var/I in brew_result)
-				var/result = I
-				var/amount = brew_result[I]
-				if (!amount)
-					amount = brew_amount
-				src.reagents.add_reagent(result, amount)
-		else
-			src.reagents.add_reagent(brew_result, brew_amount)
-
-		src.visible_message(SPAN_NOTICE("[src] brews up [W]!"))
-		return TRUE
+	New()
+		..()
+		src.set_open_container(FALSE)
 
 	proc/extract_reagent(var/obj/item/W as obj)
 		if (!W)
 			return FALSE
-		if (istype(W, /obj/item/reagent_containers/food/snacks/plant))
-			var/obj/item/reagent_containers/food/snacks/plant/P = W
-			var/datum/plant/planttype = new P.planttype()
-			var/datum/plantgenes/plantgenes = new P.plantgenes()
-			var/list/reagents = HYPget_assoc_reagents(planttype, plantgenes)
+		if (src.produce_check())
+			if (W.reagents.total_volume > 0)
+				W.reagents.trans_to(src, 0)
 			qdel(W)
+			src.do_temp()
 			return TRUE
-		else if (W.brew_result)
-			var/list/brews = list()
-			if (islist(W.brew_result))
-				brews = W.brew_result
-			else
-				brews.Add(W.brew_result)
-			var/list/mash_data = list(W.name, brews)
-			var/datum/reagent/fooddrink/mash/mash_product = new /datum/reagent/fooddrink/mash()
-			src.reagents.add_reagent("mash", 20, mash_data)
+		return FALSE
+
+	proc/do_temp()
+		if (src.temp >= src.reagents.total_temperature)
+			src.reagents.set_reagent_temp(src.temp)
+
+	// My kingdom for unified plant code
+	proc/produce_check(/obj/item/I)
+		if (istype(I, /obj/item/reagent_containers/food/snacks/plant) || istype(I, /obj/item/plant) || istype(I, /obj/item/clothing/head/flower))
 			return TRUE
 		return FALSE
 
@@ -792,20 +766,9 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 			src.anchored = !src.anchored
 
 		var/isfull = src.reagents.is_full()
-		if (W && W.brew_result && !isfull)
-			var/load = 0
-			if (src.extract_reagent(W))
-				load = 1
-			else
-				load = 0
-
-			if (load)
-				user.u_equip(W)
-				W.dropped(user)
-				qdel(W)
-				playsound(src.loc, 'sound/effects/bubbles_short.ogg', 30, 1)
-				return
-			else  ..()
+		if (!isfull)
+			src.extract_reagent(W)
+			playsound(src.loc, 'sound/misc/pourdrink.ogg', 50, 1)
 		// create feedback for items which don't produce attack messages
 		// but not for chemistry containers, because they have their own feedback
 		if (W && (W.flags & (SUPPRESSATTACK | OPENCONTAINER)) == SUPPRESSATTACK)
@@ -839,7 +802,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 					amtload++
 			if (amtload)
 				boutput(user, SPAN_NOTICE("Charged [src] with [amtload] items from [O]!"))
-				playsound(src.loc, 'sound/effects/bubbles_short.ogg', 40, 1)
+				playsound(src.loc, 'sound/misc/pourdrink.ogg', 50, 1)
 			else
 				boutput(user, SPAN_ALERT("Nothing was put into [src]!"))
 		// loading from the ground
@@ -859,8 +822,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 				if (user.loc != staystill) break
 				if (Produce.type != itemtype) continue
 				if (src.extract_reagent(Produce))
-					qdel(Produce)
-					playsound(src.loc, 'sound/effects/bubbles_short.ogg', 30, 1)
+					playsound(src.loc, 'sound/misc/pourdrink.ogg', 50, 1)
 					sleep(0.3 SECONDS)
 			boutput(user, SPAN_NOTICE("You finish charging [src] with [O]!"))
 

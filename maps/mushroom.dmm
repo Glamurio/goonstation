@@ -14283,7 +14283,7 @@
 	tag = "icon-shrub (WEST)"
 	},
 /obj/item/plant/herb/cannabis,
-/obj/item/plant/wheat,
+/obj/item/plant/grain/wheat,
 /turf/simulated/floor/carpet{
 	icon_state = "carpet2"
 	},

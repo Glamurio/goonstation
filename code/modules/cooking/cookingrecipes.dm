@@ -1983,7 +1983,7 @@ ABSTRACT_TYPE(/datum/cookingrecipe/oven/sandwich)
 /datum/cookingrecipe/oven/beefood
 	ingredients = list(\
 	/obj/item/reagent_containers/food/snacks/ingredient/honey = 1,
-	/obj/item/plant/wheat = 1,
+	/obj/item/plant/grain/wheat = 1,
 	/obj/item/reagent_containers/food/snacks/yuck = 1)
 	cookbonus = 22
 	output = /obj/item/reagent_containers/food/snacks/beefood

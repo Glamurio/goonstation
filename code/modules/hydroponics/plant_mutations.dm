@@ -312,14 +312,14 @@ ABSTRACT_TYPE(/datum/plantmutation)
 /datum/plantmutation/wheat/durum
 	name = "Durum Wheat"
 	name_prefix = "Durum "
-	crop = /obj/item/plant/wheat/durum
+	crop = /obj/item/plant/grain/wheat/durum
 
 /datum/plantmutation/wheat/steelwheat
 	name = "steel wheat"
 	name_prefix = "Steel "
 	iconmod = "WheatSteel"
 	assoc_reagents = list("iron")
-	crop = /obj/item/plant/wheat/metal
+	crop = /obj/item/plant/grain/wheat/metal
 	infusion_reagents = list("iron")
 
 // Rice Mutations
@@ -330,7 +330,7 @@ ABSTRACT_TYPE(/datum/plantmutation)
 	iconmod = "Rice"
 	PTrange = list(60,null)
 	brew_result = "ricin"
-	crop = /obj/item/reagent_containers/food/snacks/ingredient/rice_sprig
+	crop = /obj/item/plant/grain/rice
 	chance = 0
 	infusion_reagents = list("insulin")
 
@@ -341,7 +341,7 @@ ABSTRACT_TYPE(/datum/plantmutation)
 	name_prefix = "Salted "
 	iconmod = "OatSalt"
 	assoc_reagents = list("salt")
-	crop = /obj/item/plant/oat/salt
+	crop = /obj/item/plant/grain/oat/salt
 
 // Synthmeat Mutations
 

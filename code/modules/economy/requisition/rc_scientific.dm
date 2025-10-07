@@ -408,7 +408,7 @@ ABSTRACT_TYPE(/datum/rc_entry/item/organ)
 	// thus potentially providing a bit of plausible deniability.
 	var/list/mutates = list(
 		/obj/item/reagent_containers/food/snacks/plant/slurryfruit/omega,
-		/obj/item/plant/oat/salt,
+		/obj/item/plant/grain/oat/salt,
 		/obj/item/reagent_containers/food/snacks/plant/corn/pepper,
 		/obj/item/reagent_containers/food/snacks/plant/soy/soylent,
 		/obj/item/plant/herb/commol/burning,

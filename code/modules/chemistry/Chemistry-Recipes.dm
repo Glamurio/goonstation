@@ -689,8 +689,9 @@
 	fermentation
 		name = "fermentation process"
 		id = "fermentation_process"
-		required_reagents = list("space_fungus" = 1)
-		min_temperature = T0C + 80
+		required_reagents = list("space_fungus" = 1) // space fungus is the closest thing to yeast that we have. also it's funny.
+		min_temperature = T0C + 10
+		var/max_temp = T0C + 30
 		result_amount = 1
 		instant = FALSE
 		reaction_speed = 5
@@ -699,11 +700,10 @@
 		mix_sound = 'sound/effects/bubbles_short.ogg'
 
 		does_react(var/datum/reagents/holder)
-			if (!holder.my_atom.is_open_container())
+			if (!holder?.my_atom?.is_open_container())
 				return FALSE
 
 		on_reaction(datum/reagents/holder, created_volume)
-			var/max_temp = T0C + 90
 			var/temperature_factor
 
 			// Calculate a temperature factor: 0–1 for out-of-range, >1 for sweet spot
@@ -717,6 +717,8 @@
 			// Base amount produced per tick
 			var/amount_to_produce = created_volume * src.reaction_speed * temperature_factor
 			for (var/reagent in src.required_reagents)
+				if (reagent == "space_fungus")
+					continue
 				holder.remove_reagent(reagent, amount_to_produce)
 			src.add_reagent_to_holder(holder, amount_to_produce)
 
@@ -725,21 +727,24 @@
 				holder.add_reagent(src.result, amount)
 				return
 
-	fermentation/brewing
-		name = "brewing process"
-		id = "brewing_process"
-		required_reagents = list("mash" = 0, "space_fungus" = 1) // space fungus remains
-		min_temperature = T0C + 80
+	fermentation/wheat
+		name = "wheat brewing"
+		id = "wheat_brewing"
+		required_reagents = list("wheat_mash" = 1, "space_fungus" = 1)
+		result = "beer"
+		min_temperature = T20C
+		max_temp = T0C + 40
 		mix_phrase = "The mixture inside begins to brew."
 		mix_sound = 'sound/effects/bubbles_short.ogg'
 
-		add_reagent_to_holder(datum/reagents/holder, amount)
-			..()
-			var/datum/reagent/fooddrink/mash/mash_product = holder.get_reagent("mash")
-			src.eventual_result = mash_product?.data[2]
-			if (src.eventual_result)
-				for (result in src.eventual_result)
-					holder.add_reagent(result, amount)
+	// fermentation/distillation
+	// 	name = "distillation process"
+	// 	id = "distillation_process"
+	// 	required_reagents = list("ethanol" = 0)
+	// 	min_temperature = T0C + 80
+	// 	max_temp = T0C + 90
+	// 	mix_phrase = "The mixture inside begins to distill."
+	// 	mix_sound = 'sound/effects/bubbles_short.ogg'
 
 	ash
 		name = "Ash"

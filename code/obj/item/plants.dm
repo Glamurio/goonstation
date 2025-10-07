@@ -202,21 +202,28 @@ ABSTRACT_TYPE(/obj/item/plant/herb)
 	icon_state = "twobacco"
 	brew_result = list("nicotine2"=20)
 
-/obj/item/plant/wheat
+ABSTRACT_TYPE(/obj/item/plant/grain)
+/obj/item/plant/grain
+	name = "grain base"
+	crop_suffix	= " sprig"
+
+/obj/item/plant/grain/wheat
 	name = "wheat"
 	desc = "Never eat shredded wheat."
 	icon_state = "wheat"
 	brew_result = list("beer"=20)
 
-/obj/item/plant/wheat/durum
+/obj/item/plant/grain/wheat/durum
 	name = "durum wheat"
+	crop_prefix = "durum "
 	desc = "A harder wheat for a harder palate."
 	icon_state = "wheat"
 	brew_result = list("beer"=20)
 
-/obj/item/plant/wheat/metal
-	name = "steelwheat"
+/obj/item/plant/grain/wheat/metal
+	name = "steel wheat"
 	desc = "Never eat iron filings."
+	crop_prefix = "steel "
 	icon_state = "metalwheat"
 	brew_result = list("ironbrew"=20)
 
@@ -224,13 +231,19 @@ ABSTRACT_TYPE(/obj/item/plant/herb)
 		..()
 		src.setMaterial(getMaterial("steel"))
 
-/obj/item/plant/oat
+/obj/item/plant/grain/rice
+	name = "rice"
+	desc = "A stable crop all over Asia. And in Space."
+	icon_state = "rice"
+	brew_result = list("ricewine"=20)
+
+/obj/item/plant/grain/oat
 	name = "oat"
 	desc = "A bland but healthy cereal crop. Good source of fiber."
 	icon_state = "oat"
 
-/obj/item/plant/oat/salt
-	name = " salted oat"
+/obj/item/plant/grain/oat/salt
+	name = "salted oat"
 	desc = "A salty but healthy cereal crop. Just don't eat too much without water."
 	icon_state = "saltedoat"
 

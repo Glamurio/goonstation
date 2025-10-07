@@ -300,14 +300,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/ingredient)
 	icon_state = "semolina"
 	food_color = "#FFFFEE"
 
-/obj/item/reagent_containers/food/snacks/ingredient/rice_sprig
-	name = "rice sprig"
-	desc = "A sprig of rice. There's probably a decent amount in it, thankfully."
-	icon = 'icons/obj/foodNdrink/food_produce.dmi'
-	icon_state = "rice-sprig"
-	food_color = "#FFFFAA"
-	brew_result = list("ricewine"=20)
-
 /obj/item/reagent_containers/food/snacks/ingredient/rice
 	name = "rice"
 	desc = "Some rice."

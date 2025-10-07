@@ -200,7 +200,7 @@ ABSTRACT_TYPE(/datum/supply_packs)
 	desc = "x25 Assorted Cooking Ingredients"
 	category = "Civilian Department"
 	contains = list(/obj/item/reagent_containers/food/snacks/ingredient/flour = 6,
-					/obj/item/reagent_containers/food/snacks/ingredient/rice_sprig = 4,
+					/obj/item/reagent_containers/food/snacks/ingredient/rice = 4,
 					/obj/item/reagent_containers/food/snacks/ingredient/pasta/spaghetti = 3,
 					/obj/item/reagent_containers/food/snacks/ingredient/sugar = 4,
 					/obj/item/reagent_containers/food/snacks/ingredient/oatmeal = 3,

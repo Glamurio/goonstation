@@ -26,12 +26,12 @@
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 "Q" = (
-/obj/item/plant/wheat,
+/obj/item/plant/grain/wheat,
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 "W" = (
-/obj/item/plant/wheat,
-/obj/item/plant/wheat,
+/obj/item/plant/grain/wheat,
+/obj/item/plant/grain/wheat,
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 

@@ -8,16 +8,16 @@
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 "u" = (
-/obj/item/plant/wheat,
-/obj/item/plant/wheat,
+/obj/item/plant/grain/wheat,
+/obj/item/plant/grain/wheat,
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 "v" = (
-/obj/item/plant/wheat,
-/obj/item/plant/wheat,
-/obj/item/plant/wheat,
-/obj/item/plant/wheat,
-/obj/item/plant/wheat,
+/obj/item/plant/grain/wheat,
+/obj/item/plant/grain/wheat,
+/obj/item/plant/grain/wheat,
+/obj/item/plant/grain/wheat,
+/obj/item/plant/grain/wheat,
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 "B" = (
@@ -35,13 +35,13 @@
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 "S" = (
-/obj/item/plant/wheat,
-/obj/item/plant/wheat,
-/obj/item/plant/wheat,
+/obj/item/plant/grain/wheat,
+/obj/item/plant/grain/wheat,
+/obj/item/plant/grain/wheat,
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 "U" = (
-/obj/item/plant/wheat,
+/obj/item/plant/grain/wheat,
 /turf/simulated/floor/plating,
 /area/dmm_suite/clear_area)
 "V" = (

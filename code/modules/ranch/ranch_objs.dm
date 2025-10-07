@@ -262,11 +262,11 @@ TYPEINFO(/obj/submachine/ranch_feed_grinder)
 			R.ranch_flag = "lizard_tail"
 			R.food_color = "#FF0000"
 
-		else if (istype(I,/obj/item/plant/wheat/metal))
+		else if (istype(I,/obj/item/plant/grain/wheat/metal))
 			R.ranch_flag = "wheat_steel"
 			R.food_color = "#444444"
 
-		else if (istype(I,/obj/item/plant/wheat))
+		else if (istype(I,/obj/item/plant/grain/wheat))
 			R.ranch_flag = "wheat"
 			R.food_color = "#DDBB00"
 
@@ -342,7 +342,7 @@ TYPEINFO(/obj/submachine/ranch_feed_grinder)
 			B.hunger_mod = -10
 			B.feed_flags |= list("spicy")
 
-		else if (istype(F,/obj/item/reagent_containers/food/snacks/ingredient/rice_sprig))
+		else if (istype(F,/obj/item/plant/grain/rice))
 			B.happiness_mod = 3
 			B.hunger_mod = 5
 			B.feed_flags |= list("rice")

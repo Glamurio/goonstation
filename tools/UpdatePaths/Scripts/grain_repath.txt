@@ -1,0 +1,8 @@
+/obj/item/plant/wheat : /obj/item/plant/grain/wheat{@OLD}
+/obj/item/plant/wheat/durum : /obj/item/plant/grain/wheat/durum{@OLD}
+/obj/item/plant/wheat/metal : /obj/item/plant/grain/wheat/metal{@OLD}
+
+/obj/item/reagent_containers/food/snacks/ingredient/rice_sprig : /obj/item/plant/grain/rice{@OLD}
+
+/obj/item/plant/oat : /obj/item/plant/grain/oat{@OLD}
+/obj/item/plant/oat/salt : /obj/item/plant/grain/oat/salt{@OLD}

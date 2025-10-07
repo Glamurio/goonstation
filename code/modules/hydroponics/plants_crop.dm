@@ -20,7 +20,7 @@ ABSTRACT_TYPE(/datum/plant/crop)
 /datum/plant/crop/wheat
 	name = "Wheat"
 	seedcolor = "#FFFF88"
-	crop = /obj/item/plant/wheat
+	crop = /obj/item/plant/grain/wheat
 	starthealth = 15
 	growtime = 40
 	harvtime = 80
@@ -29,6 +29,7 @@ ABSTRACT_TYPE(/datum/plant/crop)
 	isgrass = 1
 	endurance = 0
 	genome = 10
+	assoc_reagents = list("wheat_mash")
 	mutations = list(/datum/plantmutation/wheat/steelwheat, /datum/plantmutation/wheat/durum)
 	commuts = list(/datum/plant_gene_strain/growth_fast,/datum/plant_gene_strain/health_poor)
 
@@ -36,7 +37,7 @@ ABSTRACT_TYPE(/datum/plant/crop)
 /datum/plant/crop/oat
 	name = "Oat"
 	seedcolor = "#CCFF88"
-	crop = /obj/item/plant/oat
+	crop = /obj/item/plant/grain/oat
 	starthealth = 20
 	growtime = 60
 	harvtime = 120
@@ -51,7 +52,7 @@ ABSTRACT_TYPE(/datum/plant/crop)
 /datum/plant/crop/rice
 	name = "Rice"
 	seedcolor = "#FFFFAA"
-	crop = /obj/item/reagent_containers/food/snacks/ingredient/rice_sprig
+	crop = /obj/item/plant/grain/rice
 	starthealth = 20
 	growtime = 30
 	harvtime = 70
