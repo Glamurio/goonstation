@@ -722,6 +722,13 @@ TYPEINFO(/obj/item/plantanalyzer)
 	initial_volume = 250
 	initial_reagents = list("saltpetre"=50, "ammonia"=50, "potash"=50, "poo"=50, "space_fungus"=50)
 
+/obj/item/reagent_containers/glass/vial/space_yeast
+	name = "Space Yeast"
+	desc = "A small vial filled with powder. You need this for brewing."
+	amount_per_transfer_from_this = 1
+	initial_volume = 5
+	initial_reagents = list("space_fungus" = 5)
+
 /obj/item/reagent_containers/glass/water_pipe
 	name = "water pipe"
 	icon = 'icons/obj/items/chemistry_glassware.dmi'

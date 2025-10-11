@@ -735,7 +735,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 			src.reagents.set_reagent_temp(src.temp)
 
 	// My kingdom for unified plant code
-	proc/produce_check(/obj/item/I)
+	proc/produce_check(obj/item/I)
 		if (istype(I, /obj/item/reagent_containers/food/snacks/plant) || istype(I, /obj/item/plant) || istype(I, /obj/item/clothing/head/flower))
 			return TRUE
 		return FALSE

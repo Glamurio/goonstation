@@ -324,7 +324,7 @@
 	heal_amt = 1
 	rc_flags = RC_FULLNESS
 	initial_volume = 125
-	initial_reagents = "moonshine"
+	initial_reagents = "moonshine_evil"
 
 /obj/item/reagent_containers/food/drinks/curacao
 	name = "curaçao liqueur"

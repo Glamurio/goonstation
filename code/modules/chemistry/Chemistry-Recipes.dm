@@ -686,15 +686,25 @@
 					// the rest chars into ash
 					holder.add_reagent("ash", (0.8 - amount_of_oil_produced) * created_volume * 5,,holder.total_temperature, chemical_reaction = TRUE, chem_reaction_priority = 3)
 
+	fungus_death // fungus dies at high temps (used for fermentation)
+		name = "Fungus Death"
+		id = "fungus_death"
+		required_reagents = list("space_fungus" = 1)
+		result = "yuck"
+		min_temperature = T0C + 55
+		mix_phrase = "The space fungus dies due to excessive heat."
+		hidden = TRUE
+		reaction_speed = 1
+
 	fermentation
 		name = "fermentation process"
 		id = "fermentation_process"
-		required_reagents = list("space_fungus" = 1) // space fungus is the closest thing to yeast that we have. also it's funny.
 		min_temperature = T0C + 10
 		var/max_temp = T0C + 30
 		result_amount = 1
 		instant = FALSE
-		reaction_speed = 5
+		stateful = TRUE
+		reaction_speed = 0.25
 		mix_phrase = "The mixture inside begins to ferment."
 		drinkrecipe = TRUE
 		mix_sound = 'sound/effects/bubbles_short.ogg'
@@ -702,9 +712,12 @@
 		does_react(var/datum/reagents/holder)
 			if (!holder?.my_atom?.is_open_container())
 				return FALSE
+			return TRUE
 
 		on_reaction(datum/reagents/holder, created_volume)
 			var/temperature_factor
+			if (!holder?.my_atom?.is_open_container())
+				return
 
 			// Calculate a temperature factor: 0–1 for out-of-range, >1 for sweet spot
 			if(holder.total_temperature < min_temperature)
@@ -727,24 +740,111 @@
 				holder.add_reagent(src.result, amount)
 				return
 
-	fermentation/wheat
-		name = "wheat brewing"
-		id = "wheat_brewing"
-		required_reagents = list("wheat_mash" = 1, "space_fungus" = 1)
+	// space fungus is the closest thing to yeast that we have. also it's funny.
+	fermentation/beer
+		name = "beer"
+		id = "beer"
+		required_reagents = list("water" = 1, "wheat_mash" = 1, "space_fungus" = 0)
 		result = "beer"
-		min_temperature = T20C
-		max_temp = T0C + 40
-		mix_phrase = "The mixture inside begins to brew."
+
+	fermentation/rice_wine
+		name = "rice wine"
+		id = "ricewine"
+		required_reagents = list("water" = 1, "rice_mash" = 1, "space_fungus" = 0)
+		result = "ricewine"
+
+	fermentation/wine
+		name = "wine"
+		id = "wine"
+		required_reagents = list("juice_grape" = 1, "space_fungus" = 0)
+		result = "wine"
+
+	fermentation/cider
+		name = "cider"
+		id = "cider"
+		required_reagents = list("juice_apple" = 1, "space_fungus" = 0)
+		result = "cider"
+
+	fermentation/perry
+		name = "perry"
+		id = "perry"
+		required_reagents = list("juice_pear" = 1, "space_fungus" = 0)
+		result = "perry"
+
+	fermentation/omniwine // look it sounded funny, so I'm doing it
+		name = "omniwine"
+		id = "omniwine"
+		required_reagents = list("omnizine" = 1, "space_fungus" = 0)
+
+	fermentation/simplesyrup
+		name = "simplesyrup"
+		id = "simplesyrup_fermented"
+		required_reagents = list("water" = 1, "sugar" = 1, "space_fungus" = 0)
+		result = "simplesyrup"
+
+	// distillation parent
+	fermentation/distillation
+		name = "distillation process"
+		id = "distillation_process"
+		min_temperature = T0C + 80
+		max_temp = T0C + 90
+		mix_phrase = "The mixture inside begins to distill."
 		mix_sound = 'sound/effects/bubbles_short.ogg'
 
-	// fermentation/distillation
-	// 	name = "distillation process"
-	// 	id = "distillation_process"
-	// 	required_reagents = list("ethanol" = 0)
-	// 	min_temperature = T0C + 80
-	// 	max_temp = T0C + 90
-	// 	mix_phrase = "The mixture inside begins to distill."
-	// 	mix_sound = 'sound/effects/bubbles_short.ogg'
+	fermentation/distillation/brandy
+		name = "brandy"
+		id = "brandy"
+		result = "brandy"
+		required_reagents = list("wine" = 1)
+
+	fermentation/distillation/whiskey
+		name = "whiskey"
+		id = "whiskey"
+		result = "bourbon" // I know all bourbon is whiskey, but not all whiskey is bourbon, bite me
+		required_reagents = list("beer" = 1)
+
+	fermentation/distillation/moonshine
+		name = "moonshine"
+		id = "moonshine"
+		required_reagents = list("beer" = 3, "omnizine" = 1)
+
+	fermentation/distillation/rum
+		name = "rum"
+		id = "rum"
+		required_reagents = list("simplesyrup" = 1)
+		result = "rum"
+
+	fermentation/distillation/schnapps
+		name = "schnapps"
+		id = "schnapps"
+		required_reagents = list("ethanol" = 0)
+		result = "schnapps"
+		var/juice_id = ""
+
+		does_react(var/datum/reagents/holder)
+			..()
+			if (src.juice_id)
+				return TRUE
+			var/list/juices = list("juice_apple" = 0.1, "juice_banana" = 0.1, "juice_cran" = 0.1, "juice_blueberry" = 0.1, "juice_cherry" = 0.1,
+			"juice_pineapple" = 0.1, "juice_raspberry" = 0.1, "juice_blueraspberry" = 0.1, "juice_blackberry" = 0.1, "juice_watermelon" = 0.1,
+			"juice_pear" = 0.1, "cider" = 1, "perry" = 1, "wine" = 1)
+			src.juice_id = holder.get_master_reagent()
+			if (juices[src.juice_id])
+				src.required_reagents = list("ethanol" = juices[src.juice_id], src.juice_id = 1)
+			else
+				return FALSE
+			return TRUE
+
+		on_end_reaction(var/datum/reagents/holder)
+			var/datum/reagent/juice_reagent = holder.reagent_list[src.juice_id]
+			var/datum/reagent/schnapps = holder.reagent_list["schnapps"]
+			if (juice_reagent)
+				schnapps.name = juice_reagent.name + " schnapps"
+
+		// add_reagent_to_holder(datum/reagents/holder, amount)
+		// 	if (src.result)
+		// 		holder.add_reagent(src.result, amount)
+		// 		return
 
 	ash
 		name = "Ash"
@@ -1381,7 +1481,7 @@
 		name = "Pisco Sour"
 		id = "piscosour"
 		result = "piscosour"
-		required_reagents = list("egg" = 1, "simplesyrup" = 1, "bitters"= 1, "juice_lime" = 1, "white_wine" = 1)
+		required_reagents = list("egg" = 1, "simplesyrup" = 1, "bitters"= 1, "juice_lime" = 1, "brandy" = 1)
 		result_amount = 5
 		mix_phrase = "The egg white foams and floats atop the lime-colored drink."
 		mix_sound = 'sound/misc/drinkfizz.ogg'
@@ -4385,7 +4485,7 @@
 		id = "LSD"
 		result = "LSD"
 		required_reagents = list("diethylamine" = 1, "space_fungus" = 1)
-		min_temperature = T0C + 70
+		min_temperature = T0C + 50 // putting this to 50, because space fungus dies at 55 Celsius, for fermentation reasons
 		result_amount = 3
 		mix_phrase = "The mixture turns a rather unassuming color and settles."
 

@@ -375,6 +375,18 @@ datum
 			taste = "fruity"
 			reagent_state = LIQUID
 
+		fooddrink/alcoholic/perry
+			name = "perry"
+			id = "perry"
+			fluid_r = 25
+			fluid_g = 90
+			fluid_b = 7
+			alch_strength = 0.06
+			depletion_rate = 1
+			description = "An alcoholic beverage derived from pears."
+			taste = "fruity"
+			reagent_state = LIQUID
+
 		fooddrink/alcoholic/schnapps
 			name = "schnapps"
 			id = "schnapps"
@@ -382,7 +394,7 @@ datum
 			fluid_g = 240
 			fluid_b = 240
 			alch_strength = 0.6
-			description = "An alcoholic beverage typically made from fermented fruits. Contains a lot of alcohol."
+			description = "An alcoholic beverage distilled from fermented fruits. Contains a lot of alcohol."
 			taste = "fruity"
 			reagent_state = LIQUID
 
@@ -421,6 +433,81 @@ datum
 			description = "An alcoholic beverage derived from white grapes."
 			reagent_state = LIQUID
 			taste = "dry"
+			viscosity = 0.3
+
+		fooddrink/alcoholic/omniwine
+			name = "omniwine"
+			id = "omniwine"
+			fluid_r = 220
+			fluid_g = 220
+			fluid_b = 220
+			transparency = 20
+			alch_strength = 0.13
+			depletion_rate = 0.7
+			description = "An alcoholic beverage derived from omnizine. What? How does that even work?"
+			reagent_state = LIQUID
+			taste = list("sweet", "medicinal")
+			viscosity = 0.3
+			value = 44
+			target_organs = list("brain", "left_eye", "right_eye", "heart", "left_lung", "right_lung", "left_kidney", "right_kidney", "stomach", "intestines", "spleen", "pancreas", "appendix", "tail")
+
+			on_mob_life(var/mob/M, var/mult = 1)
+				if(!M)
+					M = holder.my_atom
+				if(M.get_oxygen_deprivation())
+					M.take_oxygen_deprivation(-1.2 * mult)
+				if(M.losebreath && prob(80))
+					M.lose_breath(-1 * mult)
+				M.HealDamage("All", 2.2 * mult, 2.2 * mult, 0.5 * mult)
+				if (isliving(M))
+					var/mob/living/L = M
+					if (L.bleeding)
+						repair_bleeding_damage(L, 10, 1.2 * mult)
+					if (L.blood_volume < 500)
+						L.blood_volume ++
+					if (ishuman(M))
+						var/mob/living/carbon/human/H = M
+						if (H.organHolder)
+							H.organHolder.heal_organs(1.2*mult, 1.2*mult, 1.2*mult, target_organs)
+				..()
+				return
+
+			do_overdose(var/severity, var/mob/M, var/mult = 1)
+				var/mob/living/carbon/human/HH
+				if (ishuman(M))
+					HH = M
+				else return
+				if (severity == 1)
+					if(prob(10))
+						M.nauseate(3)
+					if(prob(6))
+						M.visible_message(SPAN_ALERT("<b>[M.name]</b> clutches [his_or_her(M)] stomach!"))
+						if (HH.organHolder && HH.organHolder.liver)
+							if (HH.organHolder.liver.robotic)
+								M.take_toxin_damage(severity * 3 * mult)
+								if(!HH.organHolder.liver.emagged)
+									HH.organHolder.heal_organ(severity*mult, severity*mult, severity*mult, "liver")
+							else
+								HH.organHolder.damage_organ(0, 0, severity*mult, "liver")
+				else if (severity == 2)
+					if(prob(3))
+						if (HH.organHolder && HH.organHolder.liver)
+							M.visible_message(SPAN_ALERT("<b>[M.name]</b> falls to the floor screaming!"))
+							M.take_toxin_damage(30)
+							M.TakeDamage("chest", 30, 0, 0, DAMAGE_BLUNT)
+							qdel(HH.organHolder.liver)
+
+		fooddrink/alcoholic/brandy
+			name = "brandy"
+			id = "brandy"
+			fluid_r = 255
+			fluid_g = 229
+			fluid_b = 189
+			alch_strength = 0.2
+			depletion_rate = 0.7
+			description = "An alcoholic beverage distilled from wine."
+			reagent_state = LIQUID
+			taste = "fruity"
 			viscosity = 0.3
 
 		fooddrink/alcoholic/champagne
@@ -573,6 +660,21 @@ datum
 				. = ..()
 				if(!volume_passed) return
 				if(method == INGEST)
+					M.reagents.add_reagent("omnizine",volume_passed * 0.5)
+					return
+
+			on_mob_life(var/mob/target, var/mult = 1)
+				target.reagents.del_reagent("moonshine")
+				..()
+
+		fooddrink/alcoholic/moonshine/syndicate
+			name = "moonshine"
+			id = "moonshine_evil"
+
+			reaction_mob(var/mob/M, var/method=TOUCH, var/volume_passed)
+				. = ..()
+				if(!volume_passed) return
+				if(method == INGEST)
 					if(M.client && (istraitor(M) || isspythief(M) || ispirate(M)))
 						M.reagents.add_reagent("omnizine",volume_passed * 2)
 						return
@@ -718,7 +820,7 @@ datum
 			fluid_r = 233
 			fluid_g = 246
 			fluid_b = 195
-			alch_strength = 0.4 //uses white wine since no brandy in game, but piscos are usually 35-50% alch by volume
+			alch_strength = 0.4
 
 		fooddrink/alcoholic/diesel
 			name = "Diesel"
@@ -3688,6 +3790,18 @@ datum
 			bladder_value = -1.5
 			taste = "tart"
 
+		fooddrink/juice_pear
+			name = "pear juice"
+			id = "juice_pear"
+			fluid_r = 233
+			fluid_g = 235
+			fluid_b = 0
+			description = "Fresh juice produced by pears."
+			reagent_state = LIQUID
+			thirst_value = 1.5
+			bladder_value = -1.5
+			taste = "sweet"
+
 		fooddrink/juice_peach
 			name = "peach juice"
 			id = "juice_peach"
@@ -3776,6 +3890,18 @@ datum
 						M.emote("gasp")
 						boutput(M, SPAN_ALERT("Your eyes sting!"))
 						M.change_eye_blurry(rand(5, 20))
+
+		fooddrink/juice_grape
+			name = "grape juice"
+			id = "juice_grape"
+			fluid_r = 161
+			fluid_g = 71
+			fluid_b = 231
+			description = "The juice of a fruit of grape! Not to be confused with the juice of a graperuit."
+			reagent_state = LIQUID
+			thirst_value = 1.5
+			bladder_value = -2
+			taste = list("sweet", "tart")
 
 		fooddrink/coconut_milk
 			name = "coconut milk"
@@ -4967,3 +5093,9 @@ datum
 			fluid_b = 20
 			description = "A pulp created by crushing wheat."
 			taste = list("grainy", "bland")
+
+		fooddrink/mash/rice
+			name = "rice mash"
+			id = "rice_mash"
+			description = "A pulp created by crushing rice."
+			taste = list("bland")

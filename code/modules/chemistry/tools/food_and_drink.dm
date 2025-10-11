@@ -1892,7 +1892,7 @@ ADMIN_INTERACT_PROCS(/obj/item/reagent_containers/food/drinks/drinkingglass, pro
 	                 "halfandhalf", "swedium", "caledonium", "essenceofelvis", "pizza",
 					 "mint_tea", "tomcollins", "sangria", "peachschnapps", "mintjulep",
 					 "mojito", "cremedementhe", "grasshopper", "freeze", "limeade", "juice_peach",
-					 "juice_banana")
+					 "juice_banana", "juice_grape", "juice_pear", "perry", "moonshine", "brandy")
 
 /obj/item/reagent_containers/food/drinks/drinkingglass/icewater
 	New()
@@ -2242,7 +2242,7 @@ ADMIN_INTERACT_PROCS(/obj/item/reagent_containers/food/drinks/drinkingglass, pro
 	icon = 'icons/obj/foodNdrink/bottle.dmi'
 	icon_state = "detflask"
 	item_state = "detflask"
-	initial_reagents = list("bojack"=40)
+	initial_reagents = list("whiskey"=40)
 
 /obj/item/reagent_containers/food/drinks/flask/pirate
 	initial_volume = 20

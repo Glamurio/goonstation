@@ -902,7 +902,8 @@
 	spawn_contents = list(/obj/item/gun/russianrevolver,\
 	/obj/item/reagent_containers/food/drinks/bottle/vintage,\
 	/obj/item/storage/box/glassbox,\
-	/obj/item/reagent_containers/food/drinks/juicer)
+	/obj/item/reagent_containers/food/drinks/juicer,\
+	/obj/item/reagent_containers/glass/vial/space_yeast)
 
 /obj/storage/secure/closet/civilian/chaplain
 	name = "\improper Religious supplies locker"
