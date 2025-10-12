@@ -9,8 +9,6 @@
 		list(/datum/projectile, "reagent_payload"),
 		list(/datum/plantmutation, "assoc_reagents"),
 		list(/datum/plant, "assoc_reagents"),
-		list(/obj/item/plant, "brew_result"),
-		list(/obj/item/reagent_containers/food, "brew_result"),
 		list(/datum/teg_transformation, "required_reagents")
 	)
 

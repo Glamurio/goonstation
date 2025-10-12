@@ -850,6 +850,7 @@ proc/chem_helmet_check(mob/living/carbon/human/H, var/what_liquid="hot")
 			current_reagent.on_add()
 
 		current_reagent.check_threshold()
+		current_reagent.on_update()
 
 		if (!donotupdate)
 			update_total()

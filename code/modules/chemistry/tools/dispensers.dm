@@ -804,8 +804,6 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 		// loading from the ground
 		else if (istype(O, /obj/item))
 			var/obj/item/item = O
-			if (!item.brew_result)
-				return ..()
 			// "charging" is for sure correct terminology, I'm an expert because I asked chatgpt AND read the first result on google. Mhm mhm.
 			user.visible_message(SPAN_NOTICE("[user] begins quickly charging [src] with [O]!"))
 

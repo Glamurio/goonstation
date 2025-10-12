@@ -144,8 +144,6 @@ ABSTRACT_TYPE(/obj/item)
 	var/tmp/last_tick_duration = 1 // amount of time spent between previous tick and this one (1 = normal)
 	var/tmp/last_processing_tick = -1
 
-	var/brew_result = null //! What reagent will it make if it's brewable?
-
 	var/list/tooltip_options = list()
 
 	/// This is the safe way of changing 2-handed-ness at runtime. Use this please.

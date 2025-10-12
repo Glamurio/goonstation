@@ -371,7 +371,6 @@
 	bites_left = 3
 	heal_amt = 1
 	food_color = "#C8C8C8"
-	brew_result = list("beepskybeer"=20)
 	initial_reagents = list("cholesterol"=5,"nanites"=20)
 
 /obj/item/reagent_containers/food/snacks/burger/cheeseborger
@@ -381,7 +380,6 @@
 	bites_left = 3
 	heal_amt = 1
 	food_color = "#C8C8C8"
-	brew_result = list("beepskybeer"=20)
 	initial_reagents = list("cholesterol"=5,"nanites"=20)
 
 /obj/item/reagent_containers/food/snacks/burger/synthburger

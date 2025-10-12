@@ -10,6 +10,18 @@ datum
 		fooddrink/
 			name = "food drink stuff"
 			viscosity = 0.05
+			var/update_color_and_name = TRUE
+
+			on_update()
+				if (src.data && src.update_color_and_name)
+					if(src.data["name"])
+						src.name = src.data["name"]
+					if(src.data["color"])
+						var/datum/color/C = src.data["color"]
+						src.fluid_r = C.r
+						src.fluid_b = C.b
+						src.fluid_g = C.g
+					src.update_color_and_name = FALSE
 
 		fooddrink/bilk
 			name = "bilk"
@@ -3903,6 +3915,17 @@ datum
 			bladder_value = -2
 			taste = list("sweet", "tart")
 
+		fooddrink/juice_lashberry
+			name = "lashberry juice"
+			id = "juice_lashberry"
+			fluid_r = 233
+			fluid_g = 216
+			fluid_b = 0
+			description = "A sweet and sour juice, pressed from only the most ripe of lashberries."
+			reagent_state = LIQUID
+			thirst_value = 1.5
+			taste = list("sweet", "sour")
+
 		fooddrink/coconut_milk
 			name = "coconut milk"
 			id = "coconut_milk"
@@ -4926,7 +4949,7 @@ datum
 			id = "pompelmocello"
 			description = "A rose-colored liqueur infused with bittersweet grapefruit with and a light booze."
 			reagent_state = LIQUID
-			alch_strength = 0.1
+			alch_strength = 0.3
 			fluid_r = 255
 			fluid_g = 185
 			fluid_b = 170
@@ -4940,7 +4963,7 @@ datum
 			id = "arancello"
 			description = "An orange liqueur that blends sweet citrus taste with a boozy kick."
 			reagent_state = LIQUID
-			alch_strength = 0.1
+			alch_strength = 0.3
 			fluid_r = 255
 			fluid_g = 200
 			fluid_b = 120
@@ -4954,7 +4977,7 @@ datum
 			id = "limoncello"
 			description = "A yellow liqueur that balances a bright lemon tang with some booze."
 			reagent_state = LIQUID
-			alch_strength = 0.1
+			alch_strength = 0.3
 			fluid_r = 255
 			fluid_g = 245
 			fluid_b = 155
@@ -4968,7 +4991,7 @@ datum
 			id = "limecello"
 			description = "A green liqueur that wakes up with tart lime in a boozy blanket."
 			reagent_state = LIQUID
-			alch_strength = 0.1
+			alch_strength = 0.3
 			fluid_r = 220
 			fluid_g = 255
 			fluid_b = 180
@@ -4982,7 +5005,7 @@ datum
 			id = "triplecello"
 			description = "A refreshing mixed liqueur of orange, lemon and lime juice distilled to perfection."
 			reagent_state = LIQUID
-			alch_strength = 0.2
+			alch_strength = 0.3
 			fluid_r = 230
 			fluid_g = 250
 			fluid_b = 170
@@ -5163,8 +5186,35 @@ datum
 			description = "A pulp created by crushing wheat."
 			taste = list("grainy", "bland")
 
+		fooddrink/mash/potato
+			name = "potato mash"
+			id = "potato_mash"
+			fluid_r = 190
+			fluid_g = 180
+			fluid_b = 170
+			description = "A pulp created by crushing potatoes."
+			taste = list("starchy", "bland")
+
 		fooddrink/mash/rice
 			name = "rice mash"
 			id = "rice_mash"
 			description = "A pulp created by crushing rice."
 			taste = list("bland")
+
+		fooddrink/mash/asomna
+			name = "asomna mash"
+			id = "asomna_mash"
+			fluid_r = 125
+			fluid_g = 115
+			fluid_b = 100
+			description = "A pulp created by crushing asomna bark."
+			taste = list("like wood", "bland")
+
+		fooddrink/mash/sassafras
+			name = "sassafras mash"
+			id = "sassafras_mash"
+			fluid_r = 150
+			fluid_g = 100
+			fluid_b = 20
+			description = "A pulp created by crushing sassafras."
+			taste = list("like dirt", "earthy")

@@ -46,6 +46,7 @@ ABSTRACT_TYPE(/datum/plant/veg)
 	endurance = 10
 	genome = 16
 	nectarlevel = 6
+	assoc_reagents = list("potato_mash")
 	commuts = list(/datum/plant_gene_strain/damage_res,/datum/plant_gene_strain/stabilizer)
 
 /datum/plant/veg/onion

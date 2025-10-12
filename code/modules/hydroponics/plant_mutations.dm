@@ -36,9 +36,6 @@ ABSTRACT_TYPE(/datum/plantmutation)
 
 	var/mutation_sfx = 'sound/effects/plant_mutation.ogg'
 
-	///Override the crop's brew result
-	var/brew_result = null
-
 	proc/HYPharvested_proc_M(var/obj/machinery/plantpot/POT, var/mob/user)
 		lasterr = 0
 		if (!POT || !user) return 301
@@ -281,7 +278,7 @@ ABSTRACT_TYPE(/datum/plantmutation)
 	PTrange = list(75,null)
 	infusion_chance = 80
 	infusion_reagents = list("el_diablo", "phlogiston")
-	brew_result = "ghostchilijuice"
+	assoc_reagents = list("ectoplasm", "capsaicin")
 
 // Pumpkin Mutations
 
@@ -313,12 +310,13 @@ ABSTRACT_TYPE(/datum/plantmutation)
 	name = "Durum Wheat"
 	name_prefix = "Durum "
 	crop = /obj/item/plant/grain/wheat/durum
+	assoc_reagents = list("wheat_mash")
 
 /datum/plantmutation/wheat/steelwheat
 	name = "steel wheat"
 	name_prefix = "Steel "
 	iconmod = "WheatSteel"
-	assoc_reagents = list("iron")
+	assoc_reagents = list("wheat_mash", "iron")
 	crop = /obj/item/plant/grain/wheat/metal
 	infusion_reagents = list("iron")
 
@@ -329,10 +327,10 @@ ABSTRACT_TYPE(/datum/plantmutation)
 	name_prefix = "Ricin "
 	iconmod = "Rice"
 	PTrange = list(60,null)
-	brew_result = "ricin"
 	crop = /obj/item/plant/grain/rice
 	chance = 0
 	infusion_reagents = list("insulin")
+	assoc_reagents = list("wheat_mash", "insulin")
 
 // Oat Mutations
 
@@ -670,6 +668,7 @@ ABSTRACT_TYPE(/datum/plantmutation)
 	harvest_override = 1
 	crop = /obj/item/reagent_containers/food/snacks/plant/lashberry
 	chance = 20
+	assoc_reagents = ("juice_lashberry")
 
 // Creeper Mutations
 

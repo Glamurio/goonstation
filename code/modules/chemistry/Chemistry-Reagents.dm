@@ -79,6 +79,10 @@ datum
 		proc/on_remove()
 			return
 
+		/// Called everytime the reagent changes volume
+		proc/on_update()
+			return
+
 		/// Called once on the first cycle that this chem is processed in the target
 		proc/initial_metabolize()
 			return

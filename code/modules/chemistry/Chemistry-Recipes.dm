@@ -705,10 +705,14 @@
 		result_amount = 1
 		instant = FALSE
 		stateful = TRUE
-		reaction_speed = 0.05 // This has to be insanely slow because it gets scaled by volume AND by temperature
+		reaction_speed = 0.05 // This has to be slow because it gets scaled
 		mix_phrase = "The mixture inside begins to ferment."
 		drinkrecipe = TRUE
 		mix_sound = 'sound/effects/bubbles_short.ogg'
+		var/temperature_scale = 10 // this scales the resulting result based on proper temp
+		var/list/impurities = list("sulfur", "acetic_acid", "ethanol") // things that are byproducts in the fermentation process
+		var/impurity_min_chance = 1
+		var/impurity_max_chance = 10
 		var/made_unique = FALSE // determines if the chem has already been made unique
 
 		does_react(var/datum/reagents/holder)
@@ -716,74 +720,193 @@
 				return FALSE
 			return TRUE
 
+		// because fermentation methods are so varied, it's a good idea to name and color resulting liquids
+		// this adds a cool little extra touch to beverages, even if the result isn't mechanically different
+		// primarily used for schnapps, which is distilled from a variety of fruits
+		proc/color_and_name(var/datum/reagents/holder)
+			if (src.made_unique)
+				return
+			var/datum/reagent/result_chem = holder.reagent_list[src.result]
+			if (result_chem)
+				var/datum/color/average_color = holder.get_average_color()
+				var/alist/chem_data = alist("name" = src.name, "color" = average_color)
+				result_chem.data = chem_data
+				src.made_unique = TRUE
+
+		on_reaction(datum/reagents/holder, created_volume)
+			..()
+			var/impurity = pick(src.impurities)
+
+			var/temp_bonus = src.get_temperature_multiplier(holder)
+			var/inverse_factor = 1 - clamp((temp_bonus - 1) / src.temperature_scale, 0, 1)
+			var/final_chance = src.impurity_min_chance + (inverse_factor * (src.impurity_max_chance - 1))
+
+			// chance to add impurities based on how "good" the method is
+			// 0% when it's perfect temp, 10% when it's really bad temp
+			// can be altered based on what product is being fermented
+			if (prob(final_chance))
+				holder.add_reagent(impurity, created_volume)
+
+			src.color_and_name(holder)
+
 		get_reaction_speed_multiplicator(var/datum/reagents/holder)
 			. = ..()
+			. *= src.get_temperature_multiplier(holder)
+
+		proc/get_temperature_multiplier(var/datum/reagents/holder)
 			var/temp = holder.total_temperature
-			var/bonus = 10
 
 			// Bonus for staying in sweet_temp range
 			if (temp <= src.sweet_temp)
-				. *= max(1, 0 + ((temp - src.min_temperature) / (src.sweet_temp - src.min_temperature)) * bonus)
+				return max(1, 0 + ((temp - src.min_temperature) / (src.sweet_temp - src.min_temperature)) * src.temperature_scale)
 			else if (temp <= src.max_temperature)
-				. *= max(1, bonus - ((temp - src.sweet_temp) / (src.max_temperature - src.sweet_temp)) * bonus)
+				return max(1, src.temperature_scale - ((temp - src.sweet_temp) / (src.max_temperature - src.sweet_temp)) * src.temperature_scale)
 
 	fermentation/beer
 		name = "beer"
 		id = "beer"
 		required_reagents = list("water" = 1, "wheat_mash" = 1, "space_fungus" = 0)
 		result = "beer"
+		min_temperature = T0C + 15
+		sweet_temp = T0C + 21
+		max_temperature = T0C + 30
+
+		ironbrew
+			name = "ironbrew"
+			id = "ironbrew"
+			required_reagents = list("water" = 1, "iron" = 1, "wheat_mash" = 1, "space_fungus" = 0)
+			result = "ironbrew"
+
+		chili_beer
+			name = "chili beer"
+			id = "chili_beer"
+			required_reagents = list("water" = 1, "capsaicin" = 1, "wheat_mash" = 1, "space_fungus" = 0)
+			// bad temps on purpose to produce as a byproduct
+			impurities = list("ghostchilijuice")
+			impurity_min_chance = 1
+			impurity_max_chance = 50
+
+	fermentation/sarsaparilla
+		name = "sarsaparilla"
+		id = "sarsaparilla"
+		required_reagents = list("water" = 1, "sassafras_mash" = 1, "space_fungus" = 0)
+		result = "sarsaparilla"
+		reaction_speed = 0.2
+		min_temperature = T0C + 80
+		sweet_temp = T0C + 85
+		max_temperature = T0C + 90
 
 	fermentation/rice_wine
 		name = "rice wine"
 		id = "ricewine"
 		required_reagents = list("water" = 1, "rice_mash" = 1, "space_fungus" = 0)
 		result = "ricewine"
+		min_temperature = T0C + 20
+		sweet_temp = T0C + 25
+		max_temperature = T0C + 35
+
+		ricin
+			name = "ricin wine"
+			id = "ricinwine"
+			required_reagents = list("water" = 1, "rice_mash" = 1, "insulin" = 1, "space_fungus" = 0)
+			// bad temps on purpose to produce as a byproduct
+			impurities = list("ricin")
+			impurity_min_chance = 1
+			impurity_max_chance = 50
 
 	fermentation/mead
 		name = "mead"
 		id = "mead"
 		required_reagents = list("water" = 1, "honey" = 1, "space_fungus" = 0)
 		result = "mead"
+		min_temperature = T0C + 15
+		sweet_temp = T0C + 21
+		max_temperature = T0C + 30
 
 	fermentation/wine
 		name = "wine"
 		id = "wine"
 		required_reagents = list("juice_grape" = 1, "space_fungus" = 0)
 		result = "wine"
+		min_temperature = T0C + 10
+		sweet_temp = T0C + 18
+		max_temperature = T0C + 25
 
 		cherry
 			name = "cherry wine"
 			id = "cherry_wine"
 			required_reagents = list("juice_cherry" = 1, "space_fungus" = 0)
 
+		blueberry
+			name = "blueberry wine"
+			id = "raspberry_wine"
+			required_reagents = list("juice_blueberry" = 1, "space_fungus" = 0)
+
+		raspberry
+			name = "raspberry wine"
+			id = "raspberry_wine"
+			required_reagents = list("juice_raspberry" = 1, "space_fungus" = 0)
+
+		lashberry
+			name = "lashberry wine"
+			id = "lashberry_wine"
+			required_reagents = list("juice_lashberry" = 1, "space_fungus" = 0)
+
 	fermentation/white_wine
 		name = "white wine"
 		id = "white_wine"
 		required_reagents = list("juice_grape" = 1, "insulin" = 1, "space_fungus" = 0)
 		result = "white_wine"
+		min_temperature = T0C + 10
+		sweet_temp = T0C + 18
+		max_temperature = T0C + 25
 
 	fermentation/cider
 		name = "cider"
 		id = "cider"
 		required_reagents = list("juice_apple" = 1, "space_fungus" = 0)
 		result = "cider"
+		min_temperature = T0C + 10
+		sweet_temp = T0C + 18
+		max_temperature = T0C + 25
 
 	fermentation/perry
 		name = "perry"
 		id = "perry"
 		required_reagents = list("juice_pear" = 1, "space_fungus" = 0)
 		result = "perry"
+		min_temperature = T0C + 10
+		sweet_temp = T0C + 18
+		max_temperature = T0C + 25
 
 	fermentation/omniwine // look it sounded funny, so I'm doing it
 		name = "omniwine"
 		id = "omniwine"
-		required_reagents = list("omnizine" = 1, "space_fungus" = 0)
+		required_reagents = list("omnizine" = 1, "sugar" = 1, "space_fungus" = 0)
+		min_temperature = T0C + 10
+		sweet_temp = T0C + 18
+		max_temperature = T0C + 25
 
 	fermentation/ethanol
 		name = "ethanol"
 		id = "ethanol"
 		required_reagents = list("water" = 1, "sugar" = 1, "space_fungus" = 0)
 		result = "ethanol"
+		impurities = list("sulfur", "acetic_acid")
+		min_temperature = T0C + 20
+		sweet_temp = T0C + 28
+		max_temperature = T0C + 35
+
+	fermentation/matchatea
+		name = "Matcha Tea"
+		id = "matchatea"
+		result = "matchatea"
+		required_reagents = list("matcha"=1, "water"= 1)
+		mix_phrase = "The tea fizzes lightly, giving off a soft vinegar scent."
+		mix_sound = 'sound/misc/drinkfizz.ogg'
+		min_temperature = T0C + 80
+		sweet_temp = T0C + 85
+		max_temperature = T0C + 90
 
 	fermentation/kombucha
 		name = "Kombucha"
@@ -796,19 +919,32 @@
 		max_temperature = T0C + 29
 
 	// distillation parent
+	// I know distillation and fermentation are unrelated, but ingame it's kind of the same process
 	fermentation/distillation
 		name = "distillation process"
 		id = "distillation_process"
-		min_temperature = T0C + 80
-		sweet_temp = T0C + 90
-		max_temperature = T0C + 99
+		min_temperature = T0C + 78
+		sweet_temp = T0C + 85
+		max_temperature = T0C + 90
 		mix_phrase = "The mixture inside begins to distill."
+		impurities = list("sulfur", "squeeze", "water")
+
+	fermentation/distillation/vodka // activated charcoaling?
+		name = "vodka"
+		id = "vodka"
+		required_reagents = list("potato_mash" = 1, "sugar" = 1)
+		result = "vodka"
+
+		white
+			id = "brandy_white"
+			required_reagents = list("white_wine" = 1)
 
 	fermentation/distillation/brandy
 		name = "brandy"
 		id = "brandy"
 		required_reagents = list("wine" = 1)
 		result = "brandy"
+		sweet_temp = T0C + 82
 
 		white
 			id = "brandy_white"
@@ -820,6 +956,7 @@
 		required_reagents = list("cornsyrup" = 1)
 		result_amount = 0.5
 		result = "bourbon"
+		max_temperature = T0C + 95
 
 		cornstarch
 			id = "bourbon_starch"
@@ -836,49 +973,69 @@
 		id = "rum"
 		required_reagents = list("simplesyrup" = 1)
 		result = "rum"
+		sweet_temp = T0C + 82
 
-	fermentation/distillation/pompelmocello
+	// technically not fermentation, "-cellos" are liqueur, which is infused alcohol
+	fermentation/pompelmocello
 		name = "pompelmocello"
 		id = "pompelmocello"
-		required_reagents = list("juice_grapefruit" = 1, "sugar" = 1)
+		required_reagents = list("juice_grapefruit" = 1, "sugar" = 1, "ethanol" = 1)
 		result = "pompelmocello"
+		min_temperature = T0C + 15
+		sweet_temp = T0C + 22
+		max_temperature = T0C + 30
 
-	fermentation/distillation/arancello
+	fermentation/arancello
 		name = "arancello"
 		id = "arancello"
-		required_reagents = list("juice_orange" = 1, "sugar" = 1)
+		required_reagents = list("juice_orange" = 1, "sugar" = 1, "ethanol" = 1)
 		result = "arancello"
+		min_temperature = T0C + 15
+		sweet_temp = T0C + 22
+		max_temperature = T0C + 30
 
-	fermentation/distillation/limoncello
+	fermentation/limoncello
 		name = "limoncello"
 		id = "limoncello"
-		required_reagents = list("juice_lemon" = 1, "sugar" = 1)
+		required_reagents = list("juice_lemon" = 1, "sugar" = 1, "ethanol" = 1)
 		result = "limoncello"
+		min_temperature = T0C + 15
+		sweet_temp = T0C + 22
+		max_temperature = T0C + 30
 
 		lemonade
 			id = "limoncello_sugar"
 			required_reagents = list("lemonade" = 0.3)
 
-	fermentation/distillation/limecello
+	fermentation/limecello
 		name = "limecello"
 		id = "limecello"
-		required_reagents = list("juice_lime" = 3, "sugar" = 1)
+		required_reagents = list("juice_lime" = 3, "sugar" = 1, "ethanol" = 1)
 		result = "limecello"
+		min_temperature = T0C + 15
+		sweet_temp = T0C + 22
+		max_temperature = T0C + 30
 
 		limeade
 			id = "limecello_sugar"
 			required_reagents = list("limeade" = 0.3)
 
+	// this however is distilled
 	fermentation/distillation/triplecello
 		name = "triplecello"
 		id = "triplecello"
 		required_reagents = list("limoncello" = 1, "arancello" = 1, "limecello" = 1)
 		result = "triplecello"
+		sweet_temp = T0C + 88
+		max_temperature = T0C + 90
 
 	fermentation/distillation/schnapps
 		name = "schnapps"
 		id = "schnapps"
 		result = "schnapps"
+		min_temperature = T0C + 78
+		sweet_temp = T0C + 82
+		max_temperature = T0C + 90
 
 		does_react(var/datum/reagents/holder)
 			if (holder?.my_atom?.is_open_container())
@@ -894,7 +1051,7 @@
 					amount_reactions++
 			. /= amount_reactions
 
-	// trust me I also wish there was a better way than to have 10 different schnapps recipes.
+	// trust me I also wish there was a better way than to have a million different schnapps recipes.
 	fermentation/distillation/schnapps/apple
 		name = "apple schnapps"
 		id = "apple_schnapps"
@@ -913,6 +1070,11 @@
 		name = "cranberry schnapps"
 		id = "cranberry_schnapps"
 		required_reagents = list("juice_cran" = 1, "ethanol" = 1)
+
+	fermentation/distillation/schnapps/strawberry
+		name = "strawberry schnapps"
+		id = "strawberry_schnapps"
+		required_reagents = list("juice_strawberry" = 1, "ethanol" = 1)
 
 	fermentation/distillation/schnapps/blueberry
 		name = "blueberry schnapps"
@@ -2509,15 +2671,6 @@
 		required_reagents = list("juice_orange" = 1, "ectoplasm" = 1, "uranium" = 1)
 		result_amount = 3
 		mix_phrase = "The orange juice turns an unsettlingly vibrant shade of green."
-		mix_sound = 'sound/misc/drinkfizz.ogg'
-
-	matchatea
-		name = "Matcha Tea"
-		id = "matchatea"
-		result = "matchatea"
-		required_reagents = list("matcha"=1, "water"= 1)
-		result_amount = 2
-		mix_phrase = "The matcha dissolves into the water, turning a darker green."
 		mix_sound = 'sound/misc/drinkfizz.ogg'
 
 	tealquila
