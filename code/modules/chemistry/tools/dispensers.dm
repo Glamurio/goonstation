@@ -420,10 +420,10 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 		reagents.add_reagent("helium",4000)
 
 /obj/reagent_dispensers/beerkeg
-	name = "beer keg"
+	name = "beer barrel"
 	desc = "Full of delicious alcohol, hopefully."
 	icon = 'icons/obj/objects.dmi'
-	icon_state = "beertankTEMP"
+	icon_state = "rum_barrel"
 	amount_per_transfer_from_this = 25
 
 	New()
@@ -713,7 +713,7 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 	amount_per_transfer_from_this = 25
 	event_handler_flags = NO_MOUSEDROP_QOL
 	capacity = 1000
-	var/temp = T20C
+	var/temp = T0C + 25
 
 	New()
 		..()
@@ -722,6 +722,12 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 	proc/extract_reagent(var/obj/item/W as obj)
 		if (!W)
 			return FALSE
+		if (src.reagents.is_full())
+			return FALSE
+		if (istype(W, /obj/item/reagent_containers))
+			var/obj/item/reagent_containers/container = W
+			W.reagents.trans_to(src, container.amount_per_transfer_from_this)
+			return TRUE
 		if (src.produce_check())
 			if (W.reagents.total_volume > 0)
 				W.reagents.trans_to(src, 0)
@@ -757,25 +763,15 @@ TYPEINFO(/obj/reagent_dispensers/watertank/fountain)
 			src.reagents.clear_reagents()
 
 	attackby(obj/item/W, mob/user)
-		if(isscrewingtool(W) || iswrenchingtool(W))
-			if(!src.anchored)
-				user.visible_message("<b>[user]</b> secures the [src] to the floor!")
-			else
-				user.visible_message("<b>[user]</b> unbolts the [src] from the floor!")
-			playsound(src.loc, 'sound/items/Screwdriver.ogg', 100, 1)
-			src.anchored = !src.anchored
-
-		var/isfull = src.reagents.is_full()
-		if (!isfull)
-			src.extract_reagent(W)
-			playsound(src.loc, 'sound/misc/pourdrink.ogg', 50, 1)
 		// create feedback for items which don't produce attack messages
 		// but not for chemistry containers, because they have their own feedback
 		if (W && (W.flags & (SUPPRESSATTACK | OPENCONTAINER)) == SUPPRESSATTACK)
-			if (isfull)
-				boutput(user, SPAN_ALERT("[src] is already full."))
-			else
-				boutput(user, SPAN_ALERT("Can't brew anything from [W]."))
+			boutput(user, SPAN_ALERT("Can't brew anything from [W]."))
+		else if(isscrewingtool(W) || iswrenchingtool(W))
+			bolt_unbolt(user)
+		else
+			if(src.extract_reagent(W))
+				playsound(src.loc, 'sound/misc/pourdrink.ogg', 50, 1)
 		..()
 
 	MouseDrop_T(atom/movable/O as mob|obj, mob/user as mob)

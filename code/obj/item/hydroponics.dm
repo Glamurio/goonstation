@@ -722,6 +722,7 @@ TYPEINFO(/obj/item/plantanalyzer)
 	initial_volume = 250
 	initial_reagents = list("saltpetre"=50, "ammonia"=50, "potash"=50, "poo"=50, "space_fungus"=50)
 
+// space fungus is the closest thing to yeast that we have. also it's funny.
 /obj/item/reagent_containers/glass/vial/space_yeast
 	name = "Space Yeast"
 	desc = "A small vial filled with powder. You need this for brewing."

@@ -4921,6 +4921,75 @@ datum
 				M.reagents.add_reagent("capulettium", 2.5 * src.calculate_depletion_rate(M, mult))
 				..()
 
+		fooddrink/alcoholic/pompelmocello
+			name = "pompelmocello"
+			id = "pompelmocello"
+			description = "A rose-colored liqueur infused with bittersweet grapefruit with and a light booze."
+			reagent_state = LIQUID
+			alch_strength = 0.1
+			fluid_r = 255
+			fluid_g = 185
+			fluid_b = 170
+			transparency = 100
+			thirst_value = 2
+			bladder_value = -2
+			taste =  list("bitter", "sweet", "sour")
+
+		fooddrink/alcoholic/arancello
+			name = "arancello"
+			id = "arancello"
+			description = "An orange liqueur that blends sweet citrus taste with a boozy kick."
+			reagent_state = LIQUID
+			alch_strength = 0.1
+			fluid_r = 255
+			fluid_g = 200
+			fluid_b = 120
+			transparency = 100
+			thirst_value = 2
+			bladder_value = -2
+			taste =  list("sweet", "sour")
+
+		fooddrink/alcoholic/limoncello
+			name = "limoncello"
+			id = "limoncello"
+			description = "A yellow liqueur that balances a bright lemon tang with some booze."
+			reagent_state = LIQUID
+			alch_strength = 0.1
+			fluid_r = 255
+			fluid_g = 245
+			fluid_b = 155
+			transparency = 100
+			thirst_value = 2
+			bladder_value = -2
+			taste = list("sweet", "tangy")
+
+		fooddrink/alcoholic/limecello
+			name = "limecello"
+			id = "limecello"
+			description = "A green liqueur that wakes up with tart lime in a boozy blanket."
+			reagent_state = LIQUID
+			alch_strength = 0.1
+			fluid_r = 220
+			fluid_g = 255
+			fluid_b = 180
+			transparency = 100
+			thirst_value = 2
+			bladder_value = -2
+			taste = list("sweet", "tart")
+
+		fooddrink/alcoholic/triplecello
+			name = "triplecello"
+			id = "triplecello"
+			description = "A refreshing mixed liqueur of orange, lemon and lime juice distilled to perfection."
+			reagent_state = LIQUID
+			alch_strength = 0.2
+			fluid_r = 230
+			fluid_g = 250
+			fluid_b = 170
+			thirst_value = 3
+			bladder_value = -4
+			taste = list("sweet", "zesty")
+
 		fooddrink/matcha
 			name = "matcha"
 			id = "matcha"

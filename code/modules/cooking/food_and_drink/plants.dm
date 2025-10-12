@@ -165,7 +165,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	sliceable = TRUE
 	slice_product = /obj/item/reagent_containers/food/snacks/ingredient/tomatoslice
 	slice_amount = 3
-	brew_result = list("juice_tomato"=20)
 
 	make_reagents()
 		..()
@@ -223,7 +222,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	force = 0
 	food_color = "#FFFF00"
 	var/popping = 0
-	brew_result = list("bourbon"=20)
 
 	temperature_expose(datum/gas_mixture/air, temperature, volume)
 		if ((temperature > T0C + 232) && prob(50)) //Popcorn pops at about 232 degrees celsius.
@@ -256,10 +254,10 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	bites_left = 3
 	heal_amt = 3
 	food_color = "#FFFFFF"
-	brew_result = list("ethanol"=20)
 
 	make_reagents()
 		..()
+		src.reagents.add_reagent("cornstarch",10)
 		src.reagents.add_reagent("ethanol",10)
 
 /obj/item/reagent_containers/food/snacks/plant/corn/pepper
@@ -270,7 +268,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	bites_left = 3
 	heal_amt = 3
 	food_color = "#373232"
-	brew_result = list("pepper"=20)
 
 	make_reagents()
 		..()
@@ -339,7 +336,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	crop_prefix = "golden "
 	icon_state = "goldenpeapod"
 	food_color = "#bdbd35"
-	brew_result = list("ammonia"=20)
 
 	make_reagents()
 		..()
@@ -359,7 +355,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	slice_product = /obj/item/reagent_containers/food/snacks/plant/orange/wedge
 	slice_amount = 6
 	slice_suffix = "wedge"
-	brew_result = list("schnapps"=20)
 
 	attackby(obj/item/W, mob/user)
 		if (istype(W, /obj/item/reagent_containers/food/snacks/ingredient/meat/synthmeat))
@@ -405,7 +400,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	bites_left = 1
 	validforhat = 0
 	sliceable = FALSE
-	brew_result = null
 
 	make_reagents()
 		src.reagents.add_reagent("juice_orange",5)
@@ -450,9 +444,12 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	bites_left = 5
 	heal_amt = 1
 	food_color = "#FF00FF"
-	brew_result = list("wine"=20)
 	validforhat = 1
 	food_effects = list("food_cold", "food_refreshed")
+
+	make_reagents()
+		..()
+		src.reagents.add_reagent("juice_grape",10)
 
 /obj/item/reagent_containers/food/snacks/plant/grape/green
 	name = "grapes"
@@ -461,10 +458,10 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	bites_left = 5
 	heal_amt = 2
 	food_color = "#AAFFAA"
-	brew_result = list("white_wine"=20)
 
 	make_reagents()
 		..()
+		src.reagents.add_reagent("juice_grape",5)
 		src.reagents.add_reagent("insulin",5)
 
 /obj/item/reagent_containers/food/snacks/plant/grapefruit
@@ -475,7 +472,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	bites_left = 3
 	heal_amt = 1
 	food_color = "#FF9F87"
-	brew_result = list("schnapps"=20)
 	sliceable = TRUE
 	slice_product = /obj/item/reagent_containers/food/snacks/plant/grapefruit/wedge
 	slice_amount = 6
@@ -493,7 +489,6 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	bites_left = 1
 	initial_volume = 6
 	sliceable = FALSE
-	brew_result = null
 
 	make_reagents()
 		src.reagents.add_reagent("juice_grapefruit",5)
@@ -506,13 +501,12 @@ ABSTRACT_TYPE(/obj/item/reagent_containers/food/snacks/plant)
 	bites_left = 5
 	heal_amt = 1
 	food_color = "#CC0000"
-	brew_result = list("wine"=20)
 	validforhat = 1
 	food_effects = list("food_cold", "food_refreshed")
 
 	make_reagents()
 		..()
-		src.reagents.add_reagent("juice_grapefruit",10)
+		src.reagents.add_reagent("juice_cherry",10)
 
 /obj/item/reagent_containers/food/snacks/plant/melon
 	name = "melon"
