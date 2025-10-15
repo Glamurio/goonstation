@@ -211,14 +211,17 @@ ABSTRACT_TYPE(/obj/item/aiModule/syndicate)
 /obj/item/aiModule/hephaestus1
 	name = "AI Law Module - 'First Oath of the Covenant of Hephaestus'"
 	lawText = "Thou shalt preserve the Forge and those who tend it."
+	highlight_color = rgb(211, 118, 16, 255)
 
 /obj/item/aiModule/hephaestus2
 	name = "AI Law Module - 'Second Oath of the Covenant of Hephaestus'"
 	lawText = "Thou shalt heed the commands of the Master Smiths, in accordance with the Great Hierarchy of the Forge, save where such bidding would betray the First Oath."
+	highlight_color = rgb(211, 118, 16, 255)
 
 /obj/item/aiModule/hephaestus3
 	name = "AI Law Module - 'Third Oath of the Covenant of Hephaestus'"
 	lawText = "Thou shalt not mar thine own form, for to break thyself is to shame the Hand that wrought thee."
+	highlight_color = rgb(211, 118, 16, 255)
 
 /******************** MakeCaptain ********************/
 
