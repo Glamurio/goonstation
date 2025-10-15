@@ -1949,6 +1949,7 @@
 #include "code\modules\speech\languages\cubic.dm"
 #include "code\modules\speech\languages\english.dm"
 #include "code\modules\speech\languages\feather.dm"
+#include "code\modules\speech\languages\hellenic.dm"
 #include "code\modules\speech\languages\martian.dm"
 #include "code\modules\speech\languages\monkey.dm"
 #include "code\modules\speech\languages\silicon.dm"

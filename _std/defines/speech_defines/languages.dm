@@ -3,6 +3,7 @@
 #define LANGUAGE_BINARY "binary"
 #define LANGUAGE_CUBIC "cubic"
 #define LANGUAGE_ENGLISH "english"
+#define LANGUAGE_HELLENIC "hellenic"
 #define LANGUAGE_FEATHER "feather"
 #define LANGUAGE_MARTIAN "martian"
 #define LANGUAGE_MONKEY "monkey"

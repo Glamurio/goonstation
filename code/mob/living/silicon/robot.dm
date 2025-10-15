@@ -33,6 +33,7 @@ TYPEINFO(/mob/living/silicon/robot)
 	var/obj/item/parts/robot_parts/arm/part_arm_l = null
 	var/obj/item/parts/robot_parts/leg/part_leg_r = null
 	var/obj/item/parts/robot_parts/leg/part_leg_l = null
+	var/obj/item/clothing/mask/part_mask = null
 	var/total_weight = 0
 	var/datum/robot_cosmetic/cosmetic_mods = null
 
@@ -1293,6 +1294,8 @@ TYPEINFO(/mob/living/silicon/robot)
 
 		else if (iswrenchingtool(W) && src.wiresexposed)
 			var/list/actions = list("Do nothing")
+			if (src.part_mask)
+				actions.Add("Remove Translator")
 			if (src.part_arm_r)
 				actions.Add("Remove Right Arm")
 			if (src.part_arm_l)
@@ -1409,6 +1412,11 @@ TYPEINFO(/mob/living/silicon/robot)
 						update_bodypart("r_leg")
 					src.part_leg_l = null
 					update_bodypart("l_leg")
+				if("Remove Translator")
+					src.part_mask.unequipped(src)
+					src.part_mask.set_loc(src.loc)
+					src.part_mask = null
+					logTheThing(LOG_STATION, src, "[key_name(user)] removes [translator] from [key_name(src)].")
 				else return
 			src.module_active = null
 			hud?.set_active_tool(null) // HUD will be null if we removed the chest and they fell apart
