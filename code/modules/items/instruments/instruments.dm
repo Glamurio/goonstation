@@ -1009,6 +1009,12 @@ TYPEINFO(/obj/item/instrument/bikehorn/dramatic)
 	attack_self(mob/user)
 		return //no imitating borg screams
 
+	clockwork
+		name = "ancient scream synthesizer"
+		desc = "An absurdly old looking sound synthesizer. All the labels are in Greek."
+		icon_state = "clockwork-1"
+		sounds_instrument = list('sound/voice/screams/clockwork_scream.ogg')
+
 /obj/item/instrument/keytar
 	name = "keytar"
 	desc = "All the cool factor of being a rock star guitarist with none of the Wonderwall. \

@@ -370,7 +370,6 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/head)
 	appearanceString = "clockwork"
 	icon_state = "head-clockwork"
 	max_health = 180
-	visible_eyes = 0
 	robot_movement_modifier = /datum/movement_modifier/robot_part/standard_head
 
 /obj/item/parts/robot_parts/head/screen
@@ -761,6 +760,7 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/arm/left)
 	name = "clockwork cyborg left arm"
 	appearanceString = "clockwork"
 	icon_state = "l_arm-clockwork"
+	handlistPart = "l_arm-clockwork"
 	material_amt = ROBOT_LIMB_COST
 	max_health = 100
 	weight = 0.2
@@ -826,6 +826,7 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/arm/right)
 	name = "clockwork cyborg right arm"
 	appearanceString = "clockwork"
 	icon_state = "r_arm-clockwork"
+	handlistPart = "r_arm-clockwork"
 	material_amt = ROBOT_LIMB_COST
 	max_health = 100
 	weight = 0.2
@@ -962,6 +963,10 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/left)
 	appearanceString = "clockwork_wheel"
 	icon_state = "l_leg-clockwork_wheel"
 	handlistPart = "legL-clockwork_wheel" // THIS ONE gets to layer with the hands because aloe said so
+	partlistPart = null
+	step_image_state = "tracksM"
+	movement_modifier = /datum/movement_modifier/robotleg_left
+	robot_movement_modifier = /datum/movement_modifier/robot_part/light_leg_left
 
 ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/right)
 /obj/item/parts/robot_parts/leg/right
@@ -1008,6 +1013,10 @@ ABSTRACT_TYPE(/obj/item/parts/robot_parts/leg/right)
 	appearanceString = "clockwork_wheel"
 	icon_state = "r_leg-clockwork_wheel"
 	handlistPart = "legR-clockwork_wheel" // THIS ONE gets to layer with the hands because aloe said so
+	partlistPart = null
+	step_image_state = "tracksM"
+	movement_modifier = /datum/movement_modifier/robotleg_right
+	robot_movement_modifier = /datum/movement_modifier/robot_part/light_leg_right
 
 /obj/item/parts/robot_parts/leg/left/thruster
 	name = "left thruster assembly"

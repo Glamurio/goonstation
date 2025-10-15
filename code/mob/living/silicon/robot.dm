@@ -50,6 +50,7 @@ TYPEINFO(/mob/living/silicon/robot)
 	var/obj/item/device/radio/headset/radio = null
 	var/obj/item/device/radio_upgrade/radio_upgrade = null // Used for syndicate robots
 	var/obj/item/instrument/scream_instrument = null
+	var/scream_instrument_type  = /obj/item/instrument/roboscream/
 	var/scream_note = 1 //! Either a string note or an index of the sound to play (instruments are weird)
 	var/obj/machinery/camera/camera = null
 	var/obj/item/robot_module/module = null
@@ -251,8 +252,9 @@ TYPEINFO(/mob/living/silicon/robot)
 			if (src.syndicate)
 				src.show_antag_popup(ROLE_SYNDICATE_ROBOT)
 
-		src.scream_instrument = new /obj/item/instrument/roboscream(src)
-		src.scream_note = rand(1,2)
+		if(src.scream_instrument_type)
+			src.scream_instrument = new src.scream_instrument_type(src)
+			src.scream_note = rand(1,2)
 
 		for (var/datum/movement_modifier/MM in src.movement_modifiers) // Spawning borgs applies human only movemods, this cleans that up
 			if (!istype(MM, /datum/movement_modifier/robot_part))

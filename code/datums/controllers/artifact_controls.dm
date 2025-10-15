@@ -667,7 +667,11 @@ var/datum/artifact_controller/artifact_controls
 		/datum/artifact_fault/messager/what_people_said = 10,
 		/datum/artifact_fault/messager/emoji = 10)
 	activation_sounds = list('sound/machines/ArtifactClock1.ogg')
-	instrument_sounds = list('sound/musical_instruments/artifact/Artifact_Clockwork_1.ogg')
+	instrument_sounds = list('sound/musical_instruments/artifact/Artifact_Clockwork_1.ogg',
+		'sound/musical_instruments/artifact/Artifact_Clockwork_2.ogg',
+		'sound/musical_instruments/artifact/Artifact_Clockwork_3.ogg',
+		'sound/musical_instruments/artifact/Artifact_Clockwork_4.ogg')
+	lightswitch_sounds = list('sound/misc/automaton_scratch.ogg', 'sound/misc/belt_click.ogg', 'sound/machines/windup.ogg')
 	impact_reaction_one = 0.5
 	impact_reaction_two = 0
 	heat_reaction_one = 3
