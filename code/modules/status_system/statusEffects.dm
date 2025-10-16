@@ -2513,6 +2513,16 @@
 	getTooltip()
 		. = "The recharge upgrade has quickly charged you, this now prevents you from using another one again until it's safe for your battery to quick charge again."
 
+/datum/statusEffect/kineticcharging
+	id = "kinetic_charging"
+	name = "Kinetic Charging"
+	icon_state = "stam+"
+	maxDuration = null
+
+	getTooltip()
+		. = "You are currently being manually charged."
+
+
 /datum/statusEffect/upgradedisabled
 	id = "upgrade_disabled"
 	name = "Upgrades disabled"

@@ -25,6 +25,8 @@ TYPEINFO(/mob/living/silicon/robot/clockwork)
 		..()
 		src.freemodule = FALSE
 		src.set_module(new /obj/item/robot_module/clockwork(src))
+		if(length(src.upgrades) < src.max_upgrades)
+			src.upgrades += new /obj/item/roboupgrade/windup(src)
 
 	attackby(obj/item/W, mob/user, params, is_special, silent)
 		if(istype(W, /obj/item/clothing/mask/monkey_translator))

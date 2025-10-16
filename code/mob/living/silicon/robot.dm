@@ -1495,7 +1495,6 @@ TYPEINFO(/mob/living/silicon/robot)
 			..()
 
 	attack_hand(mob/user)
-
 		var/list/available_actions = list()
 		if (src.part_head)
 			if (src.brainexposed && src.part_head.brain)
@@ -1595,8 +1594,19 @@ TYPEINFO(/mob/living/silicon/robot)
 					actions.interrupt(src, INTERRUPT_ATTACKED)
 				switch(user.a_intent)
 					if(INTENT_HELP) //Friend person
-						playsound(src.loc, 'sound/impact_sounds/Generic_Shove_1.ogg', 50, 1, -2)
-						user.visible_message(SPAN_NOTICE("[user] gives [src] a [pick_string("descriptors.txt", "borg_pat")] pat on the [pick("back", "head", "shoulder")]."))
+						var/obj/item/roboupgrade/windup/charger = null
+						for (var/obj/item/roboupgrade/R in src.upgrades)
+							if (!istype(R, /obj/item/roboupgrade/windup))
+								continue
+							charger = R
+						if(charger)
+							if(charger.activated)
+								charger.start_charging(user, src)
+							else
+								boutput(user, "[src]'s [charger.actual_name] has been deactivated. You can't crank it!")
+						else // Just bap
+							playsound(src.loc, 'sound/impact_sounds/Generic_Shove_1.ogg', 50, 1, -2)
+							user.visible_message(SPAN_NOTICE("[user] gives [src] a [pick_string("descriptors.txt", "borg_pat")] pat on the [pick("back", "head", "shoulder")]."))
 					if(INTENT_DISARM) //Shove
 						SPAWN(0) playsound(src.loc, 'sound/impact_sounds/Generic_Swing_1.ogg', 40, 1)
 						user.visible_message(SPAN_ALERT("<B>[user] shoves [src]! [prob(40) ? pick_string("descriptors.txt", "jerks") : null]</B>"))
