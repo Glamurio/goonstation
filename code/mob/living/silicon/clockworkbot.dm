@@ -5,7 +5,7 @@ TYPEINFO(/mob/living/silicon/robot/clockwork)
 	name = "Clockwork Robot"
 	voice_name = "mechanical voice"
 	icon = 'icons/mob/robots.dmi'
-	voice_type = "cyborg"
+	voice_type = "clockwork"
 	icon_state = "clockborg"
 	sound_scream = 'sound/voice/screams/clockwork_scream.ogg'
 	scream_instrument_type = /obj/item/instrument/roboscream/clockwork
@@ -42,3 +42,23 @@ TYPEINFO(/mob/living/silicon/robot/clockwork)
 			logTheThing(LOG_STATION, src, "[key_name(user)] installs [translator] into [key_name(src)].")
 			return
 		..()
+
+// No welding or pulse tools. They get decon and soldering instead.
+/obj/item/tool/omnitool/clockwork
+	name = "forging tools"
+	desc = "Tools used for the forge. They will serve you well."
+	icon = 'icons/obj/artifacts/artifactsitem.dmi'
+	modes = list(OMNI_MODE_PRYING, OMNI_MODE_SCREWING, OMNI_MODE_WRENCHING, OMNI_MODE_CUTTING, OMNI_MODE_DECON, OMNI_MODE_SOLDERING)
+
+	set_tool_icon(var/mob/holder)
+		set_icon_state("clockwork-[src.mode_to_icon(src.mode)]")
+
+	proc/mode_to_icon(var/omni_mode)
+		switch(omni_mode)
+			if(OMNI_MODE_PRYING) return "1"
+			if(OMNI_MODE_SOLDERING) return "2"
+			if(OMNI_MODE_CUTTING) return "3"
+			if(OMNI_MODE_DECON) return "4"
+			if(OMNI_MODE_WRENCHING) return "5"
+			if(OMNI_MODE_SCREWING) return "6"
+			else return null

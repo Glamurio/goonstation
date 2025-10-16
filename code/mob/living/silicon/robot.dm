@@ -1413,10 +1413,10 @@ TYPEINFO(/mob/living/silicon/robot)
 					src.part_leg_l = null
 					update_bodypart("l_leg")
 				if("Remove Translator")
+					logTheThing(LOG_STATION, src, "[key_name(user)] removes [src.part_mask] from [key_name(src)].")
 					src.part_mask.unequipped(src)
 					src.part_mask.set_loc(src.loc)
 					src.part_mask = null
-					logTheThing(LOG_STATION, src, "[key_name(user)] removes [translator] from [key_name(src)].")
 				else return
 			src.module_active = null
 			hud?.set_active_tool(null) // HUD will be null if we removed the chest and they fell apart

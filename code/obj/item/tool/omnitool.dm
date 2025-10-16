@@ -116,13 +116,9 @@
 		src.stamina_crit_chance = initial(currtype.stamina_crit_chance)
 		src.hit_type = initial(currtype.hit_type)
 		src.hitsound = initial(currtype.hitsound)
-		if(switch_icons)
-			if(mode != OMNI_MODE_WELDING)
-				set_icon_state("[prefix]-[mode_to_text(mode)]")
-				if(src.animated_changes)
-					FLICK(("[prefix]-swap-[mode_to_text(mode)]"), src)
-			if(holder)
-				holder.update_inhands()
+		src.set_tool_icon()
+		if(holder)
+			holder.update_inhands()
 		switch (src.mode)
 			if (OMNI_MODE_PRYING)
 				src.setItemSpecial(/datum/item_special/tile_fling)
@@ -138,20 +134,26 @@
 				src.setItemSpecial(/datum/item_special/double)
 			if(OMNI_MODE_WELDING)
 				src.setItemSpecial(/datum/item_special/flame)
-				if(get_fuel())
-					if(switch_icons)
-						set_icon_state("[prefix]-weldingtool-on")
-					src.force = 15
-					hit_type = DAMAGE_BURN
-					welding = TRUE
-				else
-					if(switch_icons)
-						set_icon_state("[prefix]-weldingtool-off")
-					welding = FALSE
 			if(OMNI_MODE_DECON)
 				src.setItemSpecial(/datum/item_special/simple)
 			if(OMNI_MODE_SOLDERING)
 				src.setItemSpecial(/datum/item_special/simple)
+
+	proc/set_tool_icon(var/mob/holder)
+		if(!src.switch_icons)
+			return
+		if(mode != OMNI_MODE_WELDING)
+			set_icon_state("[src.prefix]-[src.mode_to_text(src.mode)]")
+			if(src.animated_changes)
+				FLICK(("[src.prefix]-swap-[src.mode_to_text(src.mode)]"), src)
+		else if(get_fuel())
+			set_icon_state("[src.prefix]-weldingtool-on")
+			src.force = 15
+			src.hit_type = DAMAGE_BURN
+			src.welding = TRUE
+		else
+			set_icon_state("[src.prefix]-weldingtool-off")
+			src.welding = FALSE
 
 	proc/pre_attackby(source, atom/target, mob/user)
 		if(src.mode == OMNI_MODE_DECON)
