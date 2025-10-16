@@ -32,6 +32,10 @@
 	amount = 200
 	item_type = /obj/item/rods/steel
 
+	copper
+		name = "copper rods"
+		item_type = /obj/item/rods/copper
+
 /datum/robot/module_tool_creator/item_type/amount/steel_rod/setup(obj/item/rods/steel/I)
 	..()
 	if (!isnull(I))
@@ -43,7 +47,17 @@
 	amount = 200
 	item_type = /obj/item/sheet/steel
 
+/datum/robot/module_tool_creator/item_type/amount/copper_sheet
+		name = "copper sheets"
+		amount = 200
+		item_type = /obj/item/sheet/copper
+
 /datum/robot/module_tool_creator/item_type/amount/steel_tile
 	name = "steel tiles"
 	amount = 200
 	item_type = /obj/item/tile/steel
+
+/datum/robot/module_tool_creator/item_type/amount/copper_tile
+	name = "copper tiles"
+	amount = 200
+	item_type = /obj/item/tile/copper

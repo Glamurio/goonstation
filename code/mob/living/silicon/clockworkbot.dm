@@ -23,6 +23,8 @@ TYPEINFO(/mob/living/silicon/robot/clockwork)
 			var/obj/machinery/lawrack/hephaestus/rack = new /obj/machinery/lawrack/hephaestus()
 			ticker?.ai_law_rack_manager.register_new_rack(rack)
 		..()
+		src.freemodule = FALSE
+		src.set_module(new /obj/item/robot_module/clockwork(src))
 
 	attackby(obj/item/W, mob/user, params, is_special, silent)
 		if(istype(W, /obj/item/clothing/mask/monkey_translator))
@@ -42,6 +44,17 @@ TYPEINFO(/mob/living/silicon/robot/clockwork)
 			logTheThing(LOG_STATION, src, "[key_name(user)] installs [translator] into [key_name(src)].")
 			return
 		..()
+
+	uneq_active()
+		if(isnull(src.module_active))
+			return
+		var/slot = module_states.Find(module_active)
+		if (slot)
+			if (istype(module_states[slot], /obj/item/magtractor/clockwork))
+				var/obj/item/magtractor/clockwork/mag = module_states[slot]
+				mag.dropItem()
+			else
+				uneq_slot(slot)
 
 // No welding or pulse tools. They get decon and soldering instead.
 /obj/item/tool/omnitool/clockwork
