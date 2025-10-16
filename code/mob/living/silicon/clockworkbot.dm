@@ -47,17 +47,6 @@ TYPEINFO(/mob/living/silicon/robot/clockwork)
 			return
 		..()
 
-	uneq_active()
-		if(isnull(src.module_active))
-			return
-		var/slot = module_states.Find(module_active)
-		if (slot)
-			if (istype(module_states[slot], /obj/item/magtractor/clockwork))
-				var/obj/item/magtractor/clockwork/mag = module_states[slot]
-				mag.dropItem()
-			else
-				uneq_slot(slot)
-
 // No welding or pulse tools. They get decon and soldering instead.
 /obj/item/tool/omnitool/clockwork
 	name = "forging tools"

@@ -25,21 +25,8 @@ TYPEINFO(/obj/item/magtractor)
 	var/mob/holder //this is hacky way to get the user without looping through all mobs in process
 	var/processHeld = 0
 	var/highpower = 0 //high power mode (holding during movement)
-	var/pick_up_sound = 'sound/machines/whistlebeep.ogg'
-	var/hold_sound = 'sound/machines/ping.ogg'
-	var/field_color = null
-	var/weight_cap = W_CLASS_BULKY
 
 	var/datum/action/holdAction
-
-	clockwork
-		name = "ancient magtractor"
-		desc = "An ancient device used to pick up and hold objects via the mysterious power of magnets."
-		icon_state = "magtractor-clockwork"
-		highpower = TRUE
-		weight_cap = W_CLASS_HUGE
-		field_color = "#FFF484"
-		pick_up_sound = 'sound/misc/automaton_scratch.ogg'
 
 	New(mob/user)
 		..()
@@ -79,7 +66,7 @@ TYPEINFO(/obj/item/magtractor)
 			boutput(user, SPAN_ALERT("\The [src] is already holding \the [src.holding]!"))
 			return 0
 
-		if (W.anchored || W.w_class >= src.weight_cap)
+		if (W.anchored || W.w_class >= W_CLASS_BULKY) //too bulky for backpacks, too bulky for this
 			boutput(user, SPAN_NOTICE("\The [src] can't possibly hold that heavy an item!"))
 			return 0
 
@@ -115,7 +102,7 @@ TYPEINFO(/obj/item/magtractor)
 				return 0
 			var/obj/item/target = A
 
-			if (target.anchored || target.w_class == src.weight_cap)
+			if (target.anchored || target.w_class == W_CLASS_BULKY) //too bulky for backpacks, too bulky for this
 				boutput(user, SPAN_NOTICE("\The [src] can't possibly hold that heavy an item!"))
 				return 0
 
@@ -169,20 +156,17 @@ TYPEINFO(/obj/item/magtractor)
 
 		var/image/magField = GetOverlayImage("magField")
 		var/msg = "<span class='notice'>You toggle the [src]'s HPM "
-		var/magFieldColor = "#66ebe0"
 		if (src.highpower)
 			if (src.holdAction) src.holdAction.interrupt_flags |= INTERRUPT_MOVE
-			magFieldColor = "#66ebe0" //blue
+			if (magField) magField.color = "#66ebe0" //blue
 			src.highpower = 0
 			msg += "off"
 		else
 			if (src.holdAction) src.holdAction.interrupt_flags &= ~INTERRUPT_MOVE
-			magFieldColor = "#FF4A4A" //red
+			if (magField) magField.color = "#FF4A4A" //red
 			src.highpower = 1
 			msg += "on"
-		if (magField)
-			magField.color = src.field_color ? src.field_color : magFieldColor
-			src.UpdateOverlays(magField, "magField")
+		if (magField) src.UpdateOverlays(magField, "magField")
 		boutput(usr, "[msg].</span>")
 		return 1
 
@@ -217,15 +201,13 @@ TYPEINFO(/obj/item/magtractor)
 		src.processHeld = 1
 		src.w_class = W_CLASS_BULKY //bulky
 		src.useInnerItem = 1
-		src.icon_state = "[src.icon_state]-active"
+		src.icon_state = "magtractor-active"
 
 		src.UpdateOverlays(null, "magField")
 		var/image/I = image('icons/obj/items/items.dmi', "magtractor-field")
 		I.layer = -2
 
-		if (src.field_color)
-			I.color = src.field_color
-		else if (src.highpower)
+		if (src.highpower)
 			I.color = "#FF4A4A" //red
 		else
 			I.color = "#66ebe0" //blue
@@ -233,7 +215,7 @@ TYPEINFO(/obj/item/magtractor)
 		src.UpdateOverlays(I, "magField")
 		src.updateHeldOverlay(W)
 
-		playsound(src.loc, src.hold_sound, 50, 1)
+		playsound(src.loc, 'sound/machines/ping.ogg', 50, 1)
 
 		for (var/obj/ability_button/magtractor_drop/abil in src)
 			abil.icon_state = "mag_drop1"
@@ -272,7 +254,7 @@ TYPEINFO(/obj/item/magtractor)
 
 		for (var/obj/ability_button/magtractor_drop/abil in src)
 			abil.icon_state = "mag_drop0"
-		src.icon_state = initial(src.icon_state)
+		src.icon_state = "magtractor"
 		src.UpdateOverlays(null, "magField")
 		src.updateHeldOverlay()
 		//TODO: playsound, de-power thing

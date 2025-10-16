@@ -1192,10 +1192,9 @@
 	var/obj/item/target = null //This will contain the object we are trying to pick up.
 	var/obj/item/magtractor/picker = null //This is the magpicker.
 
-	New(Target, Picker, Icon)
+	New(Target, Picker)
 		target = Target
 		picker = Picker
-		src.icon_state = "[picker.icon_state]-small"
 		..()
 
 	onUpdate() //check for special conditions that could interrupt the picking-up here.
@@ -1211,7 +1210,7 @@
 			return
 		else
 			picker.working = 1
-			playsound(picker.loc, picker.pick_up_sound, 50, 1)
+			playsound(picker.loc, 'sound/machines/whistlebeep.ogg', 50, 1)
 			boutput(owner, SPAN_NOTICE("\The [picker.name] starts to pick up \the [target]."))
 			if (picker.highpower && isghostdrone(owner))
 				var/mob/living/silicon/ghostdrone/our_drone = owner

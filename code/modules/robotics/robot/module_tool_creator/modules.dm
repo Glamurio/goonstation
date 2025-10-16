@@ -191,7 +191,6 @@
 /datum/robot/module_tool_creator/recursive/module/clockwork
 	definitions = list(
 		/obj/item/tool/omnitool/clockwork,
-		/obj/item/magtractor/clockwork,
 		/datum/robot/module_tool_creator/item_type/amount/copper_tile,
 		/datum/robot/module_tool_creator/item_type/amount/copper_sheet,
 		/datum/robot/module_tool_creator/item_type/amount/steel_rod/copper
