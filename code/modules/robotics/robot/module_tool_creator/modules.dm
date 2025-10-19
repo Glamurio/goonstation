@@ -191,9 +191,10 @@
 /datum/robot/module_tool_creator/recursive/module/clockwork
 	definitions = list(
 		/obj/item/tool/omnitool/clockwork,
-		/datum/robot/module_tool_creator/item_type/amount/copper_tile,
-		/datum/robot/module_tool_creator/item_type/amount/copper_sheet,
-		/datum/robot/module_tool_creator/item_type/amount/steel_rod/copper
+		/obj/item/pocketwatch/antique,
+		/datum/robot/module_tool_creator/item_type/amount/brass_tile,
+		/datum/robot/module_tool_creator/item_type/amount/brass_sheet,
+		/datum/robot/module_tool_creator/item_type/amount/steel_rod/brass
 	)
 
 /datum/robot/module_tool_creator/recursive/module/eyebot

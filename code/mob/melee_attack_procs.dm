@@ -16,6 +16,10 @@
 	if (!istype(M))
 		return
 	src.lastattacked = get_weakref(M)
+	if(HAS_ATOM_PROPERTY(M, PROP_MOB_CAN_BE_CRANKED))
+		if (istype(M.organHolder.heart, /obj/item/organ/heart/clockwork))
+			var/obj/item/organ/heart/clockwork/heart = M.organHolder.heart
+			heart.start_charging(src)
 	if (src != M && M.getStatusDuration("burning")) //help others put out fires!!
 		src.help_put_out_fire(M)
 	else if (src == M && src.getStatusDuration("burning"))

@@ -132,6 +132,9 @@
 				if (prob(30))
 					boutput(donor, SPAN_ALERT("Oh god it's so bad you could choke to death in here!"))
 
+		src.parse_air_temp(breath, update)
+
+	proc/parse_air_temp(datum/gas_mixture/breath, datum/organ_status/lung/update)
 		if (breath.temperature > min(temp_tolerance) && !donor.is_heat_resistant()) // Hot air hurts :(
 			//do scaling *before* the clamp
 			var/lung_burn = ((breath.temperature - temp_tolerance)/100) ** 0.5
@@ -145,7 +148,6 @@
 			update.show_fire_indicator = TRUE
 			if (prob(4))
 				boutput(donor, SPAN_ALERT("Your lungs hurt like hell! This can't be good!"))
-
 
 	disposing()
 		if (holder)
@@ -434,6 +436,52 @@ obj/item/organ/lung/martian
 	organ_name = "martian_lung_R"
 	icon_state = "martian_lung_R"
 	desc = "Oh, look. Lungs, probably. This is a right lung, since it... since you found it on that side, you guess. Hopefully whoever used to have this one doesn't need it anymore."
+	organ_holder_name = "right_lung"
+	body_side = R_ORGAN
+	failure_disease = /datum/ailment/disease/respiratory_failure/right
+
+/obj/item/organ/lung/clockwork
+	name = "clockwork lungs"
+	icon_state = "clockwork_lungs_t"
+	desc = "Brass lungs which have... cogwheels protruding out of them."
+	failure_disease = /datum/ailment/disease/respiratory_failure
+	created_decal = /obj/decal/cleanable/grease
+	default_material = "brass"
+
+	on_life(var/mult = 1)
+		if (!..())
+			return FALSE
+
+		// basically convert steam into bonus stamina regen
+		var/steam_amt = donor.reagents.get_reagent_amount("steam")
+		if((steam_amt > 0))
+			boutput(donor, SPAN_ALERT("This steam is kicking your [src] into action!"))
+			donor.reagents.remove_reagent("steam", steam_amt)
+			donor.changeStatus("steamcharged", steam_amt, optional=null)
+			return
+
+	parse_air_temp(datum/gas_mixture/breath)
+		if (breath.temperature > min(temp_tolerance) && !donor.is_heat_resistant()) // Hot air good :)
+			boutput(donor, SPAN_ALERT("This hot air is kicking your [src] into action!"))
+			var/lung_burn = ((breath.temperature - temp_tolerance)/100) ** 0.5
+			lung_burn = clamp(lung_burn, 0, 10)
+			// amount of hot air scales duration of the status, so you can charge up
+			donor.changeStatus("steamcharged", lung_burn * 10, optional=null)
+
+/obj/item/organ/lung/clockwork/left
+	name = "left clockwork lung"
+	organ_name = "clockwork_lung_L"
+	icon_state = "clockwork_lung_L"
+	desc = "Brass lungs which have... cogwheels protruding out of them. This is a left lung, since it... since you found it on that side, you guess. Hopefully whoever used to have this one doesn't need it anymore."
+	organ_holder_name = "left_lung"
+	body_side = L_ORGAN
+	failure_disease = /datum/ailment/disease/respiratory_failure/left
+
+/obj/item/organ/lung/clockwork/right
+	name = "right clockwork lung"
+	organ_name = "clockwork_lung_R"
+	icon_state = "clockwork_lung_R"
+	desc = "Brass lungs which have... cogwheels protruding out of them. This is a right lung, since it... since you found it on that side, you guess. Hopefully whoever used to have this one doesn't need it anymore."
 	organ_holder_name = "right_lung"
 	body_side = R_ORGAN
 	failure_disease = /datum/ailment/disease/respiratory_failure/right

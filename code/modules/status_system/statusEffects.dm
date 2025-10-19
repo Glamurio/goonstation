@@ -2517,11 +2517,34 @@
 	id = "kinetic_charging"
 	name = "Kinetic Charging"
 	icon_state = "stam+"
+	unique = TRUE
 	maxDuration = null
 
 	getTooltip()
 		. = "You are currently being manually charged."
 
+/datum/statusEffect/steamcharged
+	id = "steam_charged"
+	name = "Steam Charged"
+	icon_state = "steamcharged"
+	maxDuration = null
+	unique = TRUE
+	effect_quality = STATUS_QUALITY_POSITIVE
+	desc = "Your clockwork lungs are charged and providing extra stamina regen."
+	var/const/regen_stam = 5
+	var/mob/living/carbon/human/H
+
+	onAdd(optional=null)
+		. = ..()
+		if (ishuman(owner))
+			H = owner
+			APPLY_ATOM_PROPERTY(H, PROP_MOB_STAMINA_REGEN_BONUS, "steam_charged", regen_stam)
+		else
+			owner.delStatus("steam_charged")
+
+	onRemove()
+		. = ..()
+		REMOVE_ATOM_PROPERTY(H, PROP_MOB_STAMINA_REGEN_BONUS, "steam_charged")
 
 /datum/statusEffect/upgradedisabled
 	id = "upgrade_disabled"

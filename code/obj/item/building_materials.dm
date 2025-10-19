@@ -519,10 +519,10 @@ MATERIAL
 		icon_state = "sheet-m-r_5"
 		default_reinforcement = "steel"
 
-/obj/item/sheet/copper
+/obj/item/sheet/brass
 	item_state = "sheet-metal"
-	default_material = "copper"
-	color = "#B87333"
+	default_material = "brass"
+	color = "#B5A642"
 
 /obj/item/sheet/glass
 	icon_state = "sheet-g_5" //overriden in-game but shows up in map editors
@@ -942,8 +942,8 @@ MATERIAL
 /obj/item/rods/steel
 	default_material = "steel"
 
-/obj/item/rods/copper
-	default_material = "copper"
+/obj/item/rods/brass
+	default_material = "brass"
 
 /obj/item/rods/mauxite
 	icon_state = "rods_5$$mauxite"
@@ -1112,9 +1112,9 @@ MATERIAL
 	default_material = "steel"
 	color = "#8C8C8C"
 
-/obj/item/tile/copper
-	default_material = "copper"
-	color = "#B87333"
+/obj/item/tile/brass
+	default_material = "brass"
+	color = "#B5A642"
 
 /obj/item/tile/cardboard // for drones
 	desc = "They keep the floor in a good and walkable condition. At least, they would if they were actually made of steel."

@@ -23,6 +23,7 @@ TYPEINFO(/mob/living/silicon/robot/clockwork)
 			var/obj/machinery/lawrack/hephaestus/rack = new /obj/machinery/lawrack/hephaestus()
 			ticker?.ai_law_rack_manager.register_new_rack(rack)
 		..()
+		src.part_chest.cell = new /obj/item/cell/ambrosium/charged(src.part_chest)
 		src.freemodule = FALSE
 		src.set_module(new /obj/item/robot_module/clockwork(src))
 		if(length(src.upgrades) < src.max_upgrades)

@@ -1594,16 +1594,15 @@ TYPEINFO(/mob/living/silicon/robot)
 					actions.interrupt(src, INTERRUPT_ATTACKED)
 				switch(user.a_intent)
 					if(INTENT_HELP) //Friend person
-						var/obj/item/roboupgrade/windup/charger = null
-						for (var/obj/item/roboupgrade/R in src.upgrades)
-							if (!istype(R, /obj/item/roboupgrade/windup))
-								continue
-							charger = R
-						if(charger)
-							if(charger.activated)
-								charger.start_charging(user, src)
-							else
-								boutput(user, "[src]'s [charger.actual_name] has been deactivated. You can't crank it!")
+						if(HAS_ATOM_PROPERTY(src, PROP_MOB_CAN_BE_CRANKED))
+							for (var/obj/item/roboupgrade/R in src.upgrades)
+								if (!istype(R, /obj/item/roboupgrade/windup))
+									continue
+								var/obj/item/roboupgrade/windup/crank = R
+								if(crank.activated)
+									crank.start_charging(user, src)
+								else
+									boutput(user, "[src]'s [crank.actual_name] has been deactivated. You can't crank it!")
 						else // Just bap
 							playsound(src.loc, 'sound/impact_sounds/Generic_Shove_1.ogg', 50, 1, -2)
 							user.visible_message(SPAN_NOTICE("[user] gives [src] a [pick_string("descriptors.txt", "borg_pat")] pat on the [pick("back", "head", "shoulder")]."))
@@ -3504,7 +3503,7 @@ TYPEINFO(/mob/living/silicon/robot)
 		if (!src.part_chest)
 			src.part_chest = new/obj/item/parts/robot_parts/chest/clockwork(src)
 			src.part_chest.wires = 1
-			src.part_chest.cell = new/obj/item/cell/cerenkite/charged(src.part_chest)
+			src.part_chest.cell = new/obj/item/cell/ambrosium/charged(src.part_chest)
 			src.cell = src.part_chest.cell
 		if (!src.part_head) src.part_head = new/obj/item/parts/robot_parts/head/clockwork(src)
 		if (!src.part_arm_l) src.part_arm_l = new/obj/item/parts/robot_parts/arm/left/clockwork(src)

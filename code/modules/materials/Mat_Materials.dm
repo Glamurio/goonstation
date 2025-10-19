@@ -640,6 +640,22 @@ ABSTRACT_TYPE(/datum/material/metal)
 		setProperty("density", 2)
 		setProperty("hard", 1)
 
+/datum/material/metal/brass
+	mat_id = "brass"
+	name = "brass"
+	desc = "Brass is the union of copper and zinc, which is notoriously difficult to obtain because of Dan's monopoly on zinc."
+	color = list(0.882, 0.757, 0.431, 0.00,\
+				0.710, 0.651, 0.259, 0.00,\
+				0.596, 0.490, 0.188, 0.00,\
+				0.00, 0.00, 0.00, 1.00,\
+				0.00, 0.00, 0.00, 0.00)
+	New()
+		..()
+		setProperty("electrical", 4)
+		setProperty("thermal", 5)
+		setProperty("density", 3)
+		setProperty("hard", 2)
+		setProperty("chemical", 3)
 
 /datum/material/metal/pharosium
 	mat_id = "pharosium"

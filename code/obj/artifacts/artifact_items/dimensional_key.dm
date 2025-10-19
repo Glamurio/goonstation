@@ -78,7 +78,7 @@
 	type_name = "Dimensional Key"
 	type_size = ARTIFACT_SIZE_TINY
 	rarity_weight = 200
-	validtypes = list("eldritch", "precursor", "clockwork")
+	validtypes = list("eldritch", "precursor")
 	react_xray = list(73, 90, 38, 4, "ANOMALOUS")
 	examine_hint = "It kinda looks like it's supposed to be inserted into something."
 

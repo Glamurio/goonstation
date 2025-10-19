@@ -278,3 +278,40 @@ TYPEINFO(/obj/item/organ/kidney/cyber)
 	failure_disease = /datum/ailment/disease/kidney_failure/left
 	created_decal = /obj/decal/cleanable/martian_viscera/fluid
 	default_material = "viscerite"
+
+/obj/item/organ/kidney/clockwork
+	name = "clockwork kidney"
+	desc = "A brass object that you THINK is a kidney."
+	organ_name = "clockwork_kidney"
+	organ_holder_name = "right_kidney"
+	icon_state = "clockwork_kidney"
+	created_decal = /obj/decal/cleanable/grease
+	default_material = "brass"
+
+	on_life(var/mult = 1)
+		if (!..())
+			return FALSE
+		if(!donor.reagents)
+			return TRUE
+		// while water is in your system, chance to heal tox
+		if((donor.reagents.get_reagent_amount("water") > 0))
+			if (prob(50))
+				donor.take_toxin_damage(-1 * mult)
+			return
+
+/obj/item/organ/kidney/clockwork/right
+	name = "right soft chunk"
+	desc = "A brass object that you THINK is a kidney. This is the one on the right."
+	organ_name = "clockwork_kidney_R"
+	icon_state = "clockwork_kidney_R"
+	body_side = R_ORGAN
+	failure_disease = /datum/ailment/disease/kidney_failure/right
+
+/obj/item/organ/kidney/clockwork/left
+	name = "left clockwork kidney"
+	desc = "A brass object that you THINK is a kidney. This is the one on the left."
+	organ_name = "clockwork_kidney_L"
+	organ_holder_name = "left_kidney"
+	icon_state = "clockwork_kidney_L"
+	body_side = L_ORGAN
+	failure_disease = /datum/ailment/disease/kidney_failure/left

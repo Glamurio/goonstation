@@ -37,6 +37,16 @@
 	"Service Bell Ring Counter",
 	"Timer")
 
+	antique
+		desc = "An antique pocketwatch with an analog display. Somehow still accurate after all this time."
+		clock_modes = list("Time Keeping", "Step Counter", "Timer")
+
+		emag_act()
+			return
+
+		the_bell_has_been_rung()
+			return
+
 	New()
 		START_TRACKING
 		processing_items.Add(src)

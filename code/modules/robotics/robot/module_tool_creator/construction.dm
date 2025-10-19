@@ -32,9 +32,9 @@
 	amount = 200
 	item_type = /obj/item/rods/steel
 
-	copper
-		name = "copper rods"
-		item_type = /obj/item/rods/copper
+	brass
+		name = "brass rods"
+		item_type = /obj/item/rods/brass
 
 /datum/robot/module_tool_creator/item_type/amount/steel_rod/setup(obj/item/rods/steel/I)
 	..()

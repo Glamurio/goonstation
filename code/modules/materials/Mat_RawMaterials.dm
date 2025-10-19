@@ -241,6 +241,11 @@
 	default_material = "copper"
 	icon_state = "bar"
 
+/obj/item/material_piece/brass
+	desc = "A processed bar of brass, made from copper and zinc."
+	default_material = "brass"
+	icon_state = "bar"
+
 /obj/item/material_piece/iridiumalloy
 	icon = 'icons/obj/items/materials/iridium.dmi'
 	name = "plate"

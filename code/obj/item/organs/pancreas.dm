@@ -89,3 +89,21 @@ TYPEINFO(/obj/item/organ/pancreas/cyber)
 	icon_state = "martian_pancreas"
 	created_decal = /obj/decal/cleanable/martian_viscera/fluid
 	default_material = "viscerite"
+
+/obj/item/organ/pancreas/clockwork
+	name = "clockwork pancreas"
+	desc = "A brass pancreas. Kind of looks like a frog? Weird."
+	icon_state = "clockwork_pancreas"
+	created_decal = /obj/decal/cleanable/grease
+	default_material = "brass"
+
+	on_life(var/mult = 1)
+		if (!..())
+			return FALSE
+		if(!donor.reagents)
+			return TRUE
+		// converts sugar into saline & heparin
+		if((donor.reagents.get_reagent_amount("sugar") >= 20))
+			donor.reagents.add_reagent("saline", 1 * mult)
+			donor.reagents.add_reagent("heparin", 1 * mult)
+			donor.reagents.remove_reagent("sugar", 1 * mult * 2)

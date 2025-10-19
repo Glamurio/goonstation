@@ -49,6 +49,14 @@
 	genrate = 2
 	specialicon = 1
 
+/obj/item/cell/ambrosium
+	name = "ambrosium power cell"
+	desc = "An ancient energy cell, powered by ambrosium. Most of wizard tech runs on this, but how to make it is lost knowledge."
+	icon_state = "ambrocell"
+	maxcharge = 100000
+	genrate = 5
+	specialicon = 1
+
 /obj/item/cell/shell_cell
 	name = "AI shell power cell"
 	desc = "A rechargeable electrochemical power cell. It's made for AI shells."
@@ -111,6 +119,9 @@
 
 /obj/item/cell/hypercell/charged
 	charge = 25000
+
+/obj/item/cell/ambrosium/charged
+	charge = 100000
 
 /obj/item/cell/New()
 	..()

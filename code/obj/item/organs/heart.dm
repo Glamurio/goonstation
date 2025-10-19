@@ -206,3 +206,42 @@ TYPEINFO(/obj/item/organ/heart/cyber)
 	icon_state = "heart_martian"
 	created_decal = /obj/decal/cleanable/martian_viscera/fluid
 	default_material = "viscerite"
+
+/obj/item/organ/heart/clockwork
+	name = "clockwork heart"
+	desc = "A metallic heart made from brass. You can hear a faint ticking noise."
+	icon_state = "heart_clockwork"
+	item_state = "heart_clockwork"
+	edible = 0
+	robotic = 1
+	created_decal = /obj/decal/cleanable/grease
+	default_material = "brass"
+	transplant_XP = 10
+	squeeze_sound = 'sound/voice/screams/clockwork_scream.ogg'
+	var/obj/item/cell/cell
+	var/windup_duration = 2 SECONDS
+
+	New()
+		..()
+		src.cell = new /obj/item/cell/ambrosium/charged(src)
+
+	proc/start_charging(mob/user)
+		if (!donor) // no guy, no charge
+			return
+		logTheThing(LOG_STATION, user, "[user] starts manually charging [src].")
+		if (src.cell.charge == src.cell.maxcharge)
+			boutput(user, "[donor]'s [src] is fully charged, there's no need to crank it!")
+		else
+			user.visible_message(SPAN_NOTICE("[user] starts cranking [donor]'s [src]."))
+			actions.start(new /datum/action/bar/icon/windup_action(src, user, donor, src.cell, src.windup_duration), user)
+
+	on_transplant(mob/M)
+		..()
+		APPLY_ATOM_PROPERTY(M, PROP_MOB_CAN_BE_CRANKED, src)
+
+	on_removal()
+		..()
+		REMOVE_ATOM_PROPERTY(donor, PROP_MOB_CAN_BE_CRANKED, src)
+
+	emp_act()
+		..()
