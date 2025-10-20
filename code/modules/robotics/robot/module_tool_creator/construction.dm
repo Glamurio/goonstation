@@ -47,17 +47,17 @@
 	amount = 200
 	item_type = /obj/item/sheet/steel
 
-/datum/robot/module_tool_creator/item_type/amount/copper_sheet
-		name = "copper sheets"
+/datum/robot/module_tool_creator/item_type/amount/brass_sheet
+		name = "brass sheets"
 		amount = 200
-		item_type = /obj/item/sheet/copper
+		item_type = /obj/item/sheet/brass
 
 /datum/robot/module_tool_creator/item_type/amount/steel_tile
 	name = "steel tiles"
 	amount = 200
 	item_type = /obj/item/tile/steel
 
-/datum/robot/module_tool_creator/item_type/amount/copper_tile
-	name = "copper tiles"
+/datum/robot/module_tool_creator/item_type/amount/brass_tile
+	name = "brass tiles"
 	amount = 200
-	item_type = /obj/item/tile/copper
+	item_type = /obj/item/tile/brass
