@@ -38,6 +38,7 @@
 	"Timer")
 
 	antique
+		name = "antique watch"
 		desc = "An antique pocketwatch with an analog display. Somehow still accurate after all this time."
 		clock_modes = list("Time Keeping", "Step Counter", "Timer")
 

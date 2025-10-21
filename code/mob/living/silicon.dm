@@ -730,6 +730,9 @@ var/global/list/module_editors = list()
 	preCheck(atom/A)
 		if (!issilicon(A))
 			return FALSE
+		else if (isrobot(A))
+			var/mob/living/silicon/robot/R = A
+			src.power_alarm_sound = R.sound_sad_robot
 		. = ..()
 
 	onAdd(optional)
@@ -764,6 +767,9 @@ var/global/list/module_editors = list()
 	preCheck(atom/A)
 		if (!issilicon(A))
 			return FALSE
+		else if (isrobot(A))
+			var/mob/living/silicon/robot/R = A
+			src.power_alarm_sound = R.sound_sad_robot
 		. = ..()
 
 	onAdd(optional)

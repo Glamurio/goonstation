@@ -8,9 +8,11 @@ TYPEINFO(/mob/living/silicon/robot/clockwork)
 	voice_type = "clockwork"
 	icon_state = "clockborg"
 	sound_scream = 'sound/voice/screams/clockwork_scream.ogg'
+	sound_birdwell =  'sound/voice/GramophoneBirdwell.ogg'
 	scream_instrument_type = /obj/item/instrument/roboscream/clockwork
-	sound_flip1 = 'sound/machines/whistlealert.ogg'
-	sound_flip2 = 'sound/machines/whistlebeep.ogg'
+	sound_flip1 = 'sound/misc/cuckoo_clock1.ogg'
+	sound_flip2 = 'sound/misc/cuckoo_clock2.ogg'
+	sound_sad_robot = 'sound/misc/grandfathertock.ogg'
 	health = 300
 	emaggable = FALSE
 	syndicate_possible = 0

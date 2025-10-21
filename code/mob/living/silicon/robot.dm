@@ -72,6 +72,7 @@ TYPEINFO(/mob/living/silicon/robot)
 	var/metalman_skin = 0	//mbc : i'm getting tired of copypasting this, i promise to fix this somehow next time i add a cyborg skin ok
 
 	sound_fart = 'sound/voice/farts/poo2_robot.ogg'
+	var/sound_birdwell = 'sound/vox/birdwell.ogg'
 	var/sound_automaton_scratch = 'sound/misc/automaton_scratch.ogg'
 	var/sound_automaton_ratchet = 'sound/misc/automaton_ratchet.ogg'
 	var/sound_automaton_tickhum = 'sound/misc/automaton_tickhum.ogg'
@@ -533,7 +534,7 @@ TYPEINFO(/mob/living/silicon/robot)
 
 			if ("birdwell", "burp")
 				if (src.emote_check(voluntary, 50))
-					playsound(src.loc, 'sound/vox/birdwell.ogg', 50, 1, 0, vocal_pitch, channel=VOLUME_CHANNEL_EMOTE) // vocal pitch added
+					playsound(src.loc, src.sound_birdwell, 50, 1, 0, vocal_pitch, channel=VOLUME_CHANNEL_EMOTE) // vocal pitch added
 					message = "<b>[used_name]</b> birdwells."
 
 			if ("scream")
