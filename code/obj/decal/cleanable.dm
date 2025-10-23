@@ -1064,18 +1064,18 @@ var/list/blood_decal_violent_icon_states = list("floor1", "floor2", "floor3", "f
 		src.name = "dried [src.real_name]"
 		src.desc = "It's all gummy. Ew."
 
-/obj/decal/cleanable/grease
-	name = "grease"
-	desc = "Great for slipping on. You think."
-	icon = 'icons/effects/water.dmi'
+/obj/decal/cleanable/copper
+	name = "copper"
+	desc = "That's metal. Literally, it's copper."
+	icon = 'icons/obj/decals/blood/blood.dmi'
 	icon_state = "floor1"
-	random_icon_states = list("floor1", "floor2", "floor3")
-	color = "#C2B280"
-	slippery = 90
+	random_icon_states = list("floor1", "floor2", "floor3", "floor4", "floor5", "floor6", "floor7")
+	color = "#C68346"
+	slippery = 0
 	can_sample = 1
-	sample_reagent = "grease"
+	sample_reagent = "copper"
 	sample_amt = 5
-	stain = /datum/stain/slime
+	stain = /datum/stain/dirt
 
 /obj/decal/cleanable/generic
 	name = "clutter"

@@ -241,3 +241,23 @@ TYPEINFO(/obj/item/organ/stomach/cyber)
 	icon_state = "martian_stomach"
 	created_decal = /obj/decal/cleanable/martian_viscera/fluid
 	default_material = "viscerite"
+
+/obj/item/organ/stomach/clockwork
+	name = "clockwork stomach"
+	desc = "Either a stomach, or a motor engine. You're not sure which."
+	icon_state = "clockwork_stomach"
+	created_decal = /obj/decal/cleanable/copper
+	default_material = "brass"
+	capacity = 10
+
+	// Breaks down biological matter via alchemical process
+	handle_digestion(mult = 1)
+		if (prob(50))
+			donor.reagents.add_reagent("omnizine", 1 * mult)
+		if (prob(50))
+			donor.reagents.add_reagent("copper", 1 * mult)
+		// Stomach gets overworked, overheats
+		if (src.capacity >= 10)
+			donor.TakeDamage("Chest", 0, 1 * mult)
+			donor.reagents.add_reagent("steam", 1 * mult)
+		..()

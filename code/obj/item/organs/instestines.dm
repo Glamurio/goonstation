@@ -97,3 +97,33 @@ TYPEINFO(/obj/item/organ/intestines/cyber)
 	icon_state = "martian_intestines"
 	created_decal = /obj/decal/cleanable/martian_viscera/fluid
 	default_material = "viscerite"
+
+/obj/item/organ/intestines/clockwork
+	name = "clockwork intestines"
+	desc = "Some gears clumped together, wrapped in metal... are these supposed to be intestines?"
+	icon_state = "clockwork_intestines"
+	created_decal = /obj/decal/cleanable/copper
+	default_material = "brass"
+	var/target_organs = list("left_lung", "right_lung", "left_kidney", "right_kidney", "liver", "stomach", "spleen", "pancreas", "appendix")
+
+	on_life(var/mult = 1)
+		if (!..())
+			return FALSE
+
+		// Heals other organs with excess food, but damages itself when overeating
+		// If heavily damaged, starts damaging other organs
+		if (src.get_damage() >= src.fail_damage)
+			if (prob(33))
+				var/organ = pick(src.target_organs)
+				if (prob(33))
+					boutput(donor, SPAN_COMBAT("Oh god, you feel your organs churning..."))
+					playsound(src, 'sound/items/mining_drill.ogg', 40, TRUE)
+					donor.emote("twitch")
+				donor.organHolder.damage_organ(5 * mult, 0, 0, organ)
+			return
+		var/obj/item/organ/stomach/tummy = donor.get_organ("stomach")
+		var/fullness_ratio = tummy.calculate_fullness() / tummy.capacity
+		if (fullness_ratio >= 0.7)
+			src.take_damage(3 * mult)
+		else if (fullness_ratio >= 0.3)
+			donor.organHolder.heal_organs(1 * mult, 1 * mult, 1 * mult, src.target_organs)

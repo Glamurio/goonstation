@@ -89,3 +89,25 @@ TYPEINFO(/obj/item/organ/appendix/cyber)
 	icon_state = "martian_appendix"
 	created_decal = /obj/decal/cleanable/martian_viscera/fluid
 	default_material = "viscerite"
+
+/obj/item/organ/appendix/clockwork
+	name = "clockwork appendix"
+	desc = "An small brass object that resembles an appendix, if you really squint your eyes."
+	icon_state = "clockwork_appendix"
+	created_decal = /obj/decal/cleanable/copper
+	default_material = "brass"
+
+	on_life(var/mult = 1)
+		if (!..())
+			return FALSE
+		// Basically a temperature regulator, but damages on overheat
+		if(donor.bodytemperature < T0C)
+			donor.reagents.add_reagent("teporone", 5 * mult)
+			donor.reagents.add_reagent("steam", 5 * mult)
+		else if(donor.bodytemperature < T20C)
+			donor.reagents.add_reagent("teporone", 1 * mult)
+			donor.reagents.add_reagent("steam", 1 * mult)
+		else if(donor.bodytemperature >= donor.base_body_temp * 2)
+			donor.reagents.add_reagent("teporone", 1 * mult)
+			src.take_damage(0, 1, 0)
+		return TRUE

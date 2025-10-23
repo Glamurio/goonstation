@@ -445,7 +445,7 @@ obj/item/organ/lung/martian
 	icon_state = "clockwork_lungs_t"
 	desc = "Brass lungs which have... cogwheels protruding out of them."
 	failure_disease = /datum/ailment/disease/respiratory_failure
-	created_decal = /obj/decal/cleanable/grease
+	created_decal = /obj/decal/cleanable/copper
 	default_material = "brass"
 
 	on_life(var/mult = 1)

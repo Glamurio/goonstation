@@ -94,7 +94,7 @@ TYPEINFO(/obj/item/organ/pancreas/cyber)
 	name = "clockwork pancreas"
 	desc = "A brass pancreas. Kind of looks like a frog? Weird."
 	icon_state = "clockwork_pancreas"
-	created_decal = /obj/decal/cleanable/grease
+	created_decal = /obj/decal/cleanable/copper
 	default_material = "brass"
 
 	on_life(var/mult = 1)

@@ -585,3 +585,16 @@ TYPEINFO(/obj/item/organ/eye/cyber/monitor)
 	created_decal = null
 	default_material = "glass"
 	blood_reagent = null
+
+/obj/item/organ/eye/clockwork
+	name = "clockwork eye"
+	organ_name = "clockwork eye"
+	desc = "Yeah, okay, I mean this is basically more telescope than eye."
+	icon_state = "eye-clockwork"
+	edible = FALSE
+	iris_state_override = "eye"
+	iris_color = "#0f0f0f"
+	show_on_examine = TRUE
+	created_decal = /obj/decal/cleanable/copper
+	default_material = "brass"
+	organ_abilities = list(/obj/ability_button/toggle_scope)

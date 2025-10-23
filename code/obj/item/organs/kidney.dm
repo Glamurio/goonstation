@@ -285,7 +285,7 @@ TYPEINFO(/obj/item/organ/kidney/cyber)
 	organ_name = "clockwork_kidney"
 	organ_holder_name = "right_kidney"
 	icon_state = "clockwork_kidney"
-	created_decal = /obj/decal/cleanable/grease
+	created_decal = /obj/decal/cleanable/copper
 	default_material = "brass"
 
 	on_life(var/mult = 1)

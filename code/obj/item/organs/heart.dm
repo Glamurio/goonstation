@@ -214,7 +214,7 @@ TYPEINFO(/obj/item/organ/heart/cyber)
 	item_state = "heart_clockwork"
 	edible = 0
 	robotic = 1
-	created_decal = /obj/decal/cleanable/grease
+	created_decal = /obj/decal/cleanable/copper
 	default_material = "brass"
 	transplant_XP = 10
 	squeeze_sound = 'sound/voice/screams/clockwork_scream.ogg'

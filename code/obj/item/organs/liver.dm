@@ -104,3 +104,28 @@ TYPEINFO(/obj/item/organ/liver/cyber)
 	icon_state = "martian_liver"
 	created_decal = /obj/decal/cleanable/martian_viscera/fluid
 	default_material = "viscerite"
+
+/obj/item/organ/liver/clockwork
+	name = "clockwork liver"
+	desc = "This looks less like a liver, and more like part of a machine..."
+	icon_state = "clockwork_liver"
+	created_decal = /obj/decal/cleanable/copper
+	default_material = "brass"
+	var/heat = 0
+
+	on_life(var/mult = 1)
+		if (!..())
+			return FALSE
+		// Heals TOX damage while building heat, if the heat gets too high, it starts burning internally
+		if (donor.get_toxin_damage() > 0)
+			donor.HealDamage("All", 0, 0, 1 * mult)
+			src.heat++
+		if (src.heat >= 100)
+			donor.TakeDamage("All", 0, 20 * mult)
+			boutput(donor, SPAN_COMBAT("Ow! Something inside your body burns you pretty badly!"))
+			src.heat -= 20
+		// Slowly decrease heat overtime
+		if (prob(10))
+			src.heat--
+		clamp(heat, 0, 100)
+		return TRUE

@@ -76,3 +76,23 @@ TYPEINFO(/obj/item/organ/spleen/cyber)
 	icon_state = "martian_spleen"
 	created_decal = /obj/decal/cleanable/martian_viscera/fluid
 	default_material = "viscerite"
+
+/obj/item/organ/spleen/clockwork
+	name = "clockwork spleen"
+	desc = "A screw. Wait, no, it's actually a spleen. Huh."
+	icon_state = "clockwork_spleen"
+	created_decal = /obj/decal/cleanable/copper
+	default_material = "brass"
+
+	on_life(var/mult = 1)
+		..()
+		if (!donor.reagents)
+			return TRUE
+
+		// Converts metals into chems
+		var/list/metals = list("copper", "iron")
+		for (var/metal in metals)
+			donor.reagents.add_reagent("spaceacillin", 1 * mult)
+			donor.reagents.add_reagent("saline", 1 * mult)
+			donor.reagents.add_reagent("salbutamol", 1 * mult)
+			donor.reagents.remove_reagent(metal, 5 * mult)

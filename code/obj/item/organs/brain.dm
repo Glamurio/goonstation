@@ -191,3 +191,10 @@
 	name = "amphibian brain"
 	desc = "A frog brain. Look at the size of those optic lobes!"
 	icon_state = "amphibian_brain"
+
+/obj/item/organ/brain/clockwork
+	name = "clockwork brain"
+	desc = "A clockwork brain. Including temperature gauge and everything!"
+	icon_state = "clockwork_brain"
+	created_decal = /obj/decal/cleanable/copper
+	default_material = "brass"
